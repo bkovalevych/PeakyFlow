@@ -51,22 +51,22 @@
         }
     }
 
+    
 
-
-    public abstract record FinancialFlowEntry(string Name, int Amount)
+    public abstract record FinancialFlowEntry(string Name, int Amount, string? FinancialEntryId = null)
     {
         public virtual int Value => Amount;
     }
 
-    public record ExpenseFlowEntry(string Name, int Amount) : FinancialFlowEntry(Name, Amount)
+    public record ExpenseFlowEntry(string Name, int Amount, string? FinancialEntryId = null) : FinancialFlowEntry(Name, Amount, FinancialEntryId)
     {
         public override int Value => -Amount;
     }
 
-    public record IncomeFlowEntry(string Name, int Amount) : FinancialFlowEntry(Name, Amount);
+    public record IncomeFlowEntry(string Name, int Amount, string? FinancialEntryId = null) : FinancialFlowEntry(Name, Amount, FinancialEntryId);
 
 
-    public abstract record FinancialEntry(string FinancialEntryInfoId, string Name, int Amount)
+    public abstract record FinancialEntry(string Id, string FinancialEntryInfoId, string Name, int Amount)
     {
         public virtual int Value => Amount;
 
@@ -75,32 +75,42 @@
             return info.EntryType switch
             {
                 FinancialEntryInfo.FinancialType.Countable => 
-                    InitEntry(Name, -details.ExpensesForOneChild * (playerState?.Children ?? 0)),
+                    InitEntry(Name, -details.ExpensesForOneChild * (playerState?.Children ?? 0), Id),
                 FinancialEntryInfo.FinancialType.Percent => 
-                    InitEntry(Name, (int)((info.Percent ?? 0) / 100.0  * Value)),
+                    InitEntry(Name, (int)((info.Percent ?? 0) / 100.0  * Value), Id),
                 _ => null
             };
         }
 
-        private static FinancialFlowEntry InitEntry(string name, int value)
+        private static FinancialFlowEntry InitEntry(string name, int value, string? financialEntryId = null)
         {
             if (value < 0)
             {
-                return new ExpenseFlowEntry(name, -value);
+                return new ExpenseFlowEntry(name, -value, financialEntryId);
             }
 
-            return new IncomeFlowEntry(name, value);
+            return new IncomeFlowEntry(name, value, financialEntryId);
         }
     }
 
-    public record LiabilityEntry(string FinancialEntryInfoId, string Name, int Amount) 
-        : FinancialEntry(FinancialEntryInfoId, Name, Amount)
+    public record LiabilityEntry(string Id, string FinancialEntryInfoId, string Name, int Amount) 
+        : FinancialEntry(Id, FinancialEntryInfoId, Name, Amount)
     {
         public override int Value => -Amount;
     }
 
-    public record AssetEntry(string FinancialEntryInfoId, string Name, int Amount) 
-        : FinancialEntry(FinancialEntryInfoId, Name, Amount);
-
+    public record AssetEntry(string Id, string FinancialEntryInfoId, string Name, int Amount, AssetEntry.AssetType AssetEntryType, int? Count, int? Price) 
+        : FinancialEntry(Id, FinancialEntryInfoId, Name, Amount)
+    {
+        public enum AssetType
+        {
+            Default,
+            Savings,
+            Stock,
+            Business,
+            RealEstate
+        }
+    }
+    
     public record RoomInfo(string Id, string Name, string? Password);
 }
