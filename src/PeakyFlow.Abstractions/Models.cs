@@ -25,92 +25,55 @@
     public record PlayerState(string PalyerId, int Savings, int ShouldSkeepTurns, int CanRaiseTwoDices, int Children, int Place);
 
     public record PlayerRole(string Id, string Name, string? ImageId, string Description, 
-        PlayerRoleDetails Details, 
-        IEnumerable<AssetEntry> Assets, 
-        IEnumerable<LiabilityEntry> Liabilities,
-        IEnumerable<IncomeFlowEntry> Incomes,
-        IEnumerable<ExpenseFlowEntry> Expenses)
+        IEnumerable<CountableLiabilityItem> CountableLiabilities, 
+        IEnumerable<PercentableLiabilityItem> PercentableLiabilities,
+        IEnumerable<StockItem> Stocks,
+        IEnumerable<FinancialItem> FinancialItems)
     {
-        private IEnumerable<FinancialFlowEntry> Flows => new List<FinancialFlowEntry>().Union(Incomes).Union(Expenses);
+        private IEnumerable<FinancialItemBase> Flows => new List<FinancialItemBase>()
+            .Union(CountableLiabilities)
+            .Union(PercentableLiabilities)
+            .Union(Stocks)
+            .Union(FinancialItems);
 
-        public int CashFlow => Flows.Sum(x => x.Value);
-        
-        public bool IsBankrupt => CashFlow < 0; 
+        public PlayerRoleDetails PlayerRoleDetails => new PlayerRoleDetails(
+            Flows.Where(x => x.FinancialType == FinancialType.Salary).Sum(x => x.FlowAmount),
+            Flows.Where(x => x.FlowAmount < 0).Sum(x => -x.FlowAmount),
+            Flows.Where(x => x.FlowAmount > 0).Sum(x => x.FlowAmount),
+            Flows.Sum(x => x.FlowAmount),
+            Flows.Where(x => x.FinancialType == FinancialType.Savings).Sum(x => x.AssetAmount),
+            CountableLiabilities.Where(x => x.FinancialType == FinancialType.ChildrenExpenses).Sum(x => x.PriceForOne));
+
+        public bool IsBankrupt => PlayerRoleDetails.CashFlow < 0; 
     }
 
-    public record PlayerRoleDetails(int Salary, int InitialSavings, int ExpensesForOneChild);
-
-    public record FinancialEntryInfo(string Id, string Name, int Order, 
-        FinancialEntryInfo.FinancialType? EntryType, int? Percent)
-    {
-        public enum FinancialType 
-        {
-           Default,
-           Countable,
-           Percent
-        }
-    }
+    public record PlayerRoleDetails(int Salary, int Expenses, int Income, int CashFlow, int InitialSavings, int ExpensesForOneChild);
 
     
 
-    public abstract record FinancialFlowEntry(string Name, int Amount, string? FinancialEntryId = null)
+    public enum FinancialType
     {
-        public virtual int Value => Amount;
+        Others,
+        Savings,
+        Salary,
+        ChildrenExpenses,
+        Stock,
+        Business,
+        RealEstate,
+        Loan,
+        Taxes
     }
 
-    public record ExpenseFlowEntry(string Name, int Amount, string? FinancialEntryId = null) : FinancialFlowEntry(Name, Amount, FinancialEntryId)
-    {
-        public override int Value => -Amount;
-    }
+    public abstract record FinancialItemBase(string Id, string Name, FinancialType FinancialType, int AssetAmount, int LiabilityAmount, int FlowAmount);
 
-    public record IncomeFlowEntry(string Name, int Amount, string? FinancialEntryId = null) : FinancialFlowEntry(Name, Amount, FinancialEntryId);
+    public record FinancialItem(string Id, string Name, FinancialType FinancialType, int AssetAmount, int LiabilityAmount, int FlowAmount)
+        : FinancialItemBase(Id, Name, FinancialType, AssetAmount, LiabilityAmount, FlowAmount);
 
+    public record CountableLiabilityItem(string Id, string Name, FinancialType FinancialType, int Count, int PriceForOne) : FinancialItemBase(Id, Name, FinancialType, 0, 0, - PriceForOne * Count);
 
-    public abstract record FinancialEntry(string Id, string FinancialEntryInfoId, string Name, int Amount)
-    {
-        public virtual int Value => Amount;
+    public record PercentableLiabilityItem(string Id, string Name, FinancialType FinancialType, int LiabilityAmount, int Percent) : FinancialItemBase(Id, Name, FinancialType, 0, LiabilityAmount, (int)Math.Round(- LiabilityAmount * Percent / 100f, 0));
 
-        public FinancialFlowEntry? GetFinancialFlowEntryByInfo(FinancialEntryInfo info, PlayerRoleDetails details, PlayerState? playerState)
-        {
-            return info.EntryType switch
-            {
-                FinancialEntryInfo.FinancialType.Countable => 
-                    InitEntry(Name, -details.ExpensesForOneChild * (playerState?.Children ?? 0), Id),
-                FinancialEntryInfo.FinancialType.Percent => 
-                    InitEntry(Name, (int)((info.Percent ?? 0) / 100.0  * Value), Id),
-                _ => null
-            };
-        }
+    public record StockItem(string Id, string Name, FinancialType FinancialType, int Count, int PriceForOne) : FinancialItemBase(Id, Name, FinancialType, 0, 0, PriceForOne * Count);
 
-        private static FinancialFlowEntry InitEntry(string name, int value, string? financialEntryId = null)
-        {
-            if (value < 0)
-            {
-                return new ExpenseFlowEntry(name, -value, financialEntryId);
-            }
-
-            return new IncomeFlowEntry(name, value, financialEntryId);
-        }
-    }
-
-    public record LiabilityEntry(string Id, string FinancialEntryInfoId, string Name, int Amount) 
-        : FinancialEntry(Id, FinancialEntryInfoId, Name, Amount)
-    {
-        public override int Value => -Amount;
-    }
-
-    public record AssetEntry(string Id, string FinancialEntryInfoId, string Name, int Amount, AssetEntry.AssetType AssetEntryType, int? Count, int? Price) 
-        : FinancialEntry(Id, FinancialEntryInfoId, Name, Amount)
-    {
-        public enum AssetType
-        {
-            Default,
-            Savings,
-            Stock,
-            Business,
-            RealEstate
-        }
-    }
-    
     public record RoomInfo(string Id, string Name, string? Password);
 }
