@@ -76,4 +76,38 @@
     public record StockItem(string Id, string Name, FinancialType FinancialType, int Count, int PriceForOne) : FinancialItemBase(Id, Name, FinancialType, 0, 0, PriceForOne * Count);
 
     public record RoomInfo(string Id, string Name, string? Password);
+
+    public record Card(
+        string Id, 
+        string Name,
+        string Group,
+        CardType CardType,
+        bool Required,
+        string Condition,
+        string Header,
+        string Description,
+        string Footer,
+        string TradingRange,
+        int Cost,
+        int Mortgage, 
+        int DownPay,
+        int CashFlow,
+        StockAction StockAction 
+        );
+
+    public enum CardType
+    {
+        Default,
+        BigDeal,
+        SmallDeal,
+        MoneyToTheWind,
+        Market
+    }
+
+    public enum StockAction
+    {
+        Default,
+        ReverseSplit1For2,
+        Split2For1
+    }
 }
