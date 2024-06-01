@@ -2,19 +2,9 @@
 {
     public record PlayerBase(string Id, string Name);
     
-    public record PlayerInLobby(string Id, string Name, 
-        string LobbyId, bool IsReady) 
-        : PlayerBase(Id, Name);
+    
 
-    public record LobbyInfo(string Id, string Name, 
-        int NumberOfPlayers,  int NumberOfPlaces, 
-        string? Password, bool IsStarted = false)
-    {
-        public bool IsPublic => Password == null;
-        public bool IsFree => NumberOfPlaces > NumberOfPlayers;
-    }
-
-    public record LobbyWithDetails(LobbyInfo Lobby, IEnumerable<PlayerInLobby> Players);
+    
 
     public record PlayerInRoom(string Id, string Name, bool IsOnline, 
         bool IsTakingTurn, int PassiveIncomePercent) 
@@ -110,4 +100,28 @@
         ReverseSplit1For2,
         Split2For1
     }
+
+    public record Map (string Name, IEnumerable<Race> Races);
+
+    public record Race (
+        string Id, 
+        string Name, 
+        IEnumerable<Step> Steps,
+        int Order);
+
+    public record PlayerInMap(string Id, string Name, string RaceId, int Index);
+
+    public record Step(int Index, StepType StepType);
+
+    public enum StepType
+    {
+        Start,
+        Salary,
+        Children,
+        Charity,
+        Market,
+        Deal,
+        MoneyToTheWind,
+        Downsize
+    } 
 }
