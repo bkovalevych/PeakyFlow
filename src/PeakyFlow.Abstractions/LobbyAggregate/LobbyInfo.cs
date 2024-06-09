@@ -1,10 +1,16 @@
 ﻿namespace PeakyFlow.Abstractions.LobbyAggregate
 {
-    public record LobbyInfo(string Id, string Name,
-        int NumberOfPlayers, int NumberOfPlaces,
-        string? Password, bool IsStarted = false)
+    public class LobbyInfo
     {
-        public bool IsPublic => Password == null;
-        public bool IsFree => NumberOfPlaces > NumberOfPlayers;
+        public LobbyInfo(string id, string name, string? password = null)
+        {
+            Id = id;
+            Name = name;
+            Password = password;
+        }
+
+        public string Id { get; private set; }
+        public string Name { get; private set; }
+        public string? Password { get; set; }
     }
 }
