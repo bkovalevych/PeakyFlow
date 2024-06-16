@@ -3,20 +3,22 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Abstractions.LobbyAggregate.Events;
-using PeakyFlow.Application.Interfaces;
+using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.LobbyGame.Create
 {
     public class CreateLobbyHandler(
         IMediator _mediator,
-        IRepository<Lobby> _lobbyRepository, ILogger<CreateLobbyHandler> _logger) 
+        IRepository<Lobby> _lobbyRepository, 
+        IGuid _guid, 
+        ILogger<CreateLobbyHandler> _logger) 
         : IRequestHandler<CreateLobbyCommand, Result<string?>>
     {    
 
         public async Task<Result<string?>> Handle(CreateLobbyCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start creating lobby with name {name}", request.Name);
-            var id = Guid.NewGuid().ToString();
+            var id = _guid.NewId();
 
             var lobbyInfo = new LobbyInfo(id, request.Name, request.Password);
             var lobby = new Lobby(lobbyInfo);
