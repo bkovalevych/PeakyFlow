@@ -9,7 +9,9 @@
             LobbyInfo = lobbyInfo;
         }
 
-        public bool IsFree => Players.Count < TeamSize;
+        public int PlayersNumber { get; private set; }
+
+        public bool IsFree => PlayersNumber < TeamSize;
 
         public bool IsPublic => LobbyInfo.Password == null;
 
@@ -37,13 +39,21 @@
             }
 
             _players.Add(player);
+            PlayersNumber++;
 
             return true;
         }
 
         public bool RemovePlayer(PlayerInLobby player)
         {
-            return _players.Remove(player);
+            var result = _players.Remove(player);
+
+            if (result)
+            {
+                --PlayersNumber;
+            }
+
+            return result;
         }
     }
 }

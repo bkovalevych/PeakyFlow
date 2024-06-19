@@ -10,7 +10,8 @@ namespace PeakyFlow.Application.LobbyGame.Create
     public class CreateLobbyHandler(
         IMediator _mediator,
         IRepository<Lobby> _lobbyRepository, 
-        IGuid _guid, 
+        IGuid _guid,
+        IDateProvider _date,
         ILogger<CreateLobbyHandler> _logger) 
         : IRequestHandler<CreateLobbyCommand, Result<string?>>
     {    
@@ -20,7 +21,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
             _logger.LogInformation("Start creating lobby with name {name}", request.Name);
             var id = _guid.NewId();
 
-            var lobbyInfo = new LobbyInfo(id, request.Name, request.Password);
+            var lobbyInfo = new LobbyInfo(id, request.Owner, request.Name, _date.Now, request.Password);
             var lobby = new Lobby(lobbyInfo);
 
             lobby.SetTeamSize(request.TeamSize);

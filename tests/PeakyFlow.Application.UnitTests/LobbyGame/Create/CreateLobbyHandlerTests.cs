@@ -14,6 +14,7 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
         private readonly Mock<IRepository<Lobby>> _fakeLobbyRepository;
         private readonly Mock<ILogger<CreateLobbyHandler>> _fakeLogger;
         private readonly Mock<IGuid> _fakeGuid;
+        private readonly Mock<IDateProvider> _fakeDateTime;
 
         public CreateLobbyHandlerTests()
         {
@@ -21,6 +22,7 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
             _fakeLobbyRepository = new Mock<IRepository<Lobby>>();
             _fakeLogger = new Mock<ILogger<CreateLobbyHandler>>();
             _fakeGuid = new Mock<IGuid>();
+            _fakeDateTime = new Mock<IDateProvider>();
         }
 
 
@@ -30,11 +32,14 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
             //Assert
 
             _fakeGuid.Setup(x => x.NewId()).Returns("1");
+            var created = new DateTime(2024, 1, 1);
+            _fakeDateTime.SetupGet(x => x.Now).Returns(created);
+
             var command = new CreateLobbyCommand("Bohdan", "Lobby1", 1, null);
-            var lobby = new Lobby(new LobbyInfo("1", "Bohdan", "Lobby1", null));
+            var lobby = new Lobby(new LobbyInfo("1", "Bohdan", "Lobby1", created, null));
             lobby.SetTeamSize(1);
 
-            var handler = new CreateLobbyHandler(_fakeMediator.Object, _fakeLobbyRepository.Object, _fakeGuid.Object, _fakeLogger.Object);
+            var handler = new CreateLobbyHandler(_fakeMediator.Object, _fakeLobbyRepository.Object, _fakeGuid.Object, _fakeDateTime.Object, _fakeLogger.Object);
             _fakeLobbyRepository.Setup(x => x.AddAsync(It.IsAny<Lobby>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(lobby);
 

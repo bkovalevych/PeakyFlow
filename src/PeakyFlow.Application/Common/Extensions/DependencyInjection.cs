@@ -14,6 +14,7 @@ namespace PeakyFlow.Application.Common.Extensions
             return services
                 .AddMediatR(x => x.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>))
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
                 .AddValidatorsFromAssemblyContaining<CreateLobbyValidator>();
         }
