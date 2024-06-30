@@ -9,10 +9,9 @@ namespace PeakyFlow.Application.LobbyGame.List
         {
             Query
                 .AsNoTracking()
-                .OrderBy(x => x.LobbyInfo.Created)
+                .OrderBy(x => x.Created)
                 .Skip(query.PaginationSkip)
-                .Take(query.PaginationCount)
-                .Include(x => x.LobbyInfo);
+                .Take(query.PaginationCount);
         }
     }
 }

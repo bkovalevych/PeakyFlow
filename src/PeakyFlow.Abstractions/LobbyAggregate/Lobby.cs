@@ -1,24 +1,22 @@
 ﻿namespace PeakyFlow.Abstractions.LobbyAggregate
 {
-    public class Lobby : IAggregateRoot
+    public class Lobby : Entity, IAggregateRoot
     {
+        public string Owner { get; set; }
+        public string Name { get; set; }
+        public string? Password { get; set; }
+        public DateTimeOffset Created { get; set; }
+
         private readonly List<PlayerInLobby> _players = new();
-
-        public Lobby(LobbyInfo lobbyInfo)
-        {
-            LobbyInfo = lobbyInfo;
-        }
-
+        
         public int PlayersNumber { get; private set; }
 
         public bool IsFree => PlayersNumber < TeamSize;
 
-        public bool IsPublic => LobbyInfo.Password == null;
+        public bool IsPublic => Password == null;
 
         public IReadOnlyCollection<PlayerInLobby> Players => _players;
         
-        public LobbyInfo LobbyInfo { get; private set; }
-
         public int TeamSize { get; private set; } = 1;
 
         public void SetTeamSize(int teamSize)
@@ -28,7 +26,7 @@
 
         public void SetPassword(string? password)
         {
-            LobbyInfo.Password = password;
+            Password = password;
         }
 
         public bool AddPlayer(PlayerInLobby player) 

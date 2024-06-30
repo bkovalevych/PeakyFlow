@@ -36,7 +36,13 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
             _fakeDateTime.SetupGet(x => x.Now).Returns(created);
 
             var command = new CreateLobbyCommand("Bohdan", "Lobby1", 1, null);
-            var lobby = new Lobby(new LobbyInfo("1", "Bohdan", "Lobby1", created, null));
+            var lobby = new Lobby()
+            {
+                Id = "1",
+                Owner = "Bohdan",
+                Name = "Lobby1",
+                Created = created
+            };
             lobby.SetTeamSize(1);
 
             var handler = new CreateLobbyHandler(_fakeMediator.Object, _fakeLobbyRepository.Object, _fakeGuid.Object, _fakeDateTime.Object, _fakeLogger.Object);

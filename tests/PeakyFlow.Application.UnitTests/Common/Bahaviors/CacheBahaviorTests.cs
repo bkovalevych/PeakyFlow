@@ -83,8 +83,20 @@ namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
 
             var expectedValue = new List<Lobby>()
             {
-                new Lobby(new LobbyInfo("id1", "bohdan", "lobby1", new DateTimeOffset(), null)),
-                new Lobby(new LobbyInfo("id2", "bohdan", "lobby2", new DateTimeOffset(), "1234"))
+                new Lobby()
+                {
+                    Id = "id1",
+                    Created = new DateTimeOffset(),
+                    Name = "lobby1",
+                    Owner = "bohdan"
+                },
+                new Lobby()
+                {
+                    Id = "id2",
+                    Created = new DateTimeOffset(),
+                    Name = "lobby2",
+                    Owner = "bohdan"
+                }
             };
 
             fakeRepository.Setup(x => x.ListAsync(It.IsAny<LobbyListSpecification>(), It.IsAny<CancellationToken>()))

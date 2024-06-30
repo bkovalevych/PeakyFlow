@@ -19,12 +19,20 @@ namespace PeakyFlow.Application.LobbyGame.Create
         public async Task<Result<string?>> Handle(CreateLobbyCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start creating lobby with name {name}", request.Name);
-            var id = _guid.NewId();
+            var lobbyId = _guid.NewId();
+            var ownerId = _guid.NewId();
 
-            var lobbyInfo = new LobbyInfo(id, request.Owner, request.Name, _date.Now, request.Password);
-            var lobby = new Lobby(lobbyInfo);
+            var lobby = new Lobby()
+            {
+                Id = lobbyId,
+                Name = request.Name,
+                Created = _date.Now,
+                Owner = request.Owner,
+                Password = request.Password,
+            };
 
             lobby.SetTeamSize(request.TeamSize);
+            lobby.AddPlayer(new PlayerInLobby() { Id = ownerId, LobbyId = lobbyId, Name = request.Owner});
 
             try
             {
@@ -38,7 +46,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
 
                 _logger.LogInformation("Created lobby with name {name}", request.Name);
 
-                var createdEvent = new LobbyCreatedEvent(lobbyInfo);
+                var createdEvent = new LobbyCreatedEvent(lobby.Id, lobby.Name, lobby.Owner, lobby.Password, lobby.Created, lobby.IsPublic, lobby.TeamSize);
                 await _mediator.Publish(createdEvent, cancellationToken);
             }
             catch (Exception ex) 
@@ -47,7 +55,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
                 return Result<string?>.Error("Data created error. Exception was thrown");
             }
 
-            return id;
+            return lobbyId;
         }
     }
 }

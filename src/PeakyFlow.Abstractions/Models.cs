@@ -1,14 +1,16 @@
 ﻿namespace PeakyFlow.Abstractions
 {
-    public record PlayerBase(string Id, string Name);
-    
-    
+    public abstract class PlayerBase : Entity
+    {
+        public required string Name { get; set; }
+    }
 
-    
-
-    public record PlayerInRoom(string Id, string Name, bool IsOnline, 
-        bool IsTakingTurn, int PassiveIncomePercent) 
-        : PlayerBase(Id, Name);
+    public class PlayerInRoom() : PlayerBase
+    {
+        public bool IsOnline { get; set; }
+        public bool IsTakingTurn { get; set; }
+        public int PassiveIncomePercent { get; set; }
+    }
 
     public record CurrenPlayerInRoom(PlayerInRoom PlayerInfo, PlayerRole Role, PlayerState State);
 
