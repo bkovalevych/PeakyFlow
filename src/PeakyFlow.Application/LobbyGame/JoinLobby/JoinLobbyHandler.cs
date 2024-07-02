@@ -23,6 +23,11 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
                 return Result<JoinLobbyResponse>.NotFound();
             }
 
+            if (!lobby.IsFree)
+            {
+                return Result<JoinLobbyResponse>.Conflict("The lobby is full.");
+            }
+
             var player = new PlayerInLobby()
             {
                 Id = _guid.NewId(),
