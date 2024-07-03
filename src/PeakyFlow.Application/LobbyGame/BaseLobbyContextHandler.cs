@@ -1,0 +1,44 @@
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
+using PeakyFlow.Abstractions.LobbyAggregate;
+using PeakyFlow.Application.Common.Interfaces;
+using PeakyFlow.Application.Common.Specifications;
+
+namespace PeakyFlow.Application.LobbyGame
+{
+    public abstract class BaseLobbyContextHandler<TRequest, TResponse>
+        : IRequestHandler<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>, ILobbyContextRequest
+    {
+        protected readonly ILogger<BaseLobbyContextHandler<TRequest, TResponse>> Logger;
+        protected readonly IRepository<Lobby> Repository;
+        
+        public BaseLobbyContextHandler(
+            ILogger<BaseLobbyContextHandler<TRequest, TResponse>> logger,
+            IRepository<Lobby> repository)
+        {
+            Logger = logger;
+            Repository = repository;
+        }
+        
+        protected abstract TResponse NotFoundResponse { get; }
+
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken)
+        {
+            Logger.LogInformation("Request lobby {lobbyId}", request.LobbyId);
+            var lobby = await Repository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<Lobby>(request.LobbyId));
+
+            if (lobby == null)
+            {
+                Logger.LogInformation("lobby {lobbyId} was not found", request.LobbyId);
+                return NotFoundResponse;
+            }
+
+            return await Handle(request, lobby, cancellationToken);
+        }
+
+        
+
+        protected abstract Task<TResponse> Handle(TRequest request, Lobby lobby, CancellationToken cancellationToken);
+    }
+}

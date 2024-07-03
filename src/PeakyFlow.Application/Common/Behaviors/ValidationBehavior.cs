@@ -33,8 +33,15 @@ namespace PeakyFlow.Application.Common.Behaviors
             }
 
             var resultGenericType = typeof(TResponse).GetGenericArguments().FirstOrDefault();
+            var isResult = typeof(TResponse) == typeof(Result);
+            var isGenericResult = typeof(TResponse) == typeof(Result<>);
 
-            if (resultGenericType == null)
+            if (isResult && (TResponse?)(object?)Result.Invalid(failures) is TResponse castedResponse)
+            {
+                return castedResponse;
+            }
+
+            if (resultGenericType == null || !isGenericResult)
             {
                 return await next();
             }
@@ -49,7 +56,7 @@ namespace PeakyFlow.Application.Common.Behaviors
                 return await next();
             }
 
-            var result = (TResponse)(object)method?.Invoke(null, [failures]);
+            var result = (TResponse?)(object?)method.Invoke(null, [failures]);
             if (result == null)
             {
                 return await next();

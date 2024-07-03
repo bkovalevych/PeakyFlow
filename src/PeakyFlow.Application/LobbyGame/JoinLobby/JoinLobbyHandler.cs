@@ -1,30 +1,30 @@
 ﻿using Ardalis.Result;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.LobbyGame.JoinLobby
 {
-    public class JoinLobbyHandler(ILogger<JoinLobbyHandler> _logger, 
-        IRepository<Lobby> _lobbyRepository,
-        IGuid _guid) 
-        : IRequestHandler<JoinLobbyCommand, Result<JoinLobbyResponse>>
+    public class JoinLobbyHandler
+        : BaseLobbyContextHandler<JoinLobbyCommand, Result<JoinLobbyResponse>>
     {
-        public async Task<Result<JoinLobbyResponse>> Handle(JoinLobbyCommand request, CancellationToken cancellationToken)
-        {
-            var lobby = await _lobbyRepository.FirstOrDefaultAsync(
-                new FirstOrDefaultByIdSpecification<Lobby>(request.LobbyId), 
-                cancellationToken);
-            
-            if (lobby == null) 
-            {
-                return Result<JoinLobbyResponse>.NotFound();
-            }
+        private IGuid _guid;
 
+        public JoinLobbyHandler(
+            ILogger<JoinLobbyHandler> logger,
+            IRepository<Lobby> lobbyRepository,
+            IGuid guid) : base(logger, lobbyRepository)
+        {
+            _guid = guid;
+        }
+
+        protected override Result<JoinLobbyResponse> NotFoundResponse => Result<JoinLobbyResponse>.NotFound();
+
+        protected override async Task<Result<JoinLobbyResponse>> Handle(JoinLobbyCommand request, Lobby lobby, CancellationToken cancellationToken)
+        {
             if (!lobby.IsFree)
             {
+                Logger.LogInformation("The lobby {lobbyId} is full", lobby.Id);
                 return Result<JoinLobbyResponse>.Conflict("The lobby is full.");
             }
 
@@ -35,13 +35,13 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
                 Name = request.PlayerName
             };
 
-            
+
             lobby.AddPlayer(player);
 
-            await _lobbyRepository.UpdateAsync(lobby, cancellationToken);
+            await Repository.UpdateAsync(lobby, cancellationToken);
 
-            var count = await _lobbyRepository.SaveChangesAsync(cancellationToken);
-            
+            var count = await Repository.SaveChangesAsync(cancellationToken);
+
             return new JoinLobbyResponse(count > 0, "Success");
         }
     }
