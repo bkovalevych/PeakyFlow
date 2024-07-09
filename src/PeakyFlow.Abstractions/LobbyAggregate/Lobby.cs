@@ -2,8 +2,9 @@
 {
     public class Lobby : Entity, IAggregateRoot
     {
-        public string Owner { get; set; }
-        public string Name { get; set; }
+        public string Owner { get; set; } = string.Empty;
+        public string OwnerId { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public string? Password { get; set; }
         public DateTimeOffset Created { get; set; }
 
@@ -18,6 +19,8 @@
         public IReadOnlyCollection<PlayerInLobby> Players => _players;
         
         public int TeamSize { get; private set; } = 1;
+
+        public bool IsClosed { get; set; }
 
         public void SetTeamSize(int teamSize)
         {
@@ -42,8 +45,15 @@
             return true;
         }
 
-        public bool RemovePlayer(PlayerInLobby player)
+        public bool RemovePlayer(string playerId)
         {
+            var player = _players.FirstOrDefault(x => x.Id == playerId);
+            
+            if (player == null) 
+            { 
+                return true;
+            }
+
             var result = _players.Remove(player);
 
             if (result)

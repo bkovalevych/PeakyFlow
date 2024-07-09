@@ -39,7 +39,7 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
             var lobby = new Lobby()
             {
                 Id = "1",
-                Owner = "Bohdan",
+                OwnerId = "Bohdan",
                 Name = "Lobby1",
                 Created = created
             };

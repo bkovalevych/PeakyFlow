@@ -88,14 +88,14 @@ namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
                     Id = "id1",
                     Created = new DateTimeOffset(),
                     Name = "lobby1",
-                    Owner = "bohdan"
+                    OwnerId = "bohdan"
                 },
                 new Lobby()
                 {
                     Id = "id2",
                     Created = new DateTimeOffset(),
                     Name = "lobby2",
-                    Owner = "bohdan"
+                    OwnerId = "bohdan"
                 }
             };
 

@@ -3,7 +3,7 @@ using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.Common.Behaviors
 {
-    public class CacheBehavior<TRequest, TResponse>(IDateProvider _dateProvider, ICacheService _cacheService) : IPipelineBehavior<TRequest, TResponse>
+    public class CacheBehavior<TRequest, TResponse>(ICacheService _cacheService) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>, ICacheQuery
     {
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)

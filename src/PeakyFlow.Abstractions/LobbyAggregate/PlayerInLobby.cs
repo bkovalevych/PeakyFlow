@@ -4,5 +4,7 @@
     {
         public required string LobbyId { get; set; }
         public bool IsReady { get; set; }
+
+        public bool IsOwner { get; set; }
     }
 }

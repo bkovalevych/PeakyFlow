@@ -27,12 +27,13 @@ namespace PeakyFlow.Application.LobbyGame.Create
                 Id = lobbyId,
                 Name = request.Name,
                 Created = _date.Now,
+                OwnerId = ownerId,
                 Owner = request.Owner,
                 Password = request.Password,
             };
 
             lobby.SetTeamSize(request.TeamSize);
-            lobby.AddPlayer(new PlayerInLobby() { Id = ownerId, LobbyId = lobbyId, Name = request.Owner});
+            lobby.AddPlayer(new PlayerInLobby() { Id = ownerId, LobbyId = lobbyId, Name = request.Owner, IsOwner = true });
 
             try
             {
@@ -46,7 +47,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
 
                 _logger.LogInformation("Created lobby with name {name}", request.Name);
 
-                var createdEvent = new LobbyCreatedEvent(lobby.Id, lobby.Name, lobby.Owner, lobby.Password, lobby.Created, lobby.IsPublic, lobby.TeamSize);
+                var createdEvent = new LobbyCreatedEvent(lobby.Id, lobby.Name, lobby.OwnerId, lobby.Password, lobby.Created, lobby.IsPublic, lobby.TeamSize);
                 await _mediator.Publish(createdEvent, cancellationToken);
             }
             catch (Exception ex) 

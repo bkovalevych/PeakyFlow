@@ -9,7 +9,7 @@ namespace PeakyFlow.Application.LobbyGame.PlayerInLobbySetIsReady
 {
     public class PlayerInLobbySetIsReadyHandler
 
-        : BaseLobbyContextHandler<PlayerInLobbySetIsReadyCommand, Result>
+        : LobbyContextHandlerBase<PlayerInLobbySetIsReadyCommand, Result>
     {
         private readonly IMediator _mediator;
 
@@ -35,6 +35,7 @@ namespace PeakyFlow.Application.LobbyGame.PlayerInLobbySetIsReady
             }
 
             player.IsReady = request.IsReady;
+            await Repository.UpdateAsync(lobby, cancellationToken);
             await Repository.SaveChangesAsync(cancellationToken);
             var playersIsReadyEvent = new PlayerInLobbyIsReadyEvent(request.LobbyId, request.PlayerId, request.IsReady);
 

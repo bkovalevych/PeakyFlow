@@ -6,15 +6,15 @@ using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.LobbyGame
 {
-    public abstract class BaseLobbyContextHandler<TRequest, TResponse>
+    public abstract class LobbyContextHandlerBase<TRequest, TResponse>
         : IRequestHandler<TRequest, TResponse>
         where TRequest : IRequest<TResponse>, ILobbyContextRequest
     {
-        protected readonly ILogger<BaseLobbyContextHandler<TRequest, TResponse>> Logger;
+        protected readonly ILogger<LobbyContextHandlerBase<TRequest, TResponse>> Logger;
         protected readonly IRepository<Lobby> Repository;
         
-        public BaseLobbyContextHandler(
-            ILogger<BaseLobbyContextHandler<TRequest, TResponse>> logger,
+        public LobbyContextHandlerBase(
+            ILogger<LobbyContextHandlerBase<TRequest, TResponse>> logger,
             IRepository<Lobby> repository)
         {
             Logger = logger;

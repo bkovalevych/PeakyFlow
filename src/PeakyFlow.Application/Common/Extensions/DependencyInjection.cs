@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using PeakyFlow.Application.Common.Behaviors;
 using PeakyFlow.Application.LobbyGame.Create;
+using PeakyFlow.Application.Roles.GetRoleForPlayer;
 using System.Reflection;
 
 namespace PeakyFlow.Application.Common.Extensions
@@ -16,7 +17,8 @@ namespace PeakyFlow.Application.Common.Extensions
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>))
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>))
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
-                .AddValidatorsFromAssemblyContaining<CreateLobbyValidator>();
+                .AddValidatorsFromAssemblyContaining<CreateLobbyValidator>()
+                .AddTransient<IGetRoleForPlayerService, GetRoleForPlayerService>();
         }
     }
 }

@@ -6,7 +6,7 @@ using PeakyFlow.Application.Common.Interfaces;
 namespace PeakyFlow.Application.LobbyGame.JoinLobby
 {
     public class JoinLobbyHandler
-        : BaseLobbyContextHandler<JoinLobbyCommand, Result<JoinLobbyResponse>>
+        : LobbyContextHandlerBase<JoinLobbyCommand, Result<JoinLobbyResponse>>
     {
         private IGuid _guid;
 
@@ -42,7 +42,7 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
 
             var count = await Repository.SaveChangesAsync(cancellationToken);
 
-            return new JoinLobbyResponse(count > 0, "Success");
+            return new JoinLobbyResponse(count > 0, "Success", player.Id);
         }
     }
 }

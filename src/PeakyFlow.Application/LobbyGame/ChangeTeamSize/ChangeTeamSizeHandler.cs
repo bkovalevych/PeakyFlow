@@ -5,7 +5,7 @@ using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.LobbyGame.ChangeTeamSize
 {
-    public class ChangeTeamSizeHandler : BaseLobbyContextHandler<ChangeTeamSizeCommand, Result>
+    public class ChangeTeamSizeHandler : LobbyContextHandlerBase<ChangeTeamSizeCommand, Result>
     {
         public ChangeTeamSizeHandler(
             ILogger<ChangeTeamSizeHandler> logger,
@@ -17,6 +17,7 @@ namespace PeakyFlow.Application.LobbyGame.ChangeTeamSize
         protected override async Task<Result> Handle(ChangeTeamSizeCommand request, Lobby lobby, CancellationToken cancellationToken)
         {
             lobby.SetTeamSize(request.TeamSize);
+            await Repository.UpdateAsync(lobby, cancellationToken);
             await Repository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
