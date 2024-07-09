@@ -1,3 +1,5 @@
+using PeakyFlow.Abstractions.GameRoleAggregate;
+using PeakyFlow.Abstractions.RoomStateAggregate;
 using System.Text.Json;
 
 namespace PeakyFlow.Abstractions.UnitTests
@@ -26,18 +28,29 @@ namespace PeakyFlow.Abstractions.UnitTests
             };
 
 
-            var playerState = new PlayerState("1", 100, 3, 2, 0, 3);
+            var playerState = new PlayerState() 
+            {
+                Id = "1",
+                Description = "descr",
+                Name = "boh",
+                RoleName = "lawer"
+            };
 
             
-            var playerRole = new PlayerRole("1", "Lawer", null, "Lawer in law",
-                financeItems.Where(x => x is CountableLiabilityItem).Cast<CountableLiabilityItem>(),
-                financeItems.Where(x => x is PercentableLiabilityItem).Cast<PercentableLiabilityItem>(),
-                financeItems.Where(x => x is StockItem).Cast<StockItem>(),
-                financeItems.Where(x => x is FinancialItem).Cast<FinancialItem>());
+            var playerRole = new GameRole()
+            {
+                Id = "1",
+                RoleName = "Lawer", 
+                Description = "Lawer in law",
+                CountableLiabilities = financeItems.Where(x => x is CountableLiabilityItem).Cast<CountableLiabilityItem>(),
+                PercentableLiabilities = financeItems.Where(x => x is PercentableLiabilityItem).Cast<PercentableLiabilityItem>(),
+                Stocks = financeItems.Where(x => x is StockItem).Cast<StockItem>(),
+                FinancialItems = financeItems.Where(x => x is FinancialItem).Cast<FinancialItem>()
+            };
 
             var json = JsonSerializer.Serialize(playerRole);
 
-            var other = JsonSerializer.Deserialize<PlayerRole>(json);
+            var other = JsonSerializer.Deserialize<GameRole>(json);
         }
     }
 }
