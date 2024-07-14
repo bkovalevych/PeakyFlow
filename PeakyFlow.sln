@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeakyFlow.Application", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeakyFlow.Application.UnitTests", "tests\PeakyFlow.Application.UnitTests\PeakyFlow.Application.UnitTests.csproj", "{12B4AB7C-FDE9-45D7-AB5E-5286E5DCBDDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeakyFlow.Infrastructure", "src\PeakyFlow.Infrastructure\PeakyFlow.Infrastructure.csproj", "{EEF05F6C-12B7-47BC-A95D-3A3A931AFA60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{12B4AB7C-FDE9-45D7-AB5E-5286E5DCBDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12B4AB7C-FDE9-45D7-AB5E-5286E5DCBDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12B4AB7C-FDE9-45D7-AB5E-5286E5DCBDDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEF05F6C-12B7-47BC-A95D-3A3A931AFA60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEF05F6C-12B7-47BC-A95D-3A3A931AFA60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEF05F6C-12B7-47BC-A95D-3A3A931AFA60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEF05F6C-12B7-47BC-A95D-3A3A931AFA60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{073AFB81-AB42-4A15-A513-EA8364E6603D} = {46CD3ADE-27DE-4AB8-9891-E5199B10F569}
 		{53853FC3-A78E-42CA-8833-3D6F2C9B94D0} = {46CD3ADE-27DE-4AB8-9891-E5199B10F569}
 		{12B4AB7C-FDE9-45D7-AB5E-5286E5DCBDDB} = {89768B53-3B6C-4F9B-B93D-13E2D4EE0844}
+		{EEF05F6C-12B7-47BC-A95D-3A3A931AFA60} = {46CD3ADE-27DE-4AB8-9891-E5199B10F569}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {292C765F-B6EB-4F27-9F9A-1988E97726C8}
