@@ -4,7 +4,7 @@ using Redis.OM.Modeling;
 namespace PeakyFlow.Infrastructure.Redis.Models
 {
     [Document(StorageType = StorageType.Json, Prefixes = [nameof(Room)])]
-    internal class RoomM : EntityM
+    public class RoomM : EntityM
     {
         [Indexed]
         public string Name { get; set; } = string.Empty;

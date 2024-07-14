@@ -1,6 +1,5 @@
 ﻿using Ardalis.Specification;
 using Microsoft.Extensions.Logging;
-using PeakyFlow.Abstractions;
 using PeakyFlow.Application.Common.Interfaces;
 using Redis.OM;
 using Redis.OM.Searching;
@@ -8,7 +7,7 @@ using Redis.OM.Searching;
 namespace PeakyFlow.Infrastructure.Redis
 {
     public class RedisRepository<T> : IRepository<T>, IDisposable
-        where T : Entity
+        where T : class
     {
         private bool disposedValue;
         private readonly ILogger<RedisRepository<T>> _logger;
@@ -199,7 +198,7 @@ namespace PeakyFlow.Infrastructure.Redis
         {
             IRedisCollection<T> initialExpression = _redisCollection;
 
-            foreach (var t  in specification.WhereExpressions) 
+            foreach (var t in specification.WhereExpressions)
             {
                 initialExpression = initialExpression.Where(t.Filter);
             }

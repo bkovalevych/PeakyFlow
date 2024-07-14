@@ -2,7 +2,7 @@
 
 namespace PeakyFlow.Infrastructure.Redis.Models
 {
-    internal class PlayerBaseM : EntityM
+    public abstract class PlayerBaseM : EntityM
     {
         [Indexed]
         public required string Name { get; set; }

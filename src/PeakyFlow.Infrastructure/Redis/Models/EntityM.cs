@@ -2,7 +2,7 @@
 
 namespace PeakyFlow.Infrastructure.Redis.Models
 {
-    internal abstract class EntityM
+    public abstract class EntityM
     {
         [RedisIdField]
         [Indexed]
