@@ -3,13 +3,8 @@ using Redis.OM.Modeling;
 
 namespace PeakyFlow.Infrastructure.Redis.Models
 {
-    public class PlayerInRoomM
+    public class PlayerInRoomM : PlayerBaseM
     {
-        [Indexed]
-        public required string Id { get; set; }
-
-        public required string Name { get; set; }
-
         [Indexed]
         public PlayerInRoomStatus Status { get; set; }
     }
