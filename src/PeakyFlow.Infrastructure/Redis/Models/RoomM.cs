@@ -9,7 +9,7 @@ namespace PeakyFlow.Infrastructure.Redis.Models
         [Indexed]
         public string Name { get; set; } = string.Empty;
 
-        [Indexed]
-        public IEnumerable<PlayerInRoomM> Players { get; set; } = new List<PlayerInRoomM>();
+        [Indexed(JsonPath = "$.Id")]
+        public PlayerInRoomM[] Players { get; set; } = [];
     }
 }
