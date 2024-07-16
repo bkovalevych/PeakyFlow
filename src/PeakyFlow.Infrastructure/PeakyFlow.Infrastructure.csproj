@@ -17,8 +17,4 @@
     <ProjectReference Include="..\PeakyFlow.Application\PeakyFlow.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Redis\RedisMappings\" />
-  </ItemGroup>
-
 </Project>
