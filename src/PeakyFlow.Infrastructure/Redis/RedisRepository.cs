@@ -1,47 +1,53 @@
 ﻿using Ardalis.Specification;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
+using PeakyFlow.Abstractions;
 using PeakyFlow.Application.Common.Interfaces;
+using PeakyFlow.Infrastructure.Redis.Models;
 using Redis.OM;
 using Redis.OM.Searching;
+using System.Linq.Expressions;
 
 namespace PeakyFlow.Infrastructure.Redis
 {
-    public class RedisRepository<T> : IRepository<T>, IDisposable
-        where T : class
+    public class RedisRepository<T, TModel> : IRepository<T>, IDisposable
+        where T : Entity
+        where TModel : EntityM
     {
         private bool disposedValue;
-        private readonly ILogger<RedisRepository<T>> _logger;
+        private readonly ILogger<RedisRepository<T, TModel>> _logger;
         private readonly RedisConnectionProvider _redisProvider;
-        private readonly RedisCollection<T> _redisCollection;
+        private readonly RedisCollection<TModel> _redisCollection;
+        private readonly IMapper _mapper;
 
-        public RedisRepository(RedisConnectionProvider provider, ILogger<RedisRepository<T>> logger)
+        public RedisRepository(RedisConnectionProvider provider, IMapper mapper, ILogger<RedisRepository<T, TModel>> logger)
         {
             _redisProvider = provider;
-            _redisCollection = (RedisCollection<T>)_redisProvider.RedisCollection<T>();
-
+            _redisCollection = (RedisCollection<TModel>)_redisProvider.RedisCollection<TModel>();
+            _mapper = mapper;
             _logger = logger;
         }
 
         public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
-            await _redisCollection.InsertAsync(entity);
+            await _redisCollection.InsertAsync(_mapper.Map<TModel>(entity));
 
             return entity;
         }
 
         public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
         {
-            await _redisCollection.InsertAsync(entities);
+            await _redisCollection.InsertAsync(_mapper.Map<IEnumerable<TModel>>(entities));
             return entities;
         }
 
         public Task<bool> AnyAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
         {
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
 
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(where.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
             return initialExpression.AnyAsync();
@@ -56,17 +62,17 @@ namespace PeakyFlow.Infrastructure.Redis
         {
             await foreach (var t in _redisCollection)
             {
-                yield return t;
+                yield return _mapper.Map<T>(t);
             }
         }
 
         public Task<int> CountAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
         {
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
 
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(where.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
             return initialExpression.CountAsync();
@@ -79,35 +85,35 @@ namespace PeakyFlow.Infrastructure.Redis
 
         public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
         {
-            return _redisCollection.DeleteAsync(entity);
+            return _redisCollection.DeleteAsync(_mapper.Map<TModel>(entity));
         }
 
         public Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
         {
-            return _redisCollection.DeleteAsync(entities);
+            return _redisCollection.DeleteAsync(_mapper.Map<TModel>(entities));
         }
 
         public async Task DeleteRangeAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
         {
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(where.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
             await _redisCollection.DeleteAsync(initialExpression);
         }
 
-        public Task<T?> FirstOrDefaultAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+        public async Task<T?> FirstOrDefaultAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
         {
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
 
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(where.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
-            return initialExpression.FirstOrDefaultAsync();
+            return _mapper.Map<T>(await initialExpression.FirstOrDefaultAsync());
         }
 
         public async Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default)
@@ -119,25 +125,25 @@ namespace PeakyFlow.Infrastructure.Redis
 
             foreach (var where in specification.WhereExpressions)
             {
-                var pre = await _redisCollection.FirstOrDefaultAsync(where.Filter);
+                var pre = await _redisCollection.FirstOrDefaultAsync(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
 
                 if (pre != null)
                 {
-                    return specification.Selector.Compile()(pre);
+                    return specification.Selector.Compile()(_mapper.Map<T>(pre));
                 }
             }
 
             return default;
         }
 
-        public Task<T?> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken = default) where TId : notnull
+        public async Task<T?> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken = default) where TId : notnull
         {
             if (typeof(TId) != typeof(string))
             {
                 throw new ArgumentException("Type of id was not a string");
             }
 
-            return _redisCollection.FindByIdAsync(id.ToString() ?? string.Empty);
+            return _mapper.Map<T>(await _redisCollection.FindByIdAsync(id.ToString() ?? string.Empty));
         }
 
         public Task<T?> GetBySpecAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
@@ -152,19 +158,18 @@ namespace PeakyFlow.Infrastructure.Redis
 
         public async Task<List<T>> ListAsync(CancellationToken cancellationToken = default)
         {
-            return (await _redisCollection.ToListAsync()).ToList();
+            return _mapper.Map<List<T>>(await _redisCollection.ToListAsync());
         }
 
         public async Task<List<T>> ListAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
         {
-            var result = new List<T>();
-
+            IRedisCollection<TModel> initialExpression = _redisCollection;
             foreach (var where in specification.WhereExpressions)
             {
-                result.AddRange(await _redisCollection.Where(where.Filter).ToListAsync());
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
-            return result;
+            return _mapper.Map<List<T>>(await initialExpression.ToListAsync());
         }
 
         public async Task<List<TResult>> ListAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default)
@@ -174,17 +179,17 @@ namespace PeakyFlow.Infrastructure.Redis
                 throw new ArgumentException("selector was not specified for entity {entity}", nameof(T));
             }
 
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
 
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(where.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
+            var list = _mapper.Map<List<T>>(await initialExpression.ToListAsync());
+            var selector = specification.Selector.Compile();
 
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-            return [.. (await initialExpression.Select(specification.Selector).ToListAsync())];
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+            return list.Select(x => selector(x)).ToList();
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -194,46 +199,48 @@ namespace PeakyFlow.Infrastructure.Redis
             return 0;
         }
 
-        public Task<T?> SingleOrDefaultAsync(ISingleResultSpecification<T> specification, CancellationToken cancellationToken = default)
+        public async Task<T?> SingleOrDefaultAsync(ISingleResultSpecification<T> specification, CancellationToken cancellationToken = default)
         {
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
 
             foreach (var t in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(t.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(t.Filter));
             }
 
-            return initialExpression.SingleOrDefaultAsync();
+            return _mapper.Map<T>(await initialExpression.SingleOrDefaultAsync());
         }
 
-        public Task<TResult?> SingleOrDefaultAsync<TResult>(ISingleResultSpecification<T, TResult> specification, CancellationToken cancellationToken = default)
+        public async Task<TResult?> SingleOrDefaultAsync<TResult>(ISingleResultSpecification<T, TResult> specification, CancellationToken cancellationToken = default)
         {
             if (specification.Selector == null)
             {
                 throw new ArgumentException("Selector was null for single or default");
             }
 
-            IRedisCollection<T> initialExpression = _redisCollection;
+            IRedisCollection<TModel> initialExpression = _redisCollection;
 
             foreach (var t in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(t.Filter);
+                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(t.Filter));
             }
 
+            var selector = specification.Selector.Compile();
 
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-            return initialExpression.Select(specification.Selector).SingleOrDefaultAsync();
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+            return selector(_mapper.Map<T>(await initialExpression.SingleOrDefaultAsync()));
         }
 
         public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
         {
-            return _redisCollection.UpdateAsync(entity);
+            var model = _mapper.Map<TModel>(entity);
+            return _redisCollection.UpdateAsync(model);
         }
 
         public async Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
         {
-            await _redisCollection.UpdateAsync(entities);
+            var models = _mapper.Map<IEnumerable<TModel>>(entities);
+
+            await _redisCollection.UpdateAsync(models);
         }
 
         protected virtual void Dispose(bool disposing)

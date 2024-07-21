@@ -1,8 +1,12 @@
 ﻿using Ardalis.Specification;
+using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 using Microsoft.Extensions.Logging;
 using Moq;
+using PeakyFlow.Abstractions.RoomAggregate;
 using PeakyFlow.Infrastructure.Redis;
 using PeakyFlow.Infrastructure.Redis.Models;
+using PeakyFlow.Infrastructure.Redis.RedisMappings;
 using PeakyFlow.Infrastructure.Services;
 using Redis.OM;
 using StackExchange.Redis;
@@ -12,12 +16,17 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
 {
     public class RedisRepositoryTests
     {
-        private readonly Mock<ILogger<RedisRepository<RoomM>>> _fakeLogger;
+        private readonly Mock<ILogger<RedisRepository<Room, RoomM>>> _fakeLogger;
+        private readonly IMapper _mapper;
 
         public RedisRepositoryTests()
         {
-            _fakeLogger = new Mock<ILogger<RedisRepository<RoomM>>>();
-            
+            _fakeLogger = new Mock<ILogger<RedisRepository<Room, RoomM>>>();
+            _mapper = new Mapper(new MapperConfiguration(x =>
+            {
+                x.AddExpressionMapping();
+                x.AddProfile<RoomProfile>();
+            }));
         }
 
 
@@ -46,21 +55,21 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
                 AbortOnConnectFail = false
             });
 
-            var rep = new RedisRepository<RoomM>(redisConnection, _fakeLogger.Object);
+            var rep = new RedisRepository<Room, RoomM>(redisConnection, _mapper, _fakeLogger.Object);
 
-            var result = await rep.AddAsync(new RoomM()
+            var result = await rep.AddAsync(new Room()
             {
                 Id = "b5bcf98a-db17-44da-b2d9-ad15e07cdb35",
                 Name = "Room1",
                 Players =
                 [
-                    new PlayerInRoomM()
+                    new PlayerInRoom()
                     {
                         Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc0",
                         Name = "BohdanChyk",
                         Status = Abstractions.RoomAggregate.PlayerInRoomStatus.Active
                     },
-                    new PlayerInRoomM()
+                    new PlayerInRoom()
                     {
                         Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc1",
                         Name = "Dan",
@@ -94,27 +103,27 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
 
             var redisConnection = new RedisConnectionProvider(new ConfigurationOptions()
             {
-                DefaultDatabase = 0,
+                DefaultDatabase = 1,
                 EndPoints = { "localhost:6379" },
                 Ssl = false,
                 ConnectTimeout = 5000,
                 AbortOnConnectFail = false
             });
 
-            var rep = new RedisRepository<RoomM>(redisConnection, _fakeLogger.Object);
+            var rep = new RedisRepository<Room, RoomM>(redisConnection, _mapper, _fakeLogger.Object);
 
-            var result = await rep.AddAsync(new RoomM()
+            var result = await rep.AddAsync(new Room()
             {
                 Id = "b5bcf98a-db17-44da-b2d9-ad15e07cdb35",
                 Name = "Room1",
                 Players = [
-                    new PlayerInRoomM()
+                    new PlayerInRoom()
                     {
                         Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc0",
                         Name = "BohdanChyk",
                         Status = Abstractions.RoomAggregate.PlayerInRoomStatus.Active
                     },
-                    new PlayerInRoomM()
+                    new PlayerInRoom()
                     {
                         Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc1",
                         Name = "Dan",
@@ -132,6 +141,7 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
             // assert
 
             Assert.NotNull(result);
+            Assert.Single(rooms);
         }
 
         [Fact]
@@ -152,27 +162,27 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
 
             var redisConnection = new RedisConnectionProvider(new ConfigurationOptions()
             {
-                DefaultDatabase = 0,
+                DefaultDatabase = 1,
                 EndPoints = { "localhost:6379" },
                 Ssl = false,
                 ConnectTimeout = 5000,
                 AbortOnConnectFail = false
             });
 
-            var rep = new RedisRepository<RoomM>(redisConnection, _fakeLogger.Object);
+            var rep = new RedisRepository<Room, RoomM>(redisConnection, _mapper, _fakeLogger.Object);
 
-            var result = await rep.AddAsync(new RoomM()
+            var result = await rep.AddAsync(new Room()
             {
                 Id = "b5bcf98a-db17-44da-b2d9-ad15e07cdb35",
                 Name = "Room1",
                 Players = [
-                    new PlayerInRoomM()
+                    new PlayerInRoom()
                     {
                         Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc0",
                         Name = "BohdanChyk",
                         Status = Abstractions.RoomAggregate.PlayerInRoomStatus.Active
                     },
-                    new PlayerInRoomM()
+                    new PlayerInRoom()
                     {
                         Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc1",
                         Name = "Dan",
@@ -185,14 +195,13 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
             var rooms = await rep.ListAsync(new RoomMFindById("46402f13-98ba-4596-b5ba-cdebaa83fbc1"), default);
 
             rooms[0].Name = "Changed Name";
-            rooms[0].Players[0].Status = Abstractions.RoomAggregate.PlayerInRoomStatus.Unknown;
-            rooms[0].Players = rooms[0].Players.Append(new PlayerInRoomM()
+            rooms[0].Players.First().Status = Abstractions.RoomAggregate.PlayerInRoomStatus.Unknown;
+            rooms[0].Players = rooms[0].Players.Append(new PlayerInRoom()
             {
                 Id = "46402f13-98ba-4596-b5ba-cdebaa83fbc2",
                 Name = "Liuda",
                 Status = Abstractions.RoomAggregate.PlayerInRoomStatus.Out
-            })
-            .ToArray();
+            });
 
             await rep.UpdateAsync(rooms[0]);
             await rep.SaveChangesAsync();
@@ -205,7 +214,7 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
             Assert.NotNull(result);
         }
 
-        private class RoomMFindById : Specification<RoomM>
+        private class RoomMFindById : Specification<Room>
         {
             public RoomMFindById(string id)
             {
