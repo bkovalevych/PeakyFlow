@@ -8,18 +8,18 @@ using PeakyFlow.Application.Roles.GetRoleForPlayer;
 
 namespace PeakyFlow.Application.RoomStates.Handlers
 {
-    public class LobbyClosedAndGameStartedEventForRoomStatehandler : INotificationHandler<LobbyClosedAndGameStartedEvent>
+    public class LobbyClosedAndGameStartedEventForRoomStateHandler : INotificationHandler<LobbyClosedAndGameStartedEvent>
     {
         private readonly IMediator _mediator;
         private readonly IRepository<RoomState> _roomStateRepository;
         private readonly IGetRoleForPlayerService _getRoleForPlayerService;
-        private readonly ILogger<LobbyClosedAndGameStartedEventForRoomStatehandler> _logger;
+        private readonly ILogger<LobbyClosedAndGameStartedEventForRoomStateHandler> _logger;
 
-        public LobbyClosedAndGameStartedEventForRoomStatehandler(
+        public LobbyClosedAndGameStartedEventForRoomStateHandler(
             IMediator mediator,
             IGetRoleForPlayerService getRoleForPlayerService,
             IRepository<RoomState> roomStateRepository,
-            ILogger<LobbyClosedAndGameStartedEventForRoomStatehandler> logger)
+            ILogger<LobbyClosedAndGameStartedEventForRoomStateHandler> logger)
         {
             _mediator = mediator;
             _roomStateRepository = roomStateRepository;
