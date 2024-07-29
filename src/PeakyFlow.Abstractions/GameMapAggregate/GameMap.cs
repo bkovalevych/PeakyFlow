@@ -8,23 +8,20 @@ namespace PeakyFlow.Abstractions.GameMapAggregate
 
         public StepType[] Steps { get; set; } = [];
 
-        public int TakingTurnPlayerIndex { get; set; }
-
-        public async Task TakeTurn(Func<PlayerAskedToThrowDiceEvent, Task<int>> throwDice,
-            Func<PlayerTookTurnEvent, Task> takeTurn)
+        public StepType? MovePlayer(string playerId, int dice)
         {
-            var player = GameMapPlayers[TakingTurnPlayerIndex];
+            var player = GameMapPlayers.FirstOrDefault(x => x.Id == playerId);
 
-            TakingTurnPlayerIndex = (TakingTurnPlayerIndex + 1) % GameMapPlayers.Length;
+            if (player == null) 
+            {
+                return null;
+            }
 
             if (player.SkeepTurns > 0)
             {
                 --player.SkeepTurns;
-                await takeTurn(new PlayerTookTurnEvent(Id, player.Id, StepType.Downsize));
-                return;
+                return StepType.Downsize;
             }
-
-            var dice = await throwDice(new PlayerAskedToThrowDiceEvent(Id, player.Id));
 
             player.Position = (player.Position + dice) % Steps.Length;
 
@@ -40,7 +37,7 @@ namespace PeakyFlow.Abstractions.GameMapAggregate
                 player.SkeepTurns = 3;
             }
 
-            await takeTurn(new PlayerTookTurnEvent(Id, player.Id, currentPosition));
+            return currentPosition;
         }
     }
 }

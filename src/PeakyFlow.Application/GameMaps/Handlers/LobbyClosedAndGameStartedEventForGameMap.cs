@@ -56,14 +56,6 @@ namespace PeakyFlow.Application.GameMaps.Handlers
             map.GameMapPlayers = players.ToArray();
 
             await _gameMapRepository.AddAsync(map, cancellationToken);
-
-            await map.TakeTurn(async (diceEvent) =>
-            {
-                await _mediator.Publish(diceEvent);
-                return diceEvent.Dice;
-            }, tookTurnEvent => _mediator.Publish(tookTurnEvent));
-
-            await _gameMapRepository.UpdateAsync(map, cancellationToken);
         }
     }
 }

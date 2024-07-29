@@ -5,12 +5,14 @@
         string Name, 
         FinancialType FinancialType, 
         int Count, 
-        int PriceForOne) 
+        int PriceForOne,
+        int FlowForOne = 0,
+        string? Group = null) 
         : FinancialItemBase(
-            Id, 
-            Name, 
-            FinancialType, 
+            Name,
+            FinancialType,
+            PriceForOne * Count, 
             0, 
-            0, 
-            PriceForOne * Count);
+            FlowForOne * Count,
+            Group);
 }

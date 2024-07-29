@@ -1,10 +1,8 @@
 ﻿using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapAggregate;
-using PeakyFlow.Abstractions.GameMapRuleAggregate;
 using PeakyFlow.Application.GameMapRules.GetMapRulesForRoom;
 using Spectre.Console;
 using Spectre.Console.Rendering;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PeakyFlow.Console.Services
 {
@@ -22,12 +20,26 @@ namespace PeakyFlow.Console.Services
             _gameMap = new GameMap()
             {
                 Id = "1",
-                GameMapPlayers = [ new GameMapPlayer() { Id = "1", Name = "Bohdan" }],
+                GameMapPlayers =
+                [
+                    new GameMapPlayer()
+                    {
+                        Id = "1", Name = "Bohdan"
+                    },
+                    new GameMapPlayer()
+                    {
+                        Id = "2", Name = "Liuda"
+                    },
+                    new GameMapPlayer()
+                    {
+                        Id = "3", Name = "Fedir"
+                    }
+                ],
                 Steps = _mapGetter.Get(default).Result!.Steps
             };
         }
 
-        
+
 
         public void StartMap()
         {
@@ -35,29 +47,39 @@ namespace PeakyFlow.Console.Services
 
             AnsiConsole.Live(_layout)
                 .Cropping(VerticalOverflowCropping.Top)
-                .StartAsync(async ctx => 
+                .StartAsync(async ctx =>
                 {
                     UpdatePlayers();
                     ctx.Refresh();
                     var key = System.Console.ReadKey();
+                    var random = new Random();
 
                     while (key.KeyChar != 'c' && (key.Modifiers & ConsoleModifiers.Control) == 0)
                     {
-                        await _gameMap.TakeTurn(_ => 
+                        for (int i = 0; i < _gameMap.GameMapPlayers.Length; i++)
                         {
-                            ClearPlayers();
-                            
-                            if ('1' <= key.KeyChar && '9' >= key.KeyChar)
-                            {
-                                return Task.FromResult(key.KeyChar - '0');
-                            }
+                            //await _gameMap.MovePlayer(async eventObj =>
+                            //{
+                            //    ClearPlayers();
 
-                            return Task.FromResult(1);
-                        }, 
-                        _ => Task.CompletedTask);
+                            //    if (eventObj.PlayerId == "1" && '1' <= key.KeyChar && '9' >= key.KeyChar)
+                            //    {
+                            //        return key.KeyChar - '0';
+                            //    }
+                            //    else if (eventObj.PlayerId != "1")
+                            //    {
+                            //        await Task.Delay(1000);
+                            //        return random.Next(1, 7);
+                            //    }
 
-                        UpdatePlayers();
-                        ctx.Refresh();
+                            //    return 1;
+                            //},
+                            //_ => Task.CompletedTask);
+
+                            //UpdatePlayers();
+                            //ctx.Refresh();
+                        }
+
                         key = System.Console.ReadKey();
                     }
                 })
@@ -96,10 +118,10 @@ namespace PeakyFlow.Console.Services
             }
         }
 
-        private void InitMap() 
+        private void InitMap()
         {
-            var columns = 4;
-            var rows = (_gameMap!.Steps.Length - 2 * columns) / 2 + 2;
+            var columns = 5;
+            var rows = (_gameMap!.Steps.Length - 2 * columns) / 2 + 2 + 1; // +1 for start
 
             _layout.SplitColumns(Enumerable.Range(0, columns)
                 .Select(x => new Layout($"col-{x}")
@@ -111,27 +133,29 @@ namespace PeakyFlow.Console.Services
             var vec = (x: 1, y: 0);
             var p = (x: 0, y: 0);
             var i = 0;
+
             foreach (var step in _gameMap!.Steps)
             {
                 var index = $"{p.x}-{p.y}";
                 var wrapper = step switch
                 {
-                    StepType.Salary => $"[yellow]{step}[/]",
-                    StepType.Market => $"[blue]{step}[/]",
-                    StepType.Children => $"[grey]{step}[/]",
-                    StepType.MoneyToTheWind => $"[red]{step}[/]",
-                    StepType.Deal => $"[green]{step}[/]",
-                    StepType.Downsize => $"[gray]{step}[/]",
-                    StepType.Charity => $"{step}",
+                    StepType.Salary => $"[yellow]{step} {i}[/]",
+                    StepType.Market => $"[blue]{step} {i}[/]",
+                    StepType.Children => $"[grey]{step} {i}[/]",
+                    StepType.MoneyToTheWind => $"[red]{step} {i}[/]",
+                    StepType.Deal => $"[green]{step} {i}[/]",
+                    StepType.Downsize => $"[gray]{step} {i}[/]",
+                    StepType.Charity => $"[#23ee11]{step} {i}[/]",
                     _ => $"{step}",
                 };
-                var text = $"{wrapper} {i + 1}";
+
+                var text = $"{wrapper}";
                 var cord = (index, text);
                 _stepCords[i] = cord;
 
                 UpdateStep(cord);
-                ++i;
 
+                ++i;
                 var next = (x: p.x + vec.x, y: p.y + vec.y);
 
                 if (next.x < 0 || next.y < 0 || next.x >= columns || next.y >= rows)
@@ -143,6 +167,11 @@ namespace PeakyFlow.Console.Services
                 }
 
                 p = next;
+
+                if (i == 1)
+                {
+                    p = (x: 0, y: 1);
+                }
             }
         }
 

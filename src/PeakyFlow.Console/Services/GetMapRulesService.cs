@@ -15,8 +15,10 @@ namespace PeakyFlow.Console.Services
                     StepType.Start,
                     StepType.Market,
                     StepType.Deal,
+                    StepType.Deal,
                     StepType.Salary,
                     StepType.Charity,
+                    StepType.Deal,
                     StepType.Deal,
                     StepType.Salary,
                     StepType.MoneyToTheWind,
@@ -25,6 +27,7 @@ namespace PeakyFlow.Console.Services
                     StepType.Salary,
                     StepType.Deal,
                     StepType.Downsize,
+                    StepType.Market,
                     StepType.Salary
                 ]
             });

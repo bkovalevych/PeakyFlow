@@ -1,10 +1,11 @@
 ﻿namespace PeakyFlow.Abstractions.GameRoleAggregate
 {
     public record CountableLiabilityItem(
-        string Id, 
         string Name, 
         FinancialType FinancialType, 
         int Count, 
-        int PriceForOne) 
-        : FinancialItemBase(Id, Name, FinancialType, 0, 0, -PriceForOne * Count);
+        int PriceForOne,
+        int LiabilityForOne = 0,
+        string? Group = null) 
+        : FinancialItemBase(Name, FinancialType, 0, LiabilityForOne * Count, -PriceForOne * Count, Group);
 }

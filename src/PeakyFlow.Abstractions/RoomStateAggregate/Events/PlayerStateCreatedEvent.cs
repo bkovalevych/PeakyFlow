@@ -4,6 +4,7 @@ using PeakyFlow.Abstractions.GameRoleAggregate;
 namespace PeakyFlow.Abstractions.RoomStateAggregate.Events
 {
     public record PlayerStateCreatedEvent(
+       bool ShouldTakeTurn,
        string Id,
        string Name,
        string RoomId,

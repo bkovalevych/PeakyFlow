@@ -6,6 +6,8 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
     {
         public int Savings { get; set; }
 
+        public float PercentageToWin => Expenses == 0 ? 1.0f : (Income - Salary) / Expenses * 1.0f;
+
         private IEnumerable<FinancialItemBase> Flows => Enumerable.Empty<FinancialItemBase>()
             .Union(CountableLiabilities)
             .Union(PercentableLiabilities)
@@ -18,11 +20,11 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
         public required string Description { get; set; }
 
         public string? ImageId { get; set; }
-
-        public IEnumerable<CountableLiabilityItem> CountableLiabilities { get; set; } = [];
-        public IEnumerable<PercentableLiabilityItem> PercentableLiabilities { get; set; } = [];
-        public IEnumerable<StockItem> Stocks { get; set; } = [];
-        public IEnumerable<FinancialItem> FinancialItems { get; set; } = [];
+        
+        public List<CountableLiabilityItem> CountableLiabilities { get; set; } = [];
+        public List<PercentableLiabilityItem> PercentableLiabilities { get; set; } = [];
+        public List<StockItem> Stocks { get; set; } = [];
+        public List<FinancialItem> FinancialItems { get; set; } = [];
 
         public int Salary => Flows.Where(x => x.FinancialType == FinancialType.Salary).Sum(x => x.FlowAmount);
         public int Expenses => Flows.Where(x => x.FlowAmount < 0).Sum(x => -x.FlowAmount);
@@ -30,5 +32,6 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
         public int CashFlow => Flows.Sum(x => x.FlowAmount);
         public int InitialSavings => Flows.Where(x => x.FinancialType == FinancialType.Savings).Sum(x => x.AssetAmount);
         public int ExpensesForOneChild => CountableLiabilities.Where(x => x.FinancialType == FinancialType.ChildrenExpenses).Sum(x => x.PriceForOne);
+        public bool HasWon => Expenses <= Income - Salary;
     }
 }

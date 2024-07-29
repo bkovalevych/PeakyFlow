@@ -21,7 +21,8 @@
         int Mortgage,
         int DownPay,
         int CashFlow,
-        StockAction StockAction
+        StockAction StockAction,
+        bool IsStock
         );
 
     public enum CardType
@@ -39,18 +40,6 @@
         ReverseSplit1For2,
         Split2For1
     }
-
-    public record Map(string Name, IEnumerable<Race> Races);
-
-    public record Race(
-        string Id,
-        string Name,
-        IEnumerable<Step> Steps,
-        int Order);
-
-    public record PlayerInMap(string Id, string Name, string RaceId, int Index);
-
-    public record Step(int Index, StepType StepType);
 
     public enum StepType
     {
