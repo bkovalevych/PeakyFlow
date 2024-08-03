@@ -6,7 +6,10 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
     {
         public Dictionary<CardType, int> Indeces { get; set; } = [];
 
-        public ILookup<CardType, string> Cards { get; set; } = Enumerable.Empty<Card>().ToLookup(x => x.CardType, x => x.Id);
+        public Dictionary<CardType, List<string>> Cards { get; set; } = [];
+
+        public IEnumerable<PlayerState> PlayerStates { get; set; } = [];
+
 
         public string GetCardIdByType(CardType cardType)
         {
@@ -18,7 +21,7 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
             var count = Cards[cardType].Count();
 
             var index = Indeces[cardType];
-            var item = Cards[cardType].ElementAt(index);
+            var item = Cards[cardType][index];
 
             Indeces[cardType] = (index + 1) % count;
 
@@ -274,7 +277,5 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
 
             return player;
         }
-
-        public IEnumerable<PlayerState> PlayerStates { get; set; } = [];
     }
 }

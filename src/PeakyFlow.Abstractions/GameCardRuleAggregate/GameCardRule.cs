@@ -4,13 +4,13 @@
     {
         public Card[] Cards { get; set; } = [];
 
-        public ILookup<CardType, string> ShuffleForGame()
+        public Dictionary<CardType, List<string>> ShuffleForGame()
         {
             var random = new Random();
             
             random.Shuffle(Cards);
             
-            return Cards.ToLookup(x => x.CardType, x => x.Id);
+            return Cards.GroupBy(x => x.CardType).ToDictionary(x => x.Key, x => x.Select(x => x.Id).ToList());
         }
     }
 }
