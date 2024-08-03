@@ -22,7 +22,9 @@
         int DownPay,
         int CashFlow,
         StockAction StockAction,
-        bool IsStock
+        bool IsStock,
+        bool IsBusiness,
+        bool IsRealEstate
         );
 
     public enum CardType

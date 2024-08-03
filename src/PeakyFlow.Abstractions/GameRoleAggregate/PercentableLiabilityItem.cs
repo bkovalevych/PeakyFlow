@@ -1,12 +1,14 @@
 ﻿namespace PeakyFlow.Abstractions.GameRoleAggregate
 {
     public record PercentableLiabilityItem(
+        string Id,
         string Name,
         FinancialType FinancialType,
         int LiabilityAmount,
         int Percent,
         string? Group = null)
         : FinancialItemBase(
+            Id,
             Name,
             FinancialType,
             0,

@@ -11,11 +11,13 @@ namespace PeakyFlow.Application.RoomStates.Borrow
     {
         private readonly IRepository<RoomState> _roomStateRepository;
         private readonly IMediator _mediator;
+        private readonly IGuid _guid;
 
-        public BorrowHandler(IMediator mediator, IRepository<RoomState> roomStateRepository)
+        public BorrowHandler(IGuid guid, IMediator mediator, IRepository<RoomState> roomStateRepository)
         {
             _roomStateRepository = roomStateRepository;
             _mediator = mediator;
+            _guid = guid;
         }
 
         public async Task<Result<PlayerStateDto>> Handle(BorrowCommand request, CancellationToken cancellationToken)
@@ -28,7 +30,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
                 return Result<PlayerStateDto>.NotFound();
             }
 
-            var p = state.Borrow(request.PlayerId, request.Money);
+            var p = state.Borrow(request.PlayerId, request.Money, _guid.NewId());
 
             if (p == null)
             {

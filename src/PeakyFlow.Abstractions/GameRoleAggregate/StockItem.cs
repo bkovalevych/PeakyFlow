@@ -1,7 +1,7 @@
 ﻿namespace PeakyFlow.Abstractions.GameRoleAggregate
 {
     public record StockItem(
-        string Id, 
+        string Id,
         string Name, 
         FinancialType FinancialType, 
         int Count, 
@@ -9,6 +9,7 @@
         int FlowForOne = 0,
         string? Group = null) 
         : FinancialItemBase(
+            Id,
             Name,
             FinancialType,
             PriceForOne * Count, 
