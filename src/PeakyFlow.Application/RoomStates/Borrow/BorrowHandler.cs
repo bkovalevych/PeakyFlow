@@ -23,7 +23,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
         public async Task<Result<PlayerStateDto>> Handle(BorrowCommand request, CancellationToken cancellationToken)
         {
             var state = await _roomStateRepository
-                .FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomStateId), cancellationToken);
+                .FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
 
             if (state == null)
             {
@@ -38,9 +38,11 @@ namespace PeakyFlow.Application.RoomStates.Borrow
             }
 
             await _mediator.Publish(new AnotherPlayerStateChangedEvent(
-                request.RoomStateId, 
+                request.RoomId, 
                 request.PlayerId, 
-                p.PercentageToWin), cancellationToken);
+                p.PercentageToWin,
+                p.HasWon,
+                p.HasLost), cancellationToken);
 
             return Result.Success(new PlayerStateDto(p.Id, p.Name, state.Id, p.Savings,
                 p.IsBankrupt,
@@ -52,7 +54,9 @@ namespace PeakyFlow.Application.RoomStates.Borrow
                 p.Expenses,
                 p.Income,
                 p.CashFlow,
-                p.HasWon));
+                p.PercentageToWin,
+                p.HasWon,
+                p.HasLost));
         }
     }
 }

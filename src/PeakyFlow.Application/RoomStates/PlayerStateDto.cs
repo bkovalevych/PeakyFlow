@@ -16,5 +16,7 @@ namespace PeakyFlow.Application.RoomStates
         int Expenses,
         int Income,
         int CashFlow,
-        bool HasWon);
+        float PercentageToWin,
+        bool HasWon,
+        bool HasLost);
 }

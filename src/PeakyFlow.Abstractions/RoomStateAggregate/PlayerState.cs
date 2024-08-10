@@ -14,7 +14,7 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
             .Union(Stocks)
             .Union(FinancialItems);
 
-        public bool IsBankrupt => CashFlow < 0;
+        public bool IsBankrupt => CashFlow < 0 && Savings < 0;
         public required string RoleName { get; set; }
 
         public required string Description { get; set; }
@@ -33,5 +33,7 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
         public int InitialSavings => Flows.Where(x => x.FinancialType == FinancialType.Savings).Sum(x => x.AssetAmount);
         public int ExpensesForOneChild => CountableLiabilities.Where(x => x.FinancialType == FinancialType.ChildrenExpenses).Sum(x => x.PriceForOne);
         public bool HasWon => Expenses <= Income - Salary;
+
+        public bool HasLost => IsBankrupt && Stocks.Count == 0 && !FinancialItems.Any(x => x.AssetAmount > 0);
     }
 }

@@ -13,16 +13,16 @@ namespace PeakyFlow.Abstractions.UnitTests
 
             var financeItems = new List<FinancialItemBase>()
             {
-                new FinancialItem("Savings", FinancialType.Savings, 40, 0, 0),
-                new FinancialItem("Salary", FinancialType.Salary, 0, 950, 950),
-                new FinancialItem("Taxes", FinancialType.Taxes, 0, 0, -235),
-                new FinancialItem("Other expenses", FinancialType.Others, 0, 0, -221),
-                new CountableLiabilityItem("Children Expenses", FinancialType.ChildrenExpenses, 0, 48),
-                new PercentableLiabilityItem("Home Mortgage", FinancialType.Loan, 14300, 1),
-                new PercentableLiabilityItem("Education", FinancialType.Loan, 0, 8),
-                new PercentableLiabilityItem("Car Payement", FinancialType.Loan, 1500, 2),
-                new PercentableLiabilityItem("Credit card payement", FinancialType.Loan, 2200, 3),
-                new PercentableLiabilityItem("Retail payment", FinancialType.Loan, 100, 5),
+                new FinancialItem("", "Savings", FinancialType.Savings, 40, 0, 0),
+                new FinancialItem("", "Salary", FinancialType.Salary, 0, 950, 950),
+                new FinancialItem("", "Taxes", FinancialType.Taxes, 0, 0, -235),
+                new FinancialItem("", "Other expenses", FinancialType.Others, 0, 0, -221),
+                new CountableLiabilityItem("", "Children Expenses", FinancialType.ChildrenExpenses, 0, 48),
+                new PercentableLiabilityItem("", "Home Mortgage", FinancialType.Loan, 14300, 1),
+                new PercentableLiabilityItem("", "Education", FinancialType.Loan, 0, 8),
+                new PercentableLiabilityItem("", "Car Payement", FinancialType.Loan, 1500, 2),
+                new PercentableLiabilityItem("", "Credit card payement", FinancialType.Loan, 2200, 3),
+                new PercentableLiabilityItem("", "Retail payment", FinancialType.Loan, 100, 5),
 
 
             };

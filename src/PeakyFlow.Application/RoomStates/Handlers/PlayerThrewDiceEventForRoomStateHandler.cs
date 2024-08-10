@@ -1,40 +1,35 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameCardRuleAggregate;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
+using PeakyFlow.Application.Rooms.Handlers;
 
 namespace PeakyFlow.Application.RoomStates.Handlers
 {
-    public class PlayerThrewDiceEventForRoomStateHandler : INotificationHandler<PlayerThrewDiceEvent>
+    public class PlayerThrewDiceEventForRoomStateHandler : RoomStateContextEventHandlerBase<PlayerThrewDiceEvent>
     {
         private readonly IReadRepository<GameCardRule> _cardRepository;
-        private readonly IRepository<RoomState> _roomStateRepository;
 
         public PlayerThrewDiceEventForRoomStateHandler(
             IRepository<RoomState> roomSateRepository,
-            IReadRepository<GameCardRule> cardRepository)
+            IReadRepository<GameCardRule> cardRepository,
+            ILogger<PlayerThrewDiceEventForRoomStateHandler> logger)
+            : base(roomSateRepository, logger)
         {
             _cardRepository = cardRepository;
-            _roomStateRepository = roomSateRepository;
         }
 
-        public async Task Handle(PlayerThrewDiceEvent notification, CancellationToken cancellationToken)
+        protected override bool ThrowWhenNotFound => true;
+
+        protected override async Task Handle(PlayerThrewDiceEvent notification, RoomState room, CancellationToken cancellationToken)
         {
             var cardRule = await _cardRepository.FirstOrDefaultAsync(new FirstOrDefaultCardRuleSpecification(), cancellationToken);
 
             if (cardRule == null)
             {
                 throw new ArgumentNullException(nameof(cardRule));
-            }
-
-            var room = await _roomStateRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(notification.RoomId), cancellationToken);
-
-            if (room == null)
-            {
-                throw new ArgumentNullException(nameof(room));
             }
 
             var cardId = string.Empty;
@@ -51,8 +46,16 @@ namespace PeakyFlow.Application.RoomStates.Handlers
 
             notification.Card = cardRule.Cards.FirstOrDefault(x => x.Id == cardId);
 
-            await _roomStateRepository.UpdateAsync(room, cancellationToken);
-            await _roomStateRepository.SaveChangesAsync(cancellationToken);
+            if (notification.WithSalary)
+            {
+                room.CountSalary(notification.PlayerId);
+            }
+
+            notification.PlayerState = room.PlayerStates
+                .FirstOrDefault(x => x.Id == notification.PlayerId);
+
+            await RoomRepository.UpdateAsync(room, cancellationToken);
+            await RoomRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

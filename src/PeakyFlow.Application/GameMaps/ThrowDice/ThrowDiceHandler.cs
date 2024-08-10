@@ -4,6 +4,7 @@ using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
 using PeakyFlow.Application.Common.Specifications;
+using PeakyFlow.Application.RoomStates;
 
 namespace PeakyFlow.Application.GameMaps.ThrowDice
 {
@@ -27,7 +28,7 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
                 return Result<ThrowDiceResponse>.NotFound();
             }
 
-            var step = gameMap.MovePlayer(request.PlayerId, request.Dice);
+            var (step, withSalary) = gameMap.MovePlayer(request.PlayerId, request.Dice);
 
             if (step == null)
             {
@@ -36,15 +37,38 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
 
             await _gameMapRepository.SaveChangesAsync(cancellationToken);
 
-            var playerThrewDiceEvent = new PlayerThrewDiceEvent(request.RoomId, request.PlayerId, step.Value);
+            var playerThrewDiceEvent = new PlayerThrewDiceEvent(request.RoomId, request.PlayerId, step.Value, withSalary);
 
             await _mediator.Publish(playerThrewDiceEvent, cancellationToken);
+
+            if (playerThrewDiceEvent.PlayerState == null)
+            {
+                return Result<ThrowDiceResponse>.NotFound();
+            }
+
+            var pst = playerThrewDiceEvent.PlayerState;
 
             return new ThrowDiceResponse(
                 request.RoomId,
                 request.PlayerId,
                 step.Value,
-                playerThrewDiceEvent.Card);
+                playerThrewDiceEvent.Card,
+                new PlayerStateDto(request.PlayerId,
+                    pst.Name,
+                    request.RoomId,
+                    pst.Savings,
+                    pst.IsBankrupt,
+                    pst.CountableLiabilities,
+                    pst.PercentableLiabilities,
+                    pst.Stocks,
+                    pst.FinancialItems,
+                    pst.Salary,
+                    pst.Expenses,
+                    pst.Income,
+                    pst.CashFlow,
+                    pst.PercentageToWin,
+                    pst.HasWon,
+                    pst.HasLost));
         }
     }
 }
