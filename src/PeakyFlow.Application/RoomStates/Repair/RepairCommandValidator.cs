@@ -6,7 +6,7 @@ namespace PeakyFlow.Application.RoomStates.Repair
     {
         public RepairCommandValidator()
         {
-            RuleFor(x => x.RoomStateId).NotEmpty();
+            RuleFor(x => x.RoomId).NotEmpty();
 
             RuleFor(x => x.PlayerId).NotEmpty();
 

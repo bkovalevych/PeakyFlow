@@ -13,7 +13,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
                 .NotNull()
                 .NotEmpty();
 
-            RuleFor(x => x.RoomStateId)
+            RuleFor(x => x.RoomId)
                 .NotNull()
                 .NotEmpty();
         }

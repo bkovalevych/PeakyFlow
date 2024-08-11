@@ -264,6 +264,14 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
             return (successfuly, acceptable, howMuchToBorrow);
         }
 
+        public void CountSalary(string playerId)
+        {
+            WithExistingPlayer(playerId, player =>
+            {
+                player.Savings += player.CashFlow;
+            });
+        }
+
         private PlayerState? WithExistingPlayer(string playerId, Action<PlayerState> action)
         {
             var player = PlayerStates.FirstOrDefault(x => x.Id == playerId);

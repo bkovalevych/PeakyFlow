@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using MediatR;
+using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.RoomStates.AcceptCard
 {
@@ -8,5 +9,5 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
         string PlayerId,
         string CardId,
         int? Count,
-        IEnumerable<string>? financialItemIds) : IRequest<Result<AcceptCardResponse>>;
+        IEnumerable<string>? financialItemIds) : IRequest<Result<AcceptCardResponse>>, IPlayerIsTakingTurnRequest;
 }

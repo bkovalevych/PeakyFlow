@@ -54,6 +54,7 @@ namespace PeakyFlow.Application.GameMaps.Handlers
             }
 
             map.GameMapPlayers = players.ToArray();
+            map.TakingTurnPlayer = map.GameMapPlayers.FirstOrDefault()?.Id;
 
             await _gameMapRepository.AddAsync(map, cancellationToken);
         }

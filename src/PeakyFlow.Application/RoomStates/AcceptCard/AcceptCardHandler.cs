@@ -2,6 +2,7 @@
 using MediatR;
 using PeakyFlow.Abstractions.GameCardRuleAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate;
+using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
 using PeakyFlow.Application.Common.Specifications;
 
@@ -11,12 +12,15 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
     {
         private readonly IRepository<RoomState> _roomStateRepository;
         private readonly IReadRepository<GameCardRule> _gameCardRuleRepository;
+        private readonly IMediator _mediator;
 
         public AcceptCardHandler(IRepository<RoomState> roomStateRepository,
-            IReadRepository<GameCardRule> gameCardRuleRepository)
+            IReadRepository<GameCardRule> gameCardRuleRepository, 
+            IMediator mediator)
         {
             _roomStateRepository = roomStateRepository;
             _gameCardRuleRepository = gameCardRuleRepository;
+            _mediator = mediator;
         }
 
         public async Task<Result<AcceptCardResponse>> Handle(AcceptCardCommand request, CancellationToken cancellationToken)
@@ -51,7 +55,10 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
                 room.Id, p.PlayerState.Savings, p.PlayerState.IsBankrupt,
                 p.PlayerState.CountableLiabilities, p.PlayerState.PercentableLiabilities,
                 p.PlayerState.Stocks, p.PlayerState.FinancialItems, p.PlayerState.Salary,
-                p.PlayerState.Expenses, p.PlayerState.Income, p.PlayerState.CashFlow, p.PlayerState.HasWon);
+                p.PlayerState.Expenses, p.PlayerState.Income, p.PlayerState.CashFlow, p.PlayerState.PercentageToWin, p.PlayerState.HasWon, p.PlayerState.HasLost);
+
+            await _mediator.Publish(new AnotherPlayerStateChangedEvent(request.RoomId, request.PlayerId, playerState.PercentageToWin, playerState.HasWon, playerState.HasLost),
+                cancellationToken);
 
             return new AcceptCardResponse(playerState, p.Acceptable);
         }
