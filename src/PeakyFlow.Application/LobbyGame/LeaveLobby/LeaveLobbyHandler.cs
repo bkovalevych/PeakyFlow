@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions.LobbyAggregate;
-using PeakyFlow.Abstractions.RoomAggregate.Events;
+using PeakyFlow.Abstractions.LobbyAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.LobbyGame.LeaveLobby
@@ -24,7 +24,7 @@ namespace PeakyFlow.Application.LobbyGame.LeaveLobby
             await Repository.UpdateAsync(lobby, cancellationToken);
             await Repository.SaveChangesAsync(cancellationToken);
 
-            var playerLeft = new PlayerLeftEvent(lobby.Id, request.PlayerId);
+            var playerLeft = new PlayerLeftLobbyEvent(lobby.Id, request.PlayerId);
 
             await _mediator.Publish(playerLeft, cancellationToken);
 

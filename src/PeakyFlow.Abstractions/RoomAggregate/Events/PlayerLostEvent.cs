@@ -1,5 +1,4 @@
-﻿using MediatR;
-using PeakyFlow.Abstractions.RoomAggregate.Interfaces;
+﻿using PeakyFlow.Abstractions.RoomAggregate.Interfaces;
 
 namespace PeakyFlow.Abstractions.RoomAggregate.Events
 {
