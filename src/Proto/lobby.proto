@@ -3,112 +3,21 @@ syntax = "proto3";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+option csharp_namespace = "PeakyFlow.GrpcProtocol.Lobby";
 
 service LobbyRpcService {
 	rpc CreateLobby (CreateLobbyMessage) returns (CreateLobbyResp);
-	rpc CloseLobby (CloseLobbyMessage) returns (RespBase);
+	rpc CloseLobby (CloseLobbyMessage) returns (Common.RespBase);
     rpc CloseLobbyAndStartGame (CloseLobbyAndStartGameMessage) returns (CloseLobbyAndStartGameResp);
     rpc JoinLobby (JoinLobbyMessage) returns (JoinLobbyResp);
-    rpc LeaveLobby (LeaveLobbyMessage) returns (RespBase);
-    rpc PlayerIsReady(PlayerIsReadyMessage) returns (RespBase); 
+    rpc LeaveLobby (LeaveLobbyMessage) returns (Common.RespBase);
+    rpc PlayerIsReady(PlayerIsReadyMessage) returns (Common.RespBase); 
     rpc OnLobbyEvent(LobbyEventMessage) returns (stream LobbyEvent);
     
     rpc ListLobbies (ListLobbyMessage) returns (LobbyListResp);
     rpc OnLobbyListEvent(google.protobuf.Empty) returns (stream LobbyListEvent);
-}
-
-service GameRpcService {
-    rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
-    rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
-    rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
-
-    rpc ThrowDice (ThrowDiceMsg) returns (ThrowDiceResp);
-    rpc Borrow (BorrowMsg) returns (BorrowResp);
-    rpc Repair (RepairMsg) returns (RepairResp);
-    rpc PullDealCard (PullDealCardMsg) returns (PullDealCardResp);
-    rpc IsCardAcceptable (IsCardAcceptableMsg) returns (IsCardAcceptableResp);
-    rpc AcceptCard (AcceptCardMsg) returns (AcceptCardResp);
-    rpc EndTurn (EndTurnMsg) returns (RespBase);
-
-}
-
-message EndTurnMsg {
-    string roomId = 1; 
-    string playerId = 2;
-}
-
-message PlayerLeftRoomMsg {
-    string roomId = 1; 
-    string playerId = 2; 
-}
-
-message AnotherPlayerStateChangedMsg {
-    string roomStateId = 1;
-    string playerId = 2; 
-    float percentageToWin = 3;
-    bool hasWon = 4;
-    bool hasLost = 5;
-}
-
-message AcceptCardMsg {
-    string roomId = 1;
-    string playerId = 2;
-    string cardId = 3;
-    optional int32 count = 4;
-    repeated string financialItemIds = 5;
-}
-
-message AcceptCardResp {
-    RespBase baseResp = 1;
-    optional PlayerStateMsg playerState = 2;
-    bool isAcceptable = 3;
-}
-
-message IsCardAcceptableMsg {
-    string roomId = 1;
-    string playerId = 2;
-    string cardId = 3;
-    optional int32 count = 4;
-}
-
-message IsCardAcceptableResp {
-    RespBase baseResp = 1;
-    optional bool Acceptable = 2; 
-    optional int32 HowMuchToBorrow = 3;
-}
-
-message PullDealCardMsg {
-    string roomId = 1; 
-    string playerId = 2;
-    CardTypeMsg cardType = 3;
-}
-
-message PullDealCardResp {
-    RespBase baseResp = 1;
-    optional CardMsg card = 2;
-}
-
-message RepairMsg {
-    string roomId = 1; 
-    string playerId = 2; 
-    repeated string liabilityNames = 3; 
-    repeated int32 money = 4;
-}
-
-message RepairResp {
-    RespBase baseResp = 1;
-    optional PlayerStateMsg playerState = 2;
-}
-
-message BorrowMsg {
-    string roomId = 1; 
-    string playerId = 2; 
-    int32 money = 3;
-}
-
-message BorrowResp {
-    RespBase baseResp = 1;
-    optional PlayerStateMsg playerState = 2;
 }
 
 message PlayerIsReadyMessage {
@@ -139,10 +48,10 @@ message CloseLobbyAndStartGameMessage {
 }
 
 message CloseLobbyAndStartGameResp {
-    RespBase baseResp = 1;
-    repeated PlayerMessage = 1;
-    google.protobuf.StringValue LobbyId = 2;
-    google.protobuf.StringValue Name = 3;
+    Common.RespBase baseResp = 1;
+    repeated PlayerMessage players = 2;
+    google.protobuf.StringValue lobbyId = 3;
+    google.protobuf.StringValue name = 4;
 }
 
 message LobbyEventMessage {
@@ -161,9 +70,9 @@ message LobbyEvent {
 }
 
 message LobbyClosedAndGameStartedMessage {
-    repeated PlayerMessage = 1;
-    google.protobuf.StringValue LobbyId = 2;
-    google.protobuf.StringValue Name = 3;
+    repeated PlayerMessage players = 1;
+    google.protobuf.StringValue lobbyId = 2;
+    google.protobuf.StringValue name = 3;
 }
 
 message PlayerMessage {
@@ -186,7 +95,7 @@ message CreateLobbyMessage {
 }
 
 message CreateLobbyResp {
-	RespBase baseResp = 1;
+	Common.RespBase baseResp = 1;
     google.protobuf.StringValue id = 2;
 }
 
@@ -201,7 +110,7 @@ message ListLobbyMessage {
 }
 
 message LobbyListResp {
-    RespBase baseResp = 1;
+    Common.RespBase baseResp = 1;
 	repeated LobbyItem lobbies = 2;
 }
 
@@ -214,152 +123,4 @@ message LobbyItem {
     bool isFree = 6;
     int32 playersNumber = 7;
     google.protobuf.Timestamp created = 8;
-}
-
-message RespBase {
-	ResultStatusMsg status = 1;
-	repeated google.protobuf.StringValue errors = 2;
-	repeated google.protobuf.StringValue validationErrors = 3;
-}
-
-message ThrowDiceMsg {
-    string roomId = 1;
-    string playerId = 2; 
-    int32 dice = 3;
-}
-
-message ThrowDiceResp {
-    RespBase baseResp = 1;
-    google.protobuf.StringValue roomId = 2; 
-    google.protobuf.StringValue playerId = 3;
-    StepTypeMsg stepType = 4;
-    optional CardMsg card = 5; 
-    optional PlayerStateMsg playerState = 6;
-}
-
-message PlayerSubscriptionMessage {
-    string roomId = 1; 
-    string playerId = 2;
-}
-
-message CardMsg {
-    string id = 1;
-    string name = 2;
-    string group = 3;
-    CardTypeMsg cardType = 4;
-    bool required = 5;
-    string condition = 6;
-    string header = 7;
-    string description = 8;
-    string footer = 9;
-    string tradingRange = 10;
-    int32 cost = 11;
-    int32 mortgage = 12;
-    int32 downPay = 13;
-    int32 cashFlow = 14;
-    StockActionMsg stockAction = 15;
-    bool isStock = 16;
-    bool isBusiness = 17;
-    bool isRealEstate = 18;
-}
-
-message PlayerStateMsg {
-    string id = 1;
-    string name = 2;
-    string roomId = 3;
-    int32 savings = 4;
-    bool isBankrupt = 5;
-    repeated FinancialItemMsg countableLiabilities = 6;
-    repeated FinancialItemMsg percentableLiabilities = 7;
-    repeated FinancialItemMsg stocks = 8;
-    repeated FinancialItemMsg financialItems = 9;
-    int32 salary = 10;
-    int32 expenses = 11;
-    int32 income = 12;
-    int32 cashFlow = 13;
-    float percentageToWin = 14;
-    bool hasWon = 15;
-    bool hasLost = 16;
-}
-
-message PlayerCreatedEventMsg {
-    bool shouldTakeTurn = 1;
-    string id = 2;
-    string name = 3;
-    string roomId = 4;
-    int32 savings = 5;
-    bool isBankrupt = 6;
-    string roleName = 7;
-    google.protobuf.StringValue description = 8;
-    google.protobuf.StringValue imageId = 9;
-    repeated FinancialItemMsg countableLiabilities = 10;
-    repeated FinancialItemMsg percentableLiabilities = 11;
-    repeated FinancialItemMsg stocks = 12;
-    repeated FinancialItemMsg financialItems = 13;
-    int32 salary = 14;
-    int32 expenses = 15;
-    int32 income = 16;
-    int32 cashFlow = 17;
-    int32 expensesForOneChild = 18;
-}
-
-message FinancialItemMsg {
-    string id = 1;
-    string name = 2; 
-    FinancialTypeMsg financialType = 3; 
-    int32 assetAmount = 4; 
-    int32 liabilityAmount = 5; 
-    int32 flowAmount = 6;
-    google.protobuf.StringValue group = 7;
-}
-
-enum ResultStatusMsg {
-    Ok = 0;
-    Created = 1;
-    Error = 2;
-    Forbidden = 3;
-    Unauthorized = 4;
-    Invalid = 5;
-    NotFound = 6;
-    NoContent = 7;
-    Conflict = 8;
-    CriticalError = 9;
-    Unavailable = 10;
-}
-
-enum FinancialTypeMsg {
-    Others = 1;
-    Savings = 2;
-    Salary = 3;
-    ChildrenExpenses = 4;
-    Stock = 5;
-    Business = 6;
-    RealEstate = 7;
-    Loan = 8;
-    Taxes = 9;
-}
-
-enum StepTypeMsg {
-    Start = 0;
-    Salary = 1;
-    Children = 2;
-    Charity = 3;
-    Market = 4;
-    Deal = 5;
-    MoneyToTheWind = 6;
-    Downsize = 7;
-}
-
-enum StockActionMsg {
-    Default = 0;
-    ReverseSplit1For2 = 1;
-    Split2For1 = 2;
-}
-
-enum CardTypeMsg {
-    Default = 0;
-    BigDeal = 1;
-    SmallDeal = 2;
-    MoneyToTheWind = 3;
-    Market = 4;
 }

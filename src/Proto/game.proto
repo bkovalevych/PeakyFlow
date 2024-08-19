@@ -1,0 +1,229 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "common.proto";
+
+option csharp_namespace = "PeakyFlow.GrpcProtocol.Game";
+
+service GameRpcService {
+    rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
+    rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
+    rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
+    rpc OnPlayerStartTurn (PlayerSubscriptionMessage) returns (stream google.protobuf.Empty);
+
+    rpc ThrowDice (ThrowDiceMsg) returns (ThrowDiceResp);
+    rpc Borrow (BorrowMsg) returns (BorrowResp);
+    rpc Repair (RepairMsg) returns (RepairResp);
+    rpc PullDealCard (PullDealCardMsg) returns (PullDealCardResp);
+    rpc IsCardAcceptable (IsCardAcceptableMsg) returns (IsCardAcceptableResp);
+    rpc AcceptCard (AcceptCardMsg) returns (AcceptCardResp);
+    rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
+}
+
+message EndTurnMsg {
+    string roomId = 1; 
+    string playerId = 2;
+}
+
+message PlayerLeftRoomMsg {
+    string roomId = 1; 
+    string playerId = 2; 
+}
+
+message AnotherPlayerStateChangedMsg {
+    string roomStateId = 1;
+    string playerId = 2; 
+    float percentageToWin = 3;
+    bool hasWon = 4;
+    bool hasLost = 5;
+}
+
+message AcceptCardMsg {
+    string roomId = 1;
+    string playerId = 2;
+    string cardId = 3;
+    optional int32 count = 4;
+    repeated string financialItemIds = 5;
+}
+
+message AcceptCardResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg playerState = 2;
+    bool isAcceptable = 3;
+}
+
+message IsCardAcceptableMsg {
+    string roomId = 1;
+    string playerId = 2;
+    string cardId = 3;
+    optional int32 count = 4;
+}
+
+message IsCardAcceptableResp {
+    Common.RespBase baseResp = 1;
+    optional bool Acceptable = 2; 
+    optional int32 HowMuchToBorrow = 3;
+}
+
+message PullDealCardMsg {
+    string roomId = 1; 
+    string playerId = 2;
+    CardTypeMsg cardType = 3;
+}
+
+message PullDealCardResp {
+    Common.RespBase baseResp = 1;
+    optional CardMsg card = 2;
+}
+
+message RepairMsg {
+    string roomId = 1; 
+    string playerId = 2; 
+    repeated string liabilityNames = 3; 
+    repeated int32 money = 4;
+}
+
+message RepairResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg playerState = 2;
+}
+
+message BorrowMsg {
+    string roomId = 1; 
+    string playerId = 2; 
+    int32 money = 3;
+}
+
+message BorrowResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg playerState = 2;
+}
+
+message ThrowDiceMsg {
+    string roomId = 1;
+    string playerId = 2; 
+    int32 dice = 3;
+}
+
+message ThrowDiceResp {
+    Common.RespBase baseResp = 1;
+    google.protobuf.StringValue roomId = 2; 
+    google.protobuf.StringValue playerId = 3;
+    StepTypeMsg stepType = 4;
+    optional CardMsg card = 5; 
+    optional PlayerStateMsg playerState = 6;
+    
+    enum StepTypeMsg {
+        Start = 0;
+        Salary = 1;
+        Children = 2;
+        Charity = 3;
+        Market = 4;
+        Deal = 5;
+        MoneyToTheWind = 6;
+        Downsize = 7;
+    }
+}
+
+message PlayerSubscriptionMessage {
+    string roomId = 1; 
+    string playerId = 2;
+}
+
+message CardMsg {
+    string id = 1;
+    string name = 2;
+    string group = 3;
+    CardTypeMsg cardType = 4;
+    bool required = 5;
+    string condition = 6;
+    string header = 7;
+    string description = 8;
+    string footer = 9;
+    string tradingRange = 10;
+    int32 cost = 11;
+    int32 mortgage = 12;
+    int32 downPay = 13;
+    int32 cashFlow = 14;
+    StockActionMsg stockAction = 15;
+    bool isStock = 16;
+    bool isBusiness = 17;
+    bool isRealEstate = 18;
+
+    enum StockActionMsg {
+        Default = 0;
+        ReverseSplit1For2 = 1;
+        Split2For1 = 2;
+    }
+}
+
+message PlayerStateMsg {
+    string id = 1;
+    string name = 2;
+    string roomId = 3;
+    int32 savings = 4;
+    bool isBankrupt = 5;
+    repeated FinancialItemMsg countableLiabilities = 6;
+    repeated FinancialItemMsg percentableLiabilities = 7;
+    repeated FinancialItemMsg stocks = 8;
+    repeated FinancialItemMsg financialItems = 9;
+    int32 salary = 10;
+    int32 expenses = 11;
+    int32 income = 12;
+    int32 cashFlow = 13;
+    float percentageToWin = 14;
+    bool hasWon = 15;
+    bool hasLost = 16;
+}
+
+message PlayerCreatedEventMsg {
+    bool shouldTakeTurn = 1;
+    string id = 2;
+    string name = 3;
+    string roomId = 4;
+    int32 savings = 5;
+    bool isBankrupt = 6;
+    string roleName = 7;
+    google.protobuf.StringValue description = 8;
+    google.protobuf.StringValue imageId = 9;
+    repeated FinancialItemMsg countableLiabilities = 10;
+    repeated FinancialItemMsg percentableLiabilities = 11;
+    repeated FinancialItemMsg stocks = 12;
+    repeated FinancialItemMsg financialItems = 13;
+    int32 salary = 14;
+    int32 expenses = 15;
+    int32 income = 16;
+    int32 cashFlow = 17;
+    int32 expensesForOneChild = 18;
+}
+
+message FinancialItemMsg {
+    string id = 1;
+    string name = 2; 
+    FinancialTypeMsg financialType = 3; 
+    int32 assetAmount = 4; 
+    int32 liabilityAmount = 5; 
+    int32 flowAmount = 6;
+    google.protobuf.StringValue group = 7;
+}
+
+enum FinancialTypeMsg {
+    Others = 0;
+    Savings = 1;
+    Salary = 2;
+    ChildrenExpenses = 3;
+    Stock = 4;
+    Business = 5;
+    RealEstate = 6;
+    Loan = 7;
+    Taxes = 8;
+}
+
+enum CardTypeMsg {
+    Default = 0;
+    BigDeal = 1;
+    SmallDeal = 2;
+    MoneyToTheWind = 3;
+    Market = 4;
+}

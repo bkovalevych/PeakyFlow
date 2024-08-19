@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeakyFlow.Console", "src\Pe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proto", "Proto", "{BB1CB15C-41A9-4882-ADCA-9153A8AEBC08}"
 	ProjectSection(SolutionItems) = preProject
+		src\Proto\common.proto = src\Proto\common.proto
+		src\Proto\game.proto = src\Proto\game.proto
 		src\Proto\lobby.proto = src\Proto\lobby.proto
 	EndProjectSection
 EndProject
