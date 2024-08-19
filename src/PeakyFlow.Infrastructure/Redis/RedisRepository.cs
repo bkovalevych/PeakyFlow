@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace PeakyFlow.Infrastructure.Redis
 {
-    public class RedisRepository<T, TModel> : IRepository<T>, IDisposable
+    public class RedisRepository<T, TModel> : IRepository<T>, IReadRepository<T>, IDisposable
         where T : Entity
         where TModel : EntityM
     {

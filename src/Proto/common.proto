@@ -10,7 +10,13 @@ option csharp_namespace = "PeakyFlow.GrpcProtocol.Common";
 message RespBase {
 	ResultStatusMsg status = 1;
 	repeated google.protobuf.StringValue errors = 2;
-	repeated google.protobuf.StringValue validationErrors = 3;
+	repeated ValidationErrorMsg validationErrors = 3;
+}
+
+message ValidationErrorMsg {
+    google.protobuf.StringValue identifier = 1;
+    google.protobuf.StringValue errorMessage = 2;
+    google.protobuf.StringValue errorCode = 3;
 }
 
 enum ResultStatusMsg {
