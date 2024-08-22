@@ -47,7 +47,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
 
                 _logger.LogInformation("Created lobby with name {name}", request.Name);
 
-                var createdEvent = new LobbyCreatedEvent(lobby.Id, lobby.Name, lobby.OwnerId, lobby.Password, lobby.Created, lobby.IsPublic, lobby.TeamSize);
+                var createdEvent = new LobbyCreatedEvent(lobby.Id, lobby.Name, lobby.OwnerId, lobby.Password, lobby.Created, lobby.IsPublic, lobby.IsFree, lobby.PlayersNumber, lobby.TeamSize);
                 await _mediator.Publish(createdEvent, cancellationToken);
             }
             catch (Exception ex) 

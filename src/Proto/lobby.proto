@@ -45,6 +45,7 @@ message JoinLobbyResp {
 
 message CloseLobbyAndStartGameMessage {
     string lobbyId = 1;
+    string playerId = 2;
 }
 
 message CloseLobbyAndStartGameResp {

@@ -1,6 +1,8 @@
-using PeakyFlow.Infrastructure.Extensions;
 using PeakyFlow.Application.Common.Extensions;
+using PeakyFlow.Infrastructure.Extensions;
+using PeakyFlow.Server.Common.Interfaces;
 using PeakyFlow.Server.Services;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddGrpc();
-builder.Services.AddAutoMapper(builder.GetType());
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
+
+builder.Services.AddSingleton(typeof(INotificationReceiver<>), typeof(NotificationReceiver<>));
 
 var app = builder.Build();
 
