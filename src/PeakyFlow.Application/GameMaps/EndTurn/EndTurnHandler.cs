@@ -58,6 +58,9 @@ namespace PeakyFlow.Application.GameMaps.EndTurn
                 await _mediator.Publish(new GameEndedEvent(request.RoomId), cancellationToken);
             }
 
+            var nextStartEvent = new PlayerStartedTurnEvent(request.RoomId, nextPlayer.Id);
+            await _mediator.Publish(nextStartEvent, cancellationToken);
+
             return Result.Success();
         }
     }

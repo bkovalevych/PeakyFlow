@@ -2,5 +2,5 @@
 
 namespace PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame
 {
-    public record CloseLobbyAndStartGameResponse(string LobbyId, IEnumerable<PlayerBase> Players);
+    public record CloseLobbyAndStartGameResponse(string LobbyId, string Name, IEnumerable<PlayerBase> Players);
 }

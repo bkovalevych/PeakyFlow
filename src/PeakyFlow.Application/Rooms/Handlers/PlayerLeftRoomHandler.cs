@@ -5,13 +5,13 @@ using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.Rooms.Handlers
 {
-    public class PlayerLeftHandler : RoomContextEventHandlerBase<PlayerLeftEvent>
+    public class PlayerLeftRoomHandler : RoomContextEventHandlerBase<PlayerLeftRoomEvent>
     {
-        public PlayerLeftHandler(IRepository<Room> roomRepository, ILogger<RoomContextEventHandlerBase<PlayerLeftEvent>> logger) : base(roomRepository, logger)
+        public PlayerLeftRoomHandler(IRepository<Room> roomRepository, ILogger<PlayerLeftRoomHandler> logger) : base(roomRepository, logger)
         {
         }
 
-        protected override async Task Handle(PlayerLeftEvent notification, Room room, CancellationToken cancellationToken)
+        protected override async Task Handle(PlayerLeftRoomEvent notification, Room room, CancellationToken cancellationToken)
         {
             var player = room.Players.FirstOrDefault(x => x.Id == notification.PlayerId);
 

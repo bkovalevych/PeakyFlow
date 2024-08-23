@@ -30,6 +30,7 @@ namespace PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame
                     .Where(x => x.IsReady);
             var response = new CloseLobbyAndStartGameResponse(
                 request.LobbyId,
+                lobby.Name,
                 players);
 
             var closedLobby = new LobbyClosedAndGameStartedEvent(request.LobbyId, lobby.Name, players);

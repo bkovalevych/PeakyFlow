@@ -10,10 +10,11 @@ using System.Linq.Expressions;
 
 namespace PeakyFlow.Infrastructure.Redis
 {
-    public class RedisRepository<T, TModel> : IRepository<T>, IDisposable
+    public class RedisRepository<T, TModel> : IRepository<T>, IReadRepository<T>, IDisposable
         where T : Entity
         where TModel : EntityM
     {
+        public const int MaxTake = 100;
         private bool disposedValue;
         private readonly ILogger<RedisRepository<T, TModel>> _logger;
         private readonly RedisConnectionProvider _redisProvider;
@@ -60,7 +61,8 @@ namespace PeakyFlow.Infrastructure.Redis
 
         public async IAsyncEnumerable<T> AsAsyncEnumerable(ISpecification<T> specification)
         {
-            await foreach (var t in _redisCollection)
+            await foreach (var t in _redisCollection.Skip(specification.Skip ?? 0)
+                .Take(specification.Take ?? MaxTake))
             {
                 yield return _mapper.Map<T>(t);
             }
@@ -169,7 +171,8 @@ namespace PeakyFlow.Infrastructure.Redis
                 initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
-            return _mapper.Map<List<T>>(await initialExpression.ToListAsync());
+            return _mapper.Map<List<T>>(await initialExpression.Skip(specification.Skip ?? 0)
+                .Take(specification.Take ?? MaxTake).ToListAsync());
         }
 
         public async Task<List<TResult>> ListAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default)
@@ -186,7 +189,8 @@ namespace PeakyFlow.Infrastructure.Redis
                 initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
-            var list = _mapper.Map<List<T>>(await initialExpression.ToListAsync());
+            var list = _mapper.Map<List<T>>(await initialExpression.Skip(specification.Skip ?? 0)
+                .Take(specification.Take ?? MaxTake).ToListAsync());
             var selector = specification.Selector.Compile();
 
             return list.Select(x => selector(x)).ToList();

@@ -4,7 +4,7 @@ using PeakyFlow.Application.Common.Interfaces;
 
 namespace PeakyFlow.Application.LobbyGame.List
 {
-    public class LobbyListQuery : IRequest<Result<IEnumerable<LobbyListResponse>>>, ICacheQuery, IPaginationQuery
+    public class LobbyListQuery : IRequest<Result<IEnumerable<LobbyListResponse>>>, IPaginationQuery
     {
         public string CacheKey => $"lobbies_take{PaginationCount}_skip{PaginationSkip}";
 
