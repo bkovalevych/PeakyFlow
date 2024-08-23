@@ -15,6 +15,7 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
+builder.Services.AddScoped<LobbyGrpcEventReceiver>();
 
 builder.Services.AddSingleton(typeof(INotificationReceiver<>), typeof(NotificationReceiver<>));
 

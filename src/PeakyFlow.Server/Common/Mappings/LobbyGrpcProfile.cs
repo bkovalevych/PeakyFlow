@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Google.Protobuf.WellKnownTypes;
+using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Abstractions.LobbyAggregate.Events;
 using PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame;
+using PeakyFlow.Application.LobbyGame.JoinLobby;
+using PeakyFlow.Application.LobbyGame.List;
 using PeakyFlow.GrpcProtocol.Lobby;
 
 namespace PeakyFlow.Server.Common.Mappings
@@ -20,6 +23,18 @@ namespace PeakyFlow.Server.Common.Mappings
 
             CreateMap<CloseLobbyAndStartGameResponse, CloseLobbyAndStartGameResp>()
                 .ReverseMap();
+
+            CreateMap<JoinLobbyResponse, JoinLobbyResp>().ReverseMap();
+            CreateMap<LobbyListResponse, LobbyListResp>().ReverseMap();
+
+            CreateMap<LobbyListResponse, LobbyItem>().ReverseMap();
+
+            CreateMap<LobbyClosedAndGameStartedEvent, LobbyClosedAndGameStartedMessage>()
+                .ReverseMap();
+
+            CreateMap<PlayerBase, PlayerMessage>().ReverseMap();
+
+            CreateMap<PlayerJoinedEvent, PlayerJoinedToLobbyMessage>();
 
         }
     }

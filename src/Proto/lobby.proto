@@ -38,9 +38,10 @@ message JoinLobbyMessage {
 }
 
 message JoinLobbyResp {
-    bool successfully = 1; 
-    google.protobuf.StringValue displayMessage = 2; 
-    google.protobuf.StringValue playerId = 3;
+    Common.RespBase baseResp = 1;
+    optional bool successfully = 2; 
+    google.protobuf.StringValue displayMessage = 3; 
+    google.protobuf.StringValue playerId = 4;
 }
 
 message CloseLobbyAndStartGameMessage {
@@ -65,9 +66,15 @@ message LobbyEvent {
         google.protobuf.StringValue playerLeftId = 2;
         google.protobuf.StringValue playerIsReadyId = 3;
         google.protobuf.StringValue playerIsNotReadyId = 4;
-        PlayerMessage playerJoined = 5;
+        PlayerJoinedToLobbyMessage playerJoined = 5;
         LobbyClosedAndGameStartedMessage lobbyClosedAndGameStarted = 6;
     }
+}
+
+message PlayerJoinedToLobbyMessage {
+    string LobbyId = 1; 
+    string PlayerId = 2; 
+    string PlayerName = 3;
 }
 
 message LobbyClosedAndGameStartedMessage {

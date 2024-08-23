@@ -45,13 +45,13 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
 
             await Repository.UpdateAsync(lobby, cancellationToken);
 
-            var count = await Repository.SaveChangesAsync(cancellationToken);
+            await Repository.SaveChangesAsync(cancellationToken);
 
             var playerJoined = new PlayerJoinedEvent(lobby.Id, player.Id, player.Name);
 
             await _mediator.Publish(playerJoined, cancellationToken);
 
-            return new JoinLobbyResponse(count > 0, "Success", player.Id);
+            return new JoinLobbyResponse(true, "Success", player.Id);
         }
     }
 }
