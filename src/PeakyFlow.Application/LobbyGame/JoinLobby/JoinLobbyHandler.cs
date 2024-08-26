@@ -10,7 +10,7 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
     public class JoinLobbyHandler
         : LobbyContextHandlerBase<JoinLobbyCommand, Result<JoinLobbyResponse>>
     {
-        private IGuid _guid;
+        private readonly IGuid _guid;
         private readonly IMediator _mediator;
 
         public JoinLobbyHandler(

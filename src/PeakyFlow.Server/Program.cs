@@ -1,5 +1,9 @@
+using PeakyFlow.Abstractions.GameCardRuleAggregate;
+using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Application.Common.Extensions;
+using PeakyFlow.Application.Common.Interfaces;
 using PeakyFlow.Infrastructure.Extensions;
+using PeakyFlow.Infrastructure.SpreadSheets;
 using PeakyFlow.Server.Common.Interfaces;
 using PeakyFlow.Server.Services;
 using System.Reflection;
@@ -13,7 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddGrpc();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddScoped<LobbyGrpcEventReceiver>();
 
