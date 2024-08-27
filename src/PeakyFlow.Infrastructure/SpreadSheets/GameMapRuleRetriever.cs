@@ -5,7 +5,7 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
 {
     internal class GameMapRuleRetriever : ISheetsRetriever<GameMapRule>
     {
-        public string Range => "'GameMap'!A1:B25";
+        public string Range => "'GameMap'!A1:B26";
         private const string ColumnName = "StepType";
 
         public List<GameMapRule> Retrieve(IList<IList<object>> objects)
@@ -26,8 +26,9 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
 
             var steps = new List<StepType>();
 
-            foreach (var item in objects[indexForStepType].Skip(1))
+            foreach (var row in objects.Skip(1))
             {
+                var item = row[indexForStepType];
                 if (item?.ToString() is string val)
                 {
                     var stepType = Enum.Parse<StepType>(val, true);

@@ -28,7 +28,7 @@ namespace PeakyFlow.Application.Rooms.Handlers
             {
                 Id = notification.LobbyId,
                 Name = notification.Name,
-                Players = notification.players.Select(p => new PlayerInRoom()
+                Players = notification.Players.Select(p => new PlayerInRoom()
                 {
                     Id = p.Id,
                     Name = p.Name,

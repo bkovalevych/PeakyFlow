@@ -48,7 +48,7 @@ namespace PeakyFlow.Application.RoomStates.Handlers
 
             var players = new List<PlayerState>();
 
-            foreach (var p in notification.players)
+            foreach (var p in notification.Players)
             {
                 var role = await _getRoleForPlayerService.GetRoleForPlayer(cancellationToken);
                 if (!role.IsSuccess)

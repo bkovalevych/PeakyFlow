@@ -33,7 +33,7 @@ namespace PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame
                 lobby.Name,
                 players);
 
-            var closedLobby = new LobbyClosedAndGameStartedEvent(request.LobbyId, lobby.Name, players);
+            var closedLobby = new LobbyClosedAndGameStartedEvent(request.LobbyId, lobby.Name, players.FirstOrDefault()?.Id, players);
 
             await _mediator.Publish(closedLobby, cancellationToken);
 
