@@ -44,7 +44,6 @@ namespace PeakyFlow.Infrastructure.Extensions
                 .AddScoped<IRepository<Lobby>, RedisRepository<Lobby, LobbyM>>()
                 .AddScoped<IRepository<Room>, RedisRepository<Room, RoomM>>()
                 .AddScoped<IRepository<GameMap>, RedisRepository<GameMap, GameMapM>>()
-                .AddScoped<IRepository<GameMapRule>, RedisRepository<GameMapRule, GameMapRuleM>>()
                 .AddScoped<IRepository<RoomState>, RedisRepository<RoomState, RoomStateM>>();
         }
     }
