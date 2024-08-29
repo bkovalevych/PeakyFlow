@@ -5,8 +5,8 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
     public interface ISheetsRetriever<TEntity>
         where TEntity : Entity, IAggregateRoot
     {
-        string Range { get; }
+        List<string> Ranges { get; }
 
-        List<TEntity> Retrieve(IList<IList<object>> objects);
+        List<TEntity> Retrieve(IList<IList<IList<object>>> ranges);
     }
 }

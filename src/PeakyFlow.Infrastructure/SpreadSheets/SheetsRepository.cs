@@ -4,6 +4,7 @@ using Google.Apis.Sheets.v4;
 using Microsoft.Extensions.Options;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Application.Common.Interfaces;
+using static Google.Apis.Sheets.v4.SpreadsheetsResource.ValuesResource.BatchGetRequest;
 
 namespace PeakyFlow.Infrastructure.SpreadSheets
 {
@@ -30,14 +31,15 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
 
         private async Task<List<TEntity>> InitIfNotInited()
         {
-            var request = _sheetsService.Spreadsheets.Values.Get(
-                _sheetsSettings.SheetId,
-                _sheetsRetriever.Range);
-                //"'BigDeals'!A1:J41");
+            var request = _sheetsService.Spreadsheets.Values.BatchGet(
+                _sheetsSettings.SheetId);
             
+            request.Ranges = _sheetsRetriever.Ranges;
+            
+            request.ValueRenderOption = ValueRenderOptionEnum.FORMATTEDVALUE;
             var val = await request.ExecuteAsync();
-
-            var result = _sheetsRetriever.Retrieve(val.Values);
+            
+            var result = _sheetsRetriever.Retrieve(val.ValueRanges.Select(x => x.Values).ToList());
             return result;
         }
 

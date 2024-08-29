@@ -13,14 +13,15 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
 
         public string GetCardIdByType(CardType cardType)
         {
-            if (!Indeces.ContainsKey(cardType))
+            if (!Indeces.TryGetValue(cardType, out int value))
             {
-                Indeces[cardType] = 0;
+                value = 0;
+                Indeces[cardType] = value;
             }
 
-            var count = Cards[cardType].Count();
+            var count = Cards[cardType].Count;
 
-            var index = Indeces[cardType];
+            var index = value;
             var item = Cards[cardType][index];
 
             Indeces[cardType] = (index + 1) % count;

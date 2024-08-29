@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PeakyFlow.Abstractions.Common.Interfaces;
+using PeakyFlow.Abstractions.Common.Services;
 using PeakyFlow.Application.Common.Behaviors;
 using PeakyFlow.Application.LobbyGame.Create;
 using PeakyFlow.Application.Roles.GetRoleForPlayer;
@@ -18,6 +20,7 @@ namespace PeakyFlow.Application.Common.Extensions
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>))
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(PlayerIsTakingTurnBehavior<,>))
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
+                .AddTransient<IStringConverter, MyStringConverter>()
                 .AddValidatorsFromAssemblyContaining<CreateLobbyValidator>()
                 .AddTransient<IGetRoleForPlayerService, GetRoleForPlayerService>();
         }

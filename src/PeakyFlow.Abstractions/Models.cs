@@ -25,7 +25,13 @@
         bool IsStock,
         bool IsBusiness,
         bool IsRealEstate
-        );
+        )
+    {
+        public static Card GetDefault()
+        {
+            return new Card("", "", "", CardType.Default, false, "", "", "", "", "", 0, 0, 0, 0, StockAction.Default, false, false, false);
+        }
+    }
 
     public enum CardType
     {

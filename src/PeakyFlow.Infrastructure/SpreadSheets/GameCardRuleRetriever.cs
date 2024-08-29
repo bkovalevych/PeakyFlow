@@ -1,59 +1,110 @@
-﻿using PeakyFlow.Abstractions;
+﻿using Microsoft.Extensions.Logging;
+using PeakyFlow.Abstractions;
+using PeakyFlow.Abstractions.Common.Interfaces;
 using PeakyFlow.Abstractions.GameCardRuleAggregate;
 
 namespace PeakyFlow.Infrastructure.SpreadSheets
 {
-    public class GameCardRuleRetriever : ISheetsRetriever<GameCardRule>
+    public class GameCardRuleRetriever(IStringConverter stringConverter, ILogger<GameCardRuleRetriever> logger) : ISheetsRetriever<GameCardRule>
     {
-        public string Range => "'BigDeals'!A1:J41";
+        public List<string> Ranges => [
+            "'BigDeals'!A1:J41", 
+            "'MoneyToTheWind'!A1:H7", 
+            "'SmallDeals'!A1:I19", 
+            "'Stocks'!A1:J37",
+            "'Market'!A1:I3"];
 
-        private static readonly IReadOnlyDictionary<string, Action<string, Card[]>> Retrievers = new Dictionary<string, Action<string, Card[]>>()
+        private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> BigDelaRetrievers = new Dictionary<string, Func<string, Card, Card>>()
         {
-            ["Id"] = (val, card) => card[0] = card[0] with {  Id = val },
-            ["Type"] = (val, card) => card[0] = card[0] with { CardType = Enum.Parse<CardType>(val.Replace(" ", ""), true) },
-            ["Name"] = (val, card) => card[0] = card[0] with { Name = val },
-            ["Header"] = (val, card) => card[0] = card[0] with { Header = val },
-            ["Description"] = (val, card) => card[0] = card[0] with { Description = val },
-            ["Footer"] = (val, card) => card[0] = card[0] with { Footer = val },
-            ["Cost"] = (val, card) => 
-            {
-                if (int.TryParse(val, out var intVal))
-                {
-                    card[0] = card[0] with { Cost = intVal };
-                }
-            },
-            ["Liability"] = (val, card) =>
-            {
-                if (int.TryParse(val, out var intVal))
-                {
-                    card[0] = card[0] with { Mortgage = intVal };
-                }
-            },
-            ["Down pay"] = (val, card) =>
-            {
-                if (int.TryParse(val, out var intVal))
-                {
-                    card[0] = card[0] with { DownPay = intVal };
-                }
-            },
-            ["Cash flow"] = (val, card) =>
-            {
-                if (int.TryParse(val, out var intVal))
-                {
-                    card[0] = card[0] with { CashFlow = intVal };
-                }
-            },
+            ["Id"] = (val, card) => card with { Id = $"bigDeal-{val}" },
+            ["Type"] = (val, card) => card with { CardType = Enum.Parse<CardType>(val.Replace(" ", ""), true) },
+            ["Name"] = (val, card) => card with { Name = val },
+            ["Header"] = (val, card) => card with { Header = val },
+            ["Description"] = (val, card) => card with { Description = val },
+            ["Footer"] = (val, card) => card with { Footer = val },
+            ["Cost"] = (val, card) => card with { Cost = stringConverter.ToValue(val, 0) },
+            ["Liability"] = (val, card) => card with { Mortgage = stringConverter.ToValue(val, 0) },
+            ["Down pay"] = (val, card) => card with { DownPay = stringConverter.ToValue(val, 0) },
+            ["Cash flow"] = (val, card) => card with { CashFlow = stringConverter.ToValue(val, 0) }
         };
 
-        public List<GameCardRule> Retrieve(IList<IList<object>> objects)
+        private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> MoneyToTheWindRetrievers = new Dictionary<string, Func<string, Card, Card>>()
+        {
+            ["Id"] = (val, card) => card with { Id = $"mtw-{val}" },
+            ["Name"] = (val, card) => card with { Name = val },
+            ["Header"] = (val, card) => card with { Header = val },
+            ["Description"] = (val, card) => card with { Description = val },
+            ["Footer"] = (val, card) => card with { Footer = val },
+            ["Mortgage"] = (val, card) => card with { Mortgage = stringConverter.ToValue(val, 0) },
+            ["DownPay"] = (val, card) => card with { DownPay = stringConverter.ToValue(val, 0) },
+            ["CashFlow"] = (val, card) => card with { CashFlow = stringConverter.ToValue(val, 0) }
+        };
+
+
+        private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> SmallDealRetrievers = new Dictionary<string, Func<string, Card, Card>>()
+        {
+            ["Id"] = (val, card) => card with { Id = $"smallDeal-{val}" },
+            ["Name"] = (val, card) => card with { Name = val },
+            ["Header"] = (val, card) => card with { Header = val },
+            ["Description"] = (val, card) => card with { Description = val },
+            ["Footer"] = (val, card) => card with { Footer = val },
+            ["Cost"] = (val, card) => card with { Cost = stringConverter.ToValue(val, 0) },
+            ["Liability / Mortgage"] = (val, card) => card with { Mortgage = stringConverter.ToValue(val, 0) },
+            ["Down pay"] = (val, card) => card with { DownPay = stringConverter.ToValue(val, 0) },
+            ["Cash flow"] = (val, card) => card with { CashFlow = stringConverter.ToValue(val, 0) }
+        };
+
+        private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> StockRetrievers = new Dictionary<string, Func<string, Card, Card>>()
+        {
+            ["Id"] = (val, card) => card with { Id = $"smallDeal-{val}" },
+            ["Symbol"] = (val, card) => card with { Name = val },
+            ["Header"] = (val, card) => card with { Header = val },
+            ["Description"] = (val, card) => card with { Description = val },
+            ["Footer"] = (val, card) => card with { Footer = val },
+            ["Price"] = (val, card) => card with { Cost = stringConverter.ToValue(val, 0), DownPay = stringConverter.ToValue(val, 0) },
+            ["Range"] = (val, card) => card with { TradingRange = val },
+            ["Divident"] = (val, card) => card with { CashFlow = stringConverter.ToValue(val, 0) },
+            ["StockAction"] = (val, card) => card with { StockAction = stringConverter.ToValue(val, StockAction.Default) }
+        };
+        
+        private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> MarketRetrievers = new Dictionary<string, Func<string, Card, Card>>()
+        {
+            ["Id"] = (val, card) => card with { Id = $"market-{val}" },
+            ["Group"] = (val, card) => card with { Group = val },
+            ["Header"] = (val, card) => card with { Header = val },
+            ["Description"] = (val, card) => card with { Description = val },
+            ["Footer"] = (val, card) => card with { Footer = val },
+            ["Cost"] = (val, card) => card with { Cost = stringConverter.ToValue(val, 0) },
+            ["Liability"] = (val, card) => card with { Mortgage = stringConverter.ToValue(val, 0) },
+            ["Down pay"] = (val, card) => card with { DownPay = stringConverter.ToValue(val, 0) },
+            ["Cash flow"] = (val, card) => card with { CashFlow = stringConverter.ToValue(val, 0) }
+        };
+
+        public List<GameCardRule> Retrieve(IList<IList<IList<object>>> ranges)
         {
             var rule = new GameCardRule() 
             {
-                Id = "b"
+                Id = "1"
             };
 
-            var cards = new List<Card>();
+            rule.Cards = [
+            .. ProcessObjects(ranges[0], BigDelaRetrievers),
+            .. ProcessObjects(ranges[1], MoneyToTheWindRetrievers, 
+                card => card with { CardType = CardType.MoneyToTheWind, Required = true }),
+            .. ProcessObjects(ranges[2], SmallDealRetrievers, 
+                card => card with { CardType = CardType.SmallDeal } ),
+            .. ProcessObjects(ranges[3], StockRetrievers,
+                card => card with { CardType = CardType.SmallDeal }),
+            .. ProcessObjects(ranges[4], MarketRetrievers,
+                card => card with { CardType = CardType.Market })];
 
+            return [rule];
+        }
+
+        
+
+        private List<Card> ProcessObjects(IList<IList<object>> objects, IReadOnlyDictionary<string, Func<string, Card, Card>> retriever, Func<Card, Card>? postProcess = null) 
+        {
             if (objects.Count <= 1)
             {
                 throw new ArgumentException("");
@@ -61,35 +112,42 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
 
             var headers = objects[0].Select((x, i) => (x.ToString(), i))
                 .ToList();
-
-            for (var row = 1; row < objects.Count; row++) 
+            
+            var cards = new List<Card>();
+            try 
             {
-                Card[] card = [new Card("", "", "", CardType.Default, false, "", "", "", "", "", 0, 0, 0, 0, StockAction.Default, false, false, false)];
-
-                foreach (var (name, col) in headers)
+                for (var row = 1; row < objects.Count; row++)
                 {
-                    if (name == null)
+                    Card card = Card.GetDefault();
+
+                    foreach (var (name, col) in headers)
                     {
-                        continue;
-                    }
-                    
-                    var val = objects[row][col].ToString();
-                    
-                    if (val == null) 
-                    {
-                        continue;
+                        if (name == null || !retriever.ContainsKey(name) || objects[row].Count <= col)
+                        {
+                            continue;
+                        }
+                        var val = objects[row][col].ToString();
+
+                        if (val == null)
+                        {
+                            continue;
+                        }
+             
+                        card = retriever[name].Invoke(val, card);
+                        card = postProcess?.Invoke(card) ?? card;
                     }
 
-                    Retrievers[name].Invoke(val, card);
+                    cards.Add(card);
                 }
-
-                cards.Add(card[0]);
-
+            }
+            catch (Exception ex) 
+            {
+                logger.LogWarning(ex, "something went wrong during retrieving cards");
+                throw;
             }
 
-            rule.Cards = [.. cards];
+            return cards;
 
-            return [rule];
         }
     }
 }

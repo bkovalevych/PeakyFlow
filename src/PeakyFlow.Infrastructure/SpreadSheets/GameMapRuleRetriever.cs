@@ -5,10 +5,10 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
 {
     internal class GameMapRuleRetriever : ISheetsRetriever<GameMapRule>
     {
-        public string Range => "'GameMap'!A1:B26";
+        public List<string> Ranges => ["'GameMap'!A1:B26"];
         private const string ColumnName = "StepType";
 
-        public List<GameMapRule> Retrieve(IList<IList<object>> objects)
+        public List<GameMapRule> Retrieve(IList<IList<IList<object>>> ranges)
         {
             var gameMaps = new List<GameMapRule>()
             {
@@ -17,6 +17,8 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
                     Id = "1"
                 }
             };
+
+            var objects = ranges[0];
 
             var indexForStepType = objects[0]
                 .Select((raw, x) => (index: x, name: raw.ToString()))
