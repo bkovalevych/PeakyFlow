@@ -54,7 +54,7 @@ namespace PeakyFlow.Application.RoomStates.Repair
                 p.CashFlow,
                 p.PercentageToWin,
                 p.HasWon,
-                p.HasLost));
+                p.HasLost, p.ExpensesForOneChild));
         }
     }
 }

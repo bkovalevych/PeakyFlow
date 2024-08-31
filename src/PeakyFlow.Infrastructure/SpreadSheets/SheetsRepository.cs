@@ -104,7 +104,7 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
                 initial = initial.Where(t.FilterFunc);
             }
 
-            return initial.FirstOrDefault();
+            return initial.Skip(specification.Skip ?? 0).FirstOrDefault();
         }
 
         public async Task<TResult?> FirstOrDefaultAsync<TResult>(ISpecification<TEntity, TResult> specification, CancellationToken cancellationToken = default)
@@ -118,7 +118,7 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
             }
 
             var s = specification.Selector?.Compile() ?? throw new ArgumentException("Selector was not specified");
-            return initial.Select(s)
+            return initial.Skip(specification.Skip ?? 0).Select(s)
                 .FirstOrDefault();
         }
 

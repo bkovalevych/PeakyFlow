@@ -1,11 +1,12 @@
-﻿using PeakyFlow.Abstractions.Common.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using PeakyFlow.Abstractions.Common.Interfaces;
 using PeakyFlow.Abstractions.GameRoleAggregate;
 
 namespace PeakyFlow.Infrastructure.SpreadSheets
 {
-    internal class GameRoleRetriever(IStringConverter stringConverter) : ISheetsRetriever<GameRole>
+    internal class GameRoleRetriever(IStringConverter stringConverter, IOptions<SheetsSettings> options) : ISheetsRetriever<GameRole>
     {
-        public List<string> Ranges => ["'Proffessions'!A1:Q3"];
+        public List<string> Ranges => [options.Value.GameRoleRange];
 
         public List<GameRole> Retrieve(IList<IList<IList<object>>> ranges)
         {

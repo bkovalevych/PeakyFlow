@@ -55,7 +55,7 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
                 room.Id, p.PlayerState.Savings, p.PlayerState.IsBankrupt,
                 p.PlayerState.CountableLiabilities, p.PlayerState.PercentableLiabilities,
                 p.PlayerState.Stocks, p.PlayerState.FinancialItems, p.PlayerState.Salary,
-                p.PlayerState.Expenses, p.PlayerState.Income, p.PlayerState.CashFlow, p.PlayerState.PercentageToWin, p.PlayerState.HasWon, p.PlayerState.HasLost);
+                p.PlayerState.Expenses, p.PlayerState.Income, p.PlayerState.CashFlow, p.PlayerState.PercentageToWin, p.PlayerState.HasWon, p.PlayerState.HasLost, p.PlayerState.ExpensesForOneChild);
 
             await _mediator.Publish(new AnotherPlayerStateChangedEvent(request.RoomId, request.PlayerId, playerState.PercentageToWin, playerState.HasWon, playerState.HasLost),
                 cancellationToken);

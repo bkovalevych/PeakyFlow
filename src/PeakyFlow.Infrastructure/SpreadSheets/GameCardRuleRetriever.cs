@@ -1,18 +1,22 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.Common.Interfaces;
 using PeakyFlow.Abstractions.GameCardRuleAggregate;
 
 namespace PeakyFlow.Infrastructure.SpreadSheets
 {
-    public class GameCardRuleRetriever(IStringConverter stringConverter, ILogger<GameCardRuleRetriever> logger) : ISheetsRetriever<GameCardRule>
+    public class GameCardRuleRetriever(
+        IStringConverter stringConverter,
+        IOptions<SheetsSettings> delegateSheets,
+        ILogger<GameCardRuleRetriever> logger) : ISheetsRetriever<GameCardRule>
     {
         public List<string> Ranges => [
-            "'BigDeals'!A1:J41", 
-            "'MoneyToTheWind'!A1:H7", 
-            "'SmallDeals'!A1:I19", 
-            "'Stocks'!A1:J37",
-            "'Market'!A1:I3"];
+            delegateSheets.Value.BigDealsRange,
+            delegateSheets.Value.MoneyToTheWindRange,
+            delegateSheets.Value.SmallDealsRange,
+            delegateSheets.Value.StocksRange,
+            delegateSheets.Value.MarketRange];
 
         private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> BigDelaRetrievers = new Dictionary<string, Func<string, Card, Card>>()
         {

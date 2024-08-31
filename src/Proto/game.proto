@@ -7,6 +7,7 @@ import "common.proto";
 option csharp_namespace = "PeakyFlow.GrpcProtocol.Game";
 
 service GameRpcService {
+    rpc GetplayerState (PlayerSubscriptionMessage) returns (GetplayerStateResp);
     rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
     rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
     rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
@@ -19,6 +20,11 @@ service GameRpcService {
     rpc IsCardAcceptable (IsCardAcceptableMsg) returns (IsCardAcceptableResp);
     rpc AcceptCard (AcceptCardMsg) returns (AcceptCardResp);
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
+}
+
+message GetplayerStateResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg player = 2;
 }
 
 message EndTurnMsg {
@@ -175,6 +181,7 @@ message PlayerStateMsg {
     float percentageToWin = 14;
     bool hasWon = 15;
     bool hasLost = 16;
+    int32 ExpensesForOneChild = 17;
 }
 
 message PlayerCreatedEventMsg {

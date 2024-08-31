@@ -1,11 +1,12 @@
-﻿using PeakyFlow.Abstractions;
+﻿using Microsoft.Extensions.Options;
+using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapRuleAggregate;
 
 namespace PeakyFlow.Infrastructure.SpreadSheets
 {
-    internal class GameMapRuleRetriever : ISheetsRetriever<GameMapRule>
+    internal class GameMapRuleRetriever(IOptions<SheetsSettings> settings) : ISheetsRetriever<GameMapRule>
     {
-        public List<string> Ranges => ["'GameMap'!A1:B26"];
+        public List<string> Ranges => [settings.Value.GameMapRange];
         private const string ColumnName = "StepType";
 
         public List<GameMapRule> Retrieve(IList<IList<IList<object>>> ranges)

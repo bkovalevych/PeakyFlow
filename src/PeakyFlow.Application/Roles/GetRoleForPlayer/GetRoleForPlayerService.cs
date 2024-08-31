@@ -24,7 +24,7 @@ namespace PeakyFlow.Application.Roles.GetRoleForPlayer
                 throw new ArgumentException("Game has no roles");
             }
 
-            var index = random.Next(count - 1);
+            var index = random.Next(count);
 
             var role = await _gameRoleRepository.FirstOrDefaultAsync(new GetRoleForPlayerSpecification(index));
 

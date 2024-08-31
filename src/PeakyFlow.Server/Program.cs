@@ -55,7 +55,7 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.MapGrpcService<LobbyGrpcService>();
-
+app.MapGrpcService<GameGrpcService>();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

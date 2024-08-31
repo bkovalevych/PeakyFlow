@@ -68,7 +68,8 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
                     pst.CashFlow,
                     pst.PercentageToWin,
                     pst.HasWon,
-                    pst.HasLost));
+                    pst.HasLost,
+                    pst.ExpensesForOneChild));
         }
     }
 }
