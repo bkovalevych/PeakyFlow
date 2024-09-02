@@ -50,27 +50,27 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
                 var countable = new List<(CountableLiabilityItem, int)>();
                 var financable = new List<(FinancialItem, int)>();
 
-                foreach (var (name, moneyForName) in liabilityNames.Zip(money))
+                foreach (var (id, moneyForName) in liabilityNames.Zip(money))
                 {
-                    var addPercentable = player.PercentableLiabilities.Where(x => x.LiabilityAmount != 0 && name == x.Name)
+                    var addPercentable = player.PercentableLiabilities.Where(x => x.LiabilityAmount != 0 && id == x.Id)
                         .Select(x => (x, moneyForName));
 
                     percentable.AddRange(addPercentable);
 
-                    var addCountable = player.CountableLiabilities.Where(x => x.LiabilityAmount != 0 && name == x.Name)
+                    var addCountable = player.CountableLiabilities.Where(x => x.LiabilityAmount != 0 && id == x.Id)
                         .Select(x => (x, moneyForName));
 
                     countable.AddRange(addCountable);
 
 
-                    var addFinancable = player.FinancialItems.Where(x => x.LiabilityAmount == moneyForName && name == x.Name)
+                    var addFinancable = player.FinancialItems.Where(x => x.LiabilityAmount != 0 && x.LiabilityAmount == moneyForName && id == x.Id)
                         .Select(x => (x, moneyForName));
 
                     financable.AddRange(addFinancable);
 
                 }
 
-                var liabilitiesSum = percentable.Sum(x => x.Item2) + countable.Sum(x => x.Item2);
+                var liabilitiesSum = percentable.Sum(x => x.Item2) + countable.Sum(x => x.Item2) + financable.Sum(x => x.Item2);
 
                 if (player.Savings < liabilitiesSum)
                 {

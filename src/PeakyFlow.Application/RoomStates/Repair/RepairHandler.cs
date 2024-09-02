@@ -35,6 +35,8 @@ namespace PeakyFlow.Application.RoomStates.Repair
                 return Result<PlayerStateDto>.NotFound();
             }
 
+            await _roomStateRepository.UpdateAsync(state, cancellationToken);
+
             await _mediator.Publish(new AnotherPlayerStateChangedEvent(
                 request.RoomId,
                 request.PlayerId,

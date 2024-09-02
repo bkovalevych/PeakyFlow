@@ -15,7 +15,8 @@ namespace PeakyFlow.Application.RoomStates.Repair
 
             RuleFor(x => x.LiabilityNames)
                 .NotEmpty()
-                .Must((command, names) => command.Money.Count() == command.LiabilityNames.Count());
+                .Must((command, names) => command.Money.Count() == command.LiabilityNames.Count())
+                .WithMessage("LiabilityNames count must be equal to Money count");
         }
     }
 }

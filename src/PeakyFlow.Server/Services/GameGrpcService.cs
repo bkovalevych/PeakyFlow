@@ -4,6 +4,7 @@ using MediatR;
 using PeakyFlow.Application.GameMaps.GetGameMap;
 using PeakyFlow.Application.RoomStates.Borrow;
 using PeakyFlow.Application.RoomStates.GetPlayerState;
+using PeakyFlow.Application.RoomStates.Repair;
 using PeakyFlow.GrpcProtocol.Game;
 using PeakyFlow.Server.Common.Extensions;
 
@@ -50,9 +51,17 @@ namespace PeakyFlow.Server.Services
             return resp;
         }
 
-        public override Task<RepairResp> Repair(RepairMsg request, ServerCallContext context)
+        public override async Task<RepairResp> Repair(RepairMsg request, ServerCallContext context)
         {
-            return base.Repair(request, context);
+            var result = await mediator.Send(new RepairCommand(request.RoomId, request.PlayerId, request.LiabilityNames, request.Money));
+
+            var resp = new RepairResp()
+            {
+                BaseResp = result.ToRespBase(mapper),
+                PlayerState = mapper.Map<PlayerStateMsg>(result.Value)
+            };
+
+            return resp;
         }
     }
 }
