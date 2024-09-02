@@ -24,7 +24,7 @@ namespace PeakyFlow.Infrastructure.Redis
         public RedisRepository(RedisConnectionProvider provider, IMapper mapper, ILogger<RedisRepository<T, TModel>> logger)
         {
             _redisProvider = provider;
-            _redisCollection = (RedisCollection<TModel>)_redisProvider.RedisCollection<TModel>();
+            _redisCollection = (RedisCollection<TModel>)_redisProvider.RedisCollection<TModel>(false);
             _mapper = mapper;
             _logger = logger;
         }

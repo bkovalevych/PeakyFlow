@@ -37,7 +37,6 @@ namespace PeakyFlow.Application.Rooms.Handlers
             };
 
             await _roomRepository.AddAsync(room, cancellationToken);
-            await _roomRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

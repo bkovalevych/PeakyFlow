@@ -33,6 +33,7 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
         {
             return WithExistingPlayer(playerId, player =>
             {
+                player.Savings += money;
                 player.PercentableLiabilities.Add(new PercentableLiabilityItem(id,
                     PercentableLiabilityItem.Loan,
                     FinancialType.Loan,

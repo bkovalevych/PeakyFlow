@@ -36,7 +36,6 @@ namespace PeakyFlow.Application.LobbyGame.PlayerInLobbySetIsReady
 
             player.IsReady = request.IsReady;
             await Repository.UpdateAsync(lobby, cancellationToken);
-            await Repository.SaveChangesAsync(cancellationToken);
             var playersIsReadyEvent = new PlayerInLobbyIsReadyEvent(request.LobbyId, request.PlayerId, request.IsReady);
 
             await _mediator.Publish(playersIsReadyEvent, cancellationToken);

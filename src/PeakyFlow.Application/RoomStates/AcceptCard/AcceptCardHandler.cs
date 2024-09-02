@@ -48,8 +48,9 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
             {
                 return Result<AcceptCardResponse>.NotFound();
             }
-
-            await _roomStateRepository.SaveChangesAsync(cancellationToken);
+            
+            await _roomStateRepository.UpdateAsync(room, cancellationToken);
+            
 
             var playerState = new PlayerStateDto(p.PlayerState.Id, p.PlayerState.Name,
                 room.Id, p.PlayerState.Savings, p.PlayerState.IsBankrupt,

@@ -77,8 +77,7 @@ namespace PeakyFlow.Application.RoomStates.Handlers
             state.PlayerStates = players;
 
             await _roomStateRepository.AddAsync(state, cancellationToken);
-            await _roomStateRepository.SaveChangesAsync(cancellationToken);
-
+            
             _logger.LogInformation("State for room {room} inited", state.Id);
 
             var first = true;

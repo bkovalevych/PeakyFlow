@@ -23,7 +23,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
         public async Task<Result<PlayerStateDto>> Handle(BorrowCommand request, CancellationToken cancellationToken)
         {
             var state = await _roomStateRepository
-                .FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
+                .GetByIdAsync(request.RoomId, cancellationToken);
 
             if (state == null)
             {
@@ -31,6 +31,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
             }
 
             var p = state.Borrow(request.PlayerId, request.Money, _guid.NewId());
+            await _roomStateRepository.UpdateAsync(state, cancellationToken);
 
             if (p == null)
             {
