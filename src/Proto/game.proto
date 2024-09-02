@@ -7,7 +7,8 @@ import "common.proto";
 option csharp_namespace = "PeakyFlow.GrpcProtocol.Game";
 
 service GameRpcService {
-    rpc GetplayerState (PlayerSubscriptionMessage) returns (GetplayerStateResp);
+    rpc GetPlayerState (PlayerSubscriptionMessage) returns (GetPlayerStateResp);
+    rpc GetGameMap (GetGameMapMessage) returns (GetGameMapResp);
     rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
     rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
     rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
@@ -22,7 +23,44 @@ service GameRpcService {
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
 }
 
-message GetplayerStateResp {
+message GetGameMapMessage {
+    string id = 1;
+}
+
+message GetGameMapResp {
+    Common.RespBase baseResp = 1;
+    GameMapResp gameMap = 2;
+}
+
+message GameMapResp {
+    string id = 1;
+    repeated GameMapPlayerResp GameMapPlayers = 2;
+    repeated StepTypeMsg Steps = 3;
+    google.protobuf.StringValue TakingTurnPlayer = 4;
+
+    enum StepTypeMsg {
+        Start = 0;
+        Salary = 1;
+        Children = 2;
+        Charity = 3;
+        Market = 4;
+        Deal = 5;
+        MoneyToTheWind = 6;
+        Downsize = 7;
+    }
+
+}
+
+message GameMapPlayerResp {
+    string id = 1;
+    string name = 2;
+    int32 position = 3;
+    int32 level = 4;
+    int32 skeepTurns = 5;
+    
+}
+
+message GetPlayerStateResp {
     Common.RespBase baseResp = 1;
     optional PlayerStateMsg player = 2;
 }
@@ -116,20 +154,9 @@ message ThrowDiceResp {
     Common.RespBase baseResp = 1;
     google.protobuf.StringValue roomId = 2; 
     google.protobuf.StringValue playerId = 3;
-    StepTypeMsg stepType = 4;
+    GameMapResp.StepTypeMsg stepType = 4;
     optional CardMsg card = 5; 
     optional PlayerStateMsg playerState = 6;
-    
-    enum StepTypeMsg {
-        Start = 0;
-        Salary = 1;
-        Children = 2;
-        Charity = 3;
-        Market = 4;
-        Deal = 5;
-        MoneyToTheWind = 6;
-        Downsize = 7;
-    }
 }
 
 message PlayerSubscriptionMessage {
