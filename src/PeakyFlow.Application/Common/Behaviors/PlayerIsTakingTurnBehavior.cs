@@ -25,7 +25,8 @@ namespace PeakyFlow.Application.Common.Behaviors
 
             var resultGenericType = typeof(TResponse).GetGenericArguments().FirstOrDefault();
             var isResult = typeof(TResponse) == typeof(Result);
-            var isGenericResult = typeof(TResponse) == typeof(Result<>);
+            var isGenericResult = resultGenericType != null && typeof(TResponse) == typeof(Result<>).MakeGenericType(resultGenericType);
+
 
             if (isResult && (TResponse?)(object?)Result.Conflict(Msg) is TResponse castedResponse)
             {
