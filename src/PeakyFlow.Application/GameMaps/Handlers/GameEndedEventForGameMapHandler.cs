@@ -24,7 +24,6 @@ namespace PeakyFlow.Application.GameMaps.Handlers
             }
 
             await _rep.DeleteAsync(gameMap, cancellationToken);
-            await _rep.SaveChangesAsync(cancellationToken);
         }
     }
 }

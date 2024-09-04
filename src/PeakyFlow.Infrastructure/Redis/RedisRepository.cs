@@ -196,11 +196,12 @@ namespace PeakyFlow.Infrastructure.Redis
             return list.Select(x => selector(x)).ToList();
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            await _redisCollection.SaveAsync();
+            throw new NotSupportedException();
+            //await _redisCollection.SaveAsync();
             //TODO implement transaction
-            return 0;
+            //return 0;
         }
 
         public async Task<T?> SingleOrDefaultAsync(ISingleResultSpecification<T> specification, CancellationToken cancellationToken = default)

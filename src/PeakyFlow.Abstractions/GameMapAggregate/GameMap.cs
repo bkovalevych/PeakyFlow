@@ -20,7 +20,7 @@
             if (player.SkeepTurns > 0)
             {
                 --player.SkeepTurns;
-                return (StepType.Downsize, false);
+                return (StepType.DownsizeWait, false);
             }
 
             var oldPosition = player.Position;
@@ -51,7 +51,8 @@
                 return true;
             }
 
-            for (var i = oldPosition; i != currentPosition; i = (i + 1) % Steps.Length)
+            for (var i = (oldPosition + 1) % Steps.Length; 
+                i != currentPosition; i = (i + 1) % Steps.Length)
             {
                 if (Steps[i] == StepType.Salary)
                 {

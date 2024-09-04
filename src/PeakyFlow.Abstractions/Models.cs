@@ -58,6 +58,7 @@
         Market,
         Deal,
         MoneyToTheWind,
-        Downsize
+        Downsize,
+        DownsizeWait
     }
 }

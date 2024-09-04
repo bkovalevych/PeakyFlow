@@ -35,8 +35,8 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
                 return Result<ThrowDiceResponse>.NotFound();
             }
 
-            await _gameMapRepository.SaveChangesAsync(cancellationToken);
-
+            await _gameMapRepository.UpdateAsync(gameMap);
+            
             var playerThrewDiceEvent = new PlayerThrewDiceEvent(request.RoomId, request.PlayerId, step.Value, withSalary);
 
             await _mediator.Publish(playerThrewDiceEvent, cancellationToken);

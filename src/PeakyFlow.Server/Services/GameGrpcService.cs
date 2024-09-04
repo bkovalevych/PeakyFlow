@@ -2,6 +2,7 @@
 using Grpc.Core;
 using MediatR;
 using PeakyFlow.Application.GameMaps.GetGameMap;
+using PeakyFlow.Application.GameMaps.ThrowDice;
 using PeakyFlow.Application.RoomStates.Borrow;
 using PeakyFlow.Application.RoomStates.GetPlayerState;
 using PeakyFlow.Application.RoomStates.Repair;
@@ -60,6 +61,16 @@ namespace PeakyFlow.Server.Services
                 BaseResp = result.ToRespBase(mapper),
                 PlayerState = mapper.Map<PlayerStateMsg>(result.Value)
             };
+
+            return resp;
+        }
+
+        public override async Task<ThrowDiceResp> ThrowDice(ThrowDiceMsg request, ServerCallContext context)
+        {
+            var result = await mediator.Send(new ThrowDiceCommand(request.RoomId, request.PlayerId, request.Dice), context.CancellationToken);
+            var resp = mapper.Map<ThrowDiceResp>(result.Value) ?? new ThrowDiceResp();
+
+            resp.BaseResp = result.ToRespBase(mapper);
 
             return resp;
         }
