@@ -38,8 +38,9 @@ namespace PeakyFlow.Application.RoomStates.PullDealCard
             }
 
             var cardId = room.GetCardIdByType(request.CardType);
+            await _roomStateRepository.UpdateAsync(room, cancellationToken);
             var card = cardRule.Cards.First(x => x.Id == cardId);
-
+            
             return card;
         }
     }

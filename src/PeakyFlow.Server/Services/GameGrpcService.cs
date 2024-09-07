@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Grpc.Core;
 using MediatR;
+using PeakyFlow.Abstractions;
 using PeakyFlow.Application.GameMaps.GetGameMap;
 using PeakyFlow.Application.GameMaps.ThrowDice;
 using PeakyFlow.Application.RoomStates.Borrow;
 using PeakyFlow.Application.RoomStates.GetPlayerState;
+using PeakyFlow.Application.RoomStates.PullDealCard;
 using PeakyFlow.Application.RoomStates.Repair;
 using PeakyFlow.GrpcProtocol.Game;
 using PeakyFlow.Server.Common.Extensions;
@@ -71,6 +73,20 @@ namespace PeakyFlow.Server.Services
             var resp = mapper.Map<ThrowDiceResp>(result.Value) ?? new ThrowDiceResp();
 
             resp.BaseResp = result.ToRespBase(mapper);
+
+            return resp;
+        }
+
+        public override async Task<PullDealCardResp> PullDealCard(PullDealCardMsg request, ServerCallContext context)
+        {
+            var cardType = mapper.Map<CardType>(request.CardType);
+            var result = await mediator.Send(new PullDealCardCommand(request.RoomId, request.PlayerId, cardType), context.CancellationToken);
+            
+            var resp = new PullDealCardResp()
+            {
+                BaseResp = result.ToRespBase(mapper),
+                Card = mapper.Map<CardMsg>(result.Value)
+            };
 
             return resp;
         }
