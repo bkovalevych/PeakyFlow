@@ -4,7 +4,6 @@ using PeakyFlow.Abstractions.GameCardRuleAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.RoomStates.AcceptCard
 {
@@ -32,7 +31,7 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
                 return Result<AcceptCardResponse>.NotFound();
             }
 
-            var room = await _roomStateRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
+            var room = await _roomStateRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (room == null)
             {

@@ -2,7 +2,6 @@
 using MediatR;
 using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 using System.Reflection;
 
 namespace PeakyFlow.Application.Common.Behaviors
@@ -14,11 +13,9 @@ namespace PeakyFlow.Application.Common.Behaviors
         public const string Msg = "It is not your turn";
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            var gameMap = await gameMapRepository.FirstOrDefaultAsync(
-                new FirstOrDefaultByIdSpecification<GameMap>(request.RoomId),
-                cancellationToken);
+            var gameMap = await gameMapRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
-            if (!(gameMap == null || gameMap.TakingTurnPlayer != null && gameMap.TakingTurnPlayer != request.PlayerId))
+            if (gameMap == null || gameMap.TakingTurnPlayer == null || gameMap.TakingTurnPlayer == request.PlayerId)
             {
                 return await next();
             }

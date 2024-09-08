@@ -3,7 +3,6 @@ using MediatR;
 using PeakyFlow.Abstractions.GameCardRuleAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.RoomStates.IsCardAcceptable
 {
@@ -28,7 +27,7 @@ namespace PeakyFlow.Application.RoomStates.IsCardAcceptable
                 return Result<IsCardAcceptableResponse>.NotFound();
             }
 
-            var room = await _roomStateRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
+            var room = await _roomStateRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (room == null)
             {

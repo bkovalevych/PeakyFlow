@@ -112,7 +112,8 @@ namespace PeakyFlow.Infrastructure.Redis
 
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
+                var filter = _mapper.Map<Expression<Func<TModel, bool>>>(where.Filter);
+                initialExpression = initialExpression.Where(filter);
             }
 
             return _mapper.Map<T>(await initialExpression.FirstOrDefaultAsync());

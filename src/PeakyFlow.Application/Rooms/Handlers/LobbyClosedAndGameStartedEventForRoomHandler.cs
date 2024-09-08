@@ -2,7 +2,6 @@
 using PeakyFlow.Abstractions.LobbyAggregate.Events;
 using PeakyFlow.Abstractions.RoomAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.Rooms.Handlers
 {
@@ -17,7 +16,7 @@ namespace PeakyFlow.Application.Rooms.Handlers
 
         public async Task Handle(LobbyClosedAndGameStartedEvent notification, CancellationToken cancellationToken)
         {
-            var existingRoom = await _roomRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<Room>(notification.LobbyId), cancellationToken);
+            var existingRoom = await _roomRepository.GetByIdAsync(notification.LobbyId, cancellationToken);
 
             if (existingRoom != null)
             {

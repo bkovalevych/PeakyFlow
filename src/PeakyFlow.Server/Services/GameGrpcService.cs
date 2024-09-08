@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using MediatR;
 using PeakyFlow.Abstractions;
+using PeakyFlow.Abstractions.GameMapAggregate.Events;
+using PeakyFlow.Application.GameMaps.EndTurn;
 using PeakyFlow.Application.GameMaps.GetGameMap;
 using PeakyFlow.Application.GameMaps.ThrowDice;
 using PeakyFlow.Application.RoomStates.AcceptCard;
@@ -10,12 +13,16 @@ using PeakyFlow.Application.RoomStates.GetPlayerState;
 using PeakyFlow.Application.RoomStates.IsCardAcceptable;
 using PeakyFlow.Application.RoomStates.PullDealCard;
 using PeakyFlow.Application.RoomStates.Repair;
+using PeakyFlow.GrpcProtocol.Common;
 using PeakyFlow.GrpcProtocol.Game;
 using PeakyFlow.Server.Common.Extensions;
+using PeakyFlow.Server.Common.Interfaces;
+using System.Reactive.Linq;
 
 namespace PeakyFlow.Server.Services
 {
     public class GameGrpcService(
+        INotificationReceiver<PlayerStartedTurnEvent> playerStartedTurnReceiver,
         IMediator mediator,
         IMapper mapper) : GameRpcService.GameRpcServiceBase
     {
@@ -115,9 +122,29 @@ namespace PeakyFlow.Server.Services
 
             resp.BaseResp = result.ToRespBase(mapper);
 
+            return resp;
+        }
 
+        public override async Task<RespBase> EndTurn(EndTurnMsg request, ServerCallContext context)
+        {
+            var result = await mediator.Send(new EndTurnCommand(request.RoomId, request.PlayerId), context.CancellationToken);
+
+            var resp = result.ToRespBase(mapper);
 
             return resp;
+        }
+
+        public override async Task OnPlayerStartTurn(PlayerSubscriptionMessage request, IServerStreamWriter<Empty> responseStream, ServerCallContext context)
+        {
+            var events = playerStartedTurnReceiver.ReceiveNotifications()
+                .Where(x => x.RoomId == request.RoomId)
+                .Where(x => x.PlayerId == request.PlayerId)
+                .ToAsyncEnumerable();
+
+            await foreach(var startTurn in events)
+            {
+                await responseStream.WriteAsync(new Empty(), context.CancellationToken);
+            }
         }
     }
 }

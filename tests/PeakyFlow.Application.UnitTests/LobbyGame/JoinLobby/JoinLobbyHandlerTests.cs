@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 using PeakyFlow.Application.LobbyGame.JoinLobby;
 
 namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
@@ -36,8 +35,8 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
                 Name = "Lobby",
             };
 
-            _mockRepository.Setup(x => x.FirstOrDefaultAsync(
-                It.IsAny<FirstOrDefaultByIdSpecification<Lobby>>(),
+            _mockRepository.Setup(x => x.GetByIdAsync(
+                It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(lobby);
 

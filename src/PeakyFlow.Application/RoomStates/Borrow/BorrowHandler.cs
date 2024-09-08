@@ -3,7 +3,6 @@ using MediatR;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.RoomStates.Borrow
 {
@@ -39,8 +38,8 @@ namespace PeakyFlow.Application.RoomStates.Borrow
             }
 
             await _mediator.Publish(new AnotherPlayerStateChangedEvent(
-                request.RoomId, 
-                request.PlayerId, 
+                request.RoomId,
+                request.PlayerId,
                 p.PercentageToWin,
                 p.HasWon,
                 p.HasLost), cancellationToken);
