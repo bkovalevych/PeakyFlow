@@ -40,8 +40,8 @@ namespace PeakyFlow.Application.RoomStates.AcceptCard
             }
 
             var card = cardRule.Cards.First(x => x.Id == request.CardId);
-
-            var p = room.AcceptCard(card, request.PlayerId, request.Count, request.financialItemIds);
+            
+            var p = room.AcceptCard(card, request.PlayerId, request.Count, request.FinancialItemIds, request.Propositions);
 
             
             if (p.PlayerState == null)

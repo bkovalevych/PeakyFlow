@@ -118,13 +118,13 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
             });
         }
 
-        public (bool Acceptable, PlayerState? PlayerState) AcceptCard(Card card, string playerId, int? count, IEnumerable<string>? financeIds)
+        public (bool Acceptable, PlayerState? PlayerState) AcceptCard(Card card, string playerId, int? count, IEnumerable<string>? financeIds, IEnumerable<Proposition>? propositions)
         {
             var acceptable = true;
 
             var resultPlayer = WithExistingPlayer(playerId, player =>
             {
-                var check = IsCardAcceptable(card, playerId, count);
+                var check = IsCardAcceptable(card, playerId, count, propositions);
                 acceptable = check.Acceptable;
                 
                 if (!acceptable) 
@@ -139,33 +139,59 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
                         throw new ArgumentNullException(nameof(count));
                     }
 
-                    var stock = player.Stocks.FirstOrDefault(x => x.Name == card.Name && x.PriceForOne == card.DownPay);
-
-                    if (stock == null)
+                    
+                    if (propositions != null && propositions.Count() > 0)
                     {
-                        stock = new StockItem(
-                            card.Id,
-                            card.Name,
-                            FinancialType.Stock,
-                            count.Value,
-                            card.DownPay,
-                            card.CashFlow,
-                            card.Group);
-                    } 
+                        foreach (var proposition in propositions)
+                        {
+                            var stock = player.Stocks.FirstOrDefault(x => x.Id == proposition.Id);
+                            
+                            if (stock == null)
+                            {
+                                continue;
+                            }
+
+                            player.Stocks.Remove(stock);
+
+                            player.Savings += card.DownPay * proposition.Count;
+
+                            if (proposition.Count < stock.Count)
+                            {
+                                
+                                player.Stocks.Add(stock with { Count = stock.Count - proposition.Count });
+                            }
+                        }
+                        
+                    }
                     else
                     {
-                        player.Stocks.Remove(stock);
-                        stock = new StockItem(
-                            stock.Id,
-                            stock.Name,
-                            stock.FinancialType,
-                            stock.Count + count.Value,
-                            stock.PriceForOne,
-                            stock.FlowForOne,
-                            stock.Group);
-                    }
+                        var stock = player.Stocks.FirstOrDefault(x => x.Name == card.Name && x.PriceForOne == card.DownPay);
+                        if (stock == null)
+                        {
+                            stock = new StockItem(
+                                card.Id,
+                                card.Name,
+                                FinancialType.Stock,
+                                count.Value,
+                                card.DownPay,
+                                card.CashFlow,
+                                card.Group);
+                        }
+                        else
+                        {
+                            player.Stocks.Remove(stock);
+                            stock = new StockItem(
+                                stock.Id,
+                                stock.Name,
+                                stock.FinancialType,
+                                stock.Count + count.Value,
+                                stock.PriceForOne,
+                                stock.FlowForOne,
+                                stock.Group);
+                        }
 
-                    player.Stocks.Add(stock);
+                        player.Stocks.Add(stock);
+                    }
                 }
                 else if (card.CardType == CardType.BigDeal || card.CardType == CardType.SmallDeal 
                     || card.CardType == CardType.MoneyToTheWind && card.CashFlow != 0)
@@ -227,7 +253,7 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
             return (acceptable, resultPlayer);
         }
 
-        public (bool Successfuly, bool Acceptable, int HowMuchToBorrow) IsCardAcceptable(Card card, string playerId, int? Count)
+        public (bool Successfuly, bool Acceptable, int HowMuchToBorrow) IsCardAcceptable(Card card, string playerId, int? Count, IEnumerable<Proposition>? propositions)
         {
             var acceptable = true;
             var howMuchToBorrow = 0;
@@ -249,11 +275,27 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
                     {
                         throw new ArgumentNullException(nameof(Count));
                     }
-
-                    var downPay = card.DownPay * Count.Value;
                     
-                    acceptable = player.Savings >= downPay;
-                    howMuchToBorrow = Math.Max(0, downPay - player.Savings);
+                    if (propositions != null && propositions.Count() > 0)
+                    {
+                        foreach (var proposition in propositions)
+                        {
+                            var stock = player.Stocks.FirstOrDefault(x => x.Id == proposition.Id);
+                            
+                            if (stock == null || stock.Count < proposition.Count)
+                            {
+                                acceptable = false;
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var downPay = card.DownPay * Count.Value;
+
+                        acceptable = player.Savings >= downPay;
+                        howMuchToBorrow = Math.Max(0, downPay - player.Savings);
+                    }
                 }
                 else if (card.CardType != CardType.Market || card.DownPay > 0) 
                 {

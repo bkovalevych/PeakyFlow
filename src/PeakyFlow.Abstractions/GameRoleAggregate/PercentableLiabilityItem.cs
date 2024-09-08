@@ -14,7 +14,8 @@
             0,
             LiabilityAmount,
             (int)Math.Round(-LiabilityAmount * Percent / 100f, 0),
-            Group)
+            Group,
+            null)
     {
         public const string Loan = "Loan";
         public const int LoanPercent = 10;

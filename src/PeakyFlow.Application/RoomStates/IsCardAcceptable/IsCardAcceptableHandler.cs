@@ -37,7 +37,7 @@ namespace PeakyFlow.Application.RoomStates.IsCardAcceptable
 
             var card = cardRule.Cards.First(x => x.Id == request.CardId);
 
-            var p = room.IsCardAcceptable(card, request.PlayerId, request.Count);
+            var p = room.IsCardAcceptable(card, request.PlayerId, request.Count, request.Propositions);
 
             if (!p.Successfuly)
             {

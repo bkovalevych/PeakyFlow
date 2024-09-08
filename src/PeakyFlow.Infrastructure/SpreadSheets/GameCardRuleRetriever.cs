@@ -98,7 +98,7 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
             .. ProcessObjects(ranges[2], SmallDealRetrievers, 
                 card => card with { CardType = CardType.SmallDeal } ),
             .. ProcessObjects(ranges[3], StockRetrievers,
-                card => card with { CardType = CardType.SmallDeal }),
+                card => card with { CardType = CardType.SmallDeal, IsStock = true }),
             .. ProcessObjects(ranges[4], MarketRetrievers,
                 card => card with { CardType = CardType.Market })];
 

@@ -33,6 +33,8 @@
         }
     }
 
+    public record Proposition(string Id, int Count);
+
     public enum CardType
     {
         Default,

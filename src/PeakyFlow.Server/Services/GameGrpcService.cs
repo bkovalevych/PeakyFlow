@@ -4,8 +4,10 @@ using MediatR;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Application.GameMaps.GetGameMap;
 using PeakyFlow.Application.GameMaps.ThrowDice;
+using PeakyFlow.Application.RoomStates.AcceptCard;
 using PeakyFlow.Application.RoomStates.Borrow;
 using PeakyFlow.Application.RoomStates.GetPlayerState;
+using PeakyFlow.Application.RoomStates.IsCardAcceptable;
 using PeakyFlow.Application.RoomStates.PullDealCard;
 using PeakyFlow.Application.RoomStates.Repair;
 using PeakyFlow.GrpcProtocol.Game;
@@ -87,6 +89,33 @@ namespace PeakyFlow.Server.Services
                 BaseResp = result.ToRespBase(mapper),
                 Card = mapper.Map<CardMsg>(result.Value)
             };
+
+            return resp;
+        }
+
+        public override async Task<IsCardAcceptableResp> IsCardAcceptable(IsCardAcceptableMsg request, ServerCallContext context)
+        {
+            var propositions = mapper.Map<IEnumerable<Proposition>>(request.Propositions);
+            var result = await mediator.Send(new IsCardAcceptableQuery(request.RoomId, request.PlayerId, request.CardId, request.Count, propositions), context.CancellationToken);
+            var resp = mapper.Map<IsCardAcceptableResp>(result.Value) ?? new IsCardAcceptableResp();
+
+            resp.BaseResp = result.ToRespBase(mapper);
+
+            return resp;
+        }
+
+        public override async Task<AcceptCardResp> AcceptCard(AcceptCardMsg request, ServerCallContext context)
+        {
+            var propositions = mapper.Map<IEnumerable<Proposition>>(request.Propositions);
+
+            var result = await mediator.Send(new AcceptCardCommand(request.RoomId, request.PlayerId, request.CardId, request.Count, request.FinancialItemIds, propositions), 
+                context.CancellationToken);
+
+            var resp = mapper.Map<AcceptCardResp>(result.Value) ?? new AcceptCardResp();
+
+            resp.BaseResp = result.ToRespBase(mapper);
+
+
 
             return resp;
         }

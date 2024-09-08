@@ -23,6 +23,11 @@ service GameRpcService {
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
 }
 
+message PropositionMsg {
+    string Id = 1;
+    int32 Count = 2; 
+}
+
 message GetGameMapMessage {
     string id = 1;
 }
@@ -88,8 +93,9 @@ message AcceptCardMsg {
     string roomId = 1;
     string playerId = 2;
     string cardId = 3;
-    optional int32 count = 4;
+    google.protobuf.Int32Value count = 4;
     repeated string financialItemIds = 5;
+    repeated PropositionMsg propositions = 6;
 }
 
 message AcceptCardResp {
@@ -103,6 +109,7 @@ message IsCardAcceptableMsg {
     string playerId = 2;
     string cardId = 3;
     optional int32 count = 4;
+    repeated PropositionMsg propositions = 5;
 }
 
 message IsCardAcceptableResp {
@@ -241,6 +248,7 @@ message FinancialItemMsg {
     int32 liabilityAmount = 5; 
     int32 flowAmount = 6;
     google.protobuf.StringValue group = 7;
+    google.protobuf.Int32Value count = 8;
 }
 
 enum FinancialTypeMsg {
