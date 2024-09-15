@@ -1,3 +1,4 @@
+using AutoMapper.Extensions.ExpressionMapping;
 using PeakyFlow.Application.Common.Extensions;
 using PeakyFlow.Infrastructure.Extensions;
 using PeakyFlow.Server.Common.Interfaces;
@@ -11,9 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddGrpc();
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(conf => conf.AddExpressionMapping(), Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddScoped<LobbyGrpcEventReceiver>();
 
@@ -51,7 +52,7 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.MapGrpcService<LobbyGrpcService>();
-
+app.MapGrpcService<GameGrpcService>();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

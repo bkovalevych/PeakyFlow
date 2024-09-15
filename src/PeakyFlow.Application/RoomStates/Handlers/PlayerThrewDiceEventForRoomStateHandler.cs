@@ -55,7 +55,6 @@ namespace PeakyFlow.Application.RoomStates.Handlers
                 .FirstOrDefault(x => x.Id == notification.PlayerId);
 
             await RoomRepository.UpdateAsync(room, cancellationToken);
-            await RoomRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

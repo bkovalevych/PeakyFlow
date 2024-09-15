@@ -1,9 +1,9 @@
 ﻿using Ardalis.Result;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 using PeakyFlow.Application.LobbyGame.JoinLobby;
 
 namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
@@ -13,12 +13,14 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
         private readonly Mock<IRepository<Lobby>> _mockRepository;
         private readonly Mock<ILogger<JoinLobbyHandler>> _mockLogger;
         private readonly Mock<IGuid> _mockGuid;
+        private readonly Mock<IMediator> _mockMediator;
 
         public JoinLobbyHandlerTests()
         {
             _mockRepository = new Mock<IRepository<Lobby>>();
             _mockLogger = new Mock<ILogger<JoinLobbyHandler>>();
             _mockGuid = new Mock<IGuid>();
+            _mockMediator = new Mock<IMediator>();
         }
 
 
@@ -33,8 +35,8 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
                 Name = "Lobby",
             };
 
-            _mockRepository.Setup(x => x.FirstOrDefaultAsync(
-                It.IsAny<FirstOrDefaultByIdSpecification<Lobby>>(),
+            _mockRepository.Setup(x => x.GetByIdAsync(
+                It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(lobby);
 
@@ -43,7 +45,7 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
 
             var command = new JoinLobbyCommand("id1", "Dan", null);
 
-            var handler = new JoinLobbyHandler(_mockLogger.Object, _mockRepository.Object, _mockGuid.Object);
+            var handler = new JoinLobbyHandler(_mockLogger.Object, _mockRepository.Object, _mockGuid.Object, _mockMediator.Object);
 
 
 
@@ -65,7 +67,7 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.JoinLobby
 
             var command = new JoinLobbyCommand("id1", "Dan", null);
 
-            var handler = new JoinLobbyHandler(_mockLogger.Object, _mockRepository.Object, _mockGuid.Object);
+            var handler = new JoinLobbyHandler(_mockLogger.Object, _mockRepository.Object, _mockGuid.Object, _mockMediator.Object);
 
             // Act
 

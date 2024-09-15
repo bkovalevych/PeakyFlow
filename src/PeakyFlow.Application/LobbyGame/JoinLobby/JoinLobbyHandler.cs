@@ -10,7 +10,7 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
     public class JoinLobbyHandler
         : LobbyContextHandlerBase<JoinLobbyCommand, Result<JoinLobbyResponse>>
     {
-        private IGuid _guid;
+        private readonly IGuid _guid;
         private readonly IMediator _mediator;
 
         public JoinLobbyHandler(
@@ -44,8 +44,6 @@ namespace PeakyFlow.Application.LobbyGame.JoinLobby
             lobby.AddPlayer(player);
 
             await Repository.UpdateAsync(lobby, cancellationToken);
-
-            await Repository.SaveChangesAsync(cancellationToken);
 
             var playerJoined = new PlayerJoinedEvent(lobby.Id, player.Id, player.Name);
 

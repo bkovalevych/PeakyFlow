@@ -2,18 +2,21 @@
 {
     public record StockItem(
         string Id,
-        string Name, 
-        FinancialType FinancialType, 
-        int Count, 
+        string Name,
+        FinancialType FinancialType,
+        int Count,
         int PriceForOne,
         int FlowForOne = 0,
-        string? Group = null) 
+        string? Group = null)
         : FinancialItemBase(
             Id,
             Name,
             FinancialType,
-            PriceForOne * Count, 
-            0, 
+            PriceForOne * Count,
+            0,
             FlowForOne * Count,
-            Group);
+            Group, Count)
+    {
+        public new int Count { get; init; }
+    }
 }

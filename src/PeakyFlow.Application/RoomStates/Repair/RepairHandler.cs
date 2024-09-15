@@ -3,7 +3,6 @@ using MediatR;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.RoomStates.Repair
 {
@@ -21,7 +20,7 @@ namespace PeakyFlow.Application.RoomStates.Repair
         public async Task<Result<PlayerStateDto>> Handle(RepairCommand request, CancellationToken cancellationToken)
         {
             var state = await _roomStateRepository
-                .FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
+                .GetByIdAsync(request.RoomId, cancellationToken);
 
             if (state == null)
             {
@@ -34,6 +33,8 @@ namespace PeakyFlow.Application.RoomStates.Repair
             {
                 return Result<PlayerStateDto>.NotFound();
             }
+
+            await _roomStateRepository.UpdateAsync(state, cancellationToken);
 
             await _mediator.Publish(new AnotherPlayerStateChangedEvent(
                 request.RoomId,
@@ -54,7 +55,7 @@ namespace PeakyFlow.Application.RoomStates.Repair
                 p.CashFlow,
                 p.PercentageToWin,
                 p.HasWon,
-                p.HasLost));
+                p.HasLost, p.ExpensesForOneChild));
         }
     }
 }

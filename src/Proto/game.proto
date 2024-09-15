@@ -7,6 +7,8 @@ import "common.proto";
 option csharp_namespace = "PeakyFlow.GrpcProtocol.Game";
 
 service GameRpcService {
+    rpc GetPlayerState (PlayerSubscriptionMessage) returns (GetPlayerStateResp);
+    rpc GetGameMap (GetGameMapMessage) returns (GetGameMapResp);
     rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
     rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
     rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
@@ -19,6 +21,54 @@ service GameRpcService {
     rpc IsCardAcceptable (IsCardAcceptableMsg) returns (IsCardAcceptableResp);
     rpc AcceptCard (AcceptCardMsg) returns (AcceptCardResp);
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
+}
+
+message PropositionMsg {
+    string Id = 1;
+    int32 Count = 2; 
+}
+
+message GetGameMapMessage {
+    string id = 1;
+}
+
+message GetGameMapResp {
+    Common.RespBase baseResp = 1;
+    GameMapResp gameMap = 2;
+}
+
+message GameMapResp {
+    string id = 1;
+    repeated GameMapPlayerResp GameMapPlayers = 2;
+    repeated StepTypeMsg Steps = 3;
+    google.protobuf.StringValue TakingTurnPlayer = 4;
+
+    enum StepTypeMsg {
+        Start = 0;
+        Salary = 1;
+        Children = 2;
+        Charity = 3;
+        Market = 4;
+        Deal = 5;
+        MoneyToTheWind = 6;
+        Downsize = 7;
+        DownsizeWait = 8;
+    }
+
+}
+
+message GameMapPlayerResp {
+    string id = 1;
+    string name = 2;
+    int32 position = 3;
+    int32 level = 4;
+    int32 skeepTurns = 5;
+    
+}
+
+message GetPlayerStateResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg player = 2;
 }
 
 message EndTurnMsg {
@@ -43,8 +93,9 @@ message AcceptCardMsg {
     string roomId = 1;
     string playerId = 2;
     string cardId = 3;
-    optional int32 count = 4;
+    google.protobuf.Int32Value count = 4;
     repeated string financialItemIds = 5;
+    repeated PropositionMsg propositions = 6;
 }
 
 message AcceptCardResp {
@@ -58,6 +109,7 @@ message IsCardAcceptableMsg {
     string playerId = 2;
     string cardId = 3;
     optional int32 count = 4;
+    repeated PropositionMsg propositions = 5;
 }
 
 message IsCardAcceptableResp {
@@ -110,20 +162,9 @@ message ThrowDiceResp {
     Common.RespBase baseResp = 1;
     google.protobuf.StringValue roomId = 2; 
     google.protobuf.StringValue playerId = 3;
-    StepTypeMsg stepType = 4;
+    GameMapResp.StepTypeMsg stepType = 4;
     optional CardMsg card = 5; 
     optional PlayerStateMsg playerState = 6;
-    
-    enum StepTypeMsg {
-        Start = 0;
-        Salary = 1;
-        Children = 2;
-        Charity = 3;
-        Market = 4;
-        Deal = 5;
-        MoneyToTheWind = 6;
-        Downsize = 7;
-    }
 }
 
 message PlayerSubscriptionMessage {
@@ -175,6 +216,7 @@ message PlayerStateMsg {
     float percentageToWin = 14;
     bool hasWon = 15;
     bool hasLost = 16;
+    int32 ExpensesForOneChild = 17;
 }
 
 message PlayerCreatedEventMsg {
@@ -206,6 +248,7 @@ message FinancialItemMsg {
     int32 liabilityAmount = 5; 
     int32 flowAmount = 6;
     google.protobuf.StringValue group = 7;
+    google.protobuf.Int32Value count = 8;
 }
 
 enum FinancialTypeMsg {

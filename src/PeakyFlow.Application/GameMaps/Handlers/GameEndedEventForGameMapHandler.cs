@@ -2,7 +2,6 @@
 using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.GameMaps.Handlers
 {
@@ -17,14 +16,13 @@ namespace PeakyFlow.Application.GameMaps.Handlers
 
         public async Task Handle(GameEndedEvent notification, CancellationToken cancellationToken)
         {
-            var gameMap = await _rep.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<GameMap>(notification.RoomId), cancellationToken);
+            var gameMap = await _rep.GetByIdAsync(notification.RoomId, cancellationToken);
             if (gameMap == null) 
             {
                 return;
             }
 
             await _rep.DeleteAsync(gameMap, cancellationToken);
-            await _rep.SaveChangesAsync(cancellationToken);
         }
     }
 }

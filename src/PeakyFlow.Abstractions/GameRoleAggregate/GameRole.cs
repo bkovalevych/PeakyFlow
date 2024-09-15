@@ -2,15 +2,54 @@
 {
     public class GameRole : Entity, IAggregateRoot
     {
+        public GameRole() { }
+
+        public GameRole(
+            string name,
+            string description,
+            int childExpenses,
+            int savings,
+            int income,
+            int taxes,
+            int mortgageLiability,
+            int homeMortgage,
+            int schoolLoan,
+            int schoolExpenses,
+            int carLoan,
+            int carPayment,
+            int creditCardsLiability,
+            int creditCards,
+            int retailDebt,
+            int retailPayment,
+            int otherExpenses)
+        {
+            RoleName = name;
+            Description = description;
+            CountableLiabilities = [
+                new CountableLiabilityItem("Children", "Children", FinancialType.ChildrenExpenses, 0, childExpenses)];
+            FinancialItems =
+            [
+                    new FinancialItem("savings", "Savings", FinancialType.Savings, savings, 0, 0),
+                    new FinancialItem("salary", "Salary", FinancialType.Salary, 0, 0, income),
+                    new FinancialItem("taxes", "Taxes", FinancialType.Taxes, 0, 0, -taxes),
+                    new FinancialItem("home mortgage", "Home Mortgage", FinancialType.Loan, 0, mortgageLiability, -homeMortgage),
+                    new FinancialItem("school", "School", FinancialType.Loan, 0, schoolLoan, -schoolExpenses),
+                    new FinancialItem("car", "Car", FinancialType.Loan, 0, carLoan, -carPayment),
+                    new FinancialItem("credit cards", "Credit Cards", FinancialType.Loan, 0, creditCardsLiability, -creditCards),
+                    new FinancialItem("retail payment", "Retail Payment", FinancialType.Loan, 0, retailDebt, -retailPayment),
+                    new FinancialItem("other expenses", "Other Expenses", FinancialType.Others, 0, 0, -otherExpenses)
+            ];
+        }
+
         private IEnumerable<FinancialItemBase> Flows => Enumerable.Empty<FinancialItemBase>()
             .Union(CountableLiabilities)
             .Union(PercentableLiabilities)
             .Union(Stocks)
             .Union(FinancialItems);
 
-        public required string RoleName { get; set; }
+        public string RoleName { get; set; } = string.Empty;
 
-        public required string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         public string? ImageId { get; set; }
 

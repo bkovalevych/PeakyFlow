@@ -4,7 +4,6 @@ using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameCardRuleAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.RoomStates.PullDealCard
 {
@@ -30,7 +29,7 @@ namespace PeakyFlow.Application.RoomStates.PullDealCard
                 throw new ArgumentNullException(nameof(cardRule));
             }
 
-            var room = await _roomStateRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
+            var room = await _roomStateRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (room == null)
             {
@@ -38,8 +37,9 @@ namespace PeakyFlow.Application.RoomStates.PullDealCard
             }
 
             var cardId = room.GetCardIdByType(request.CardType);
+            await _roomStateRepository.UpdateAsync(room, cancellationToken);
             var card = cardRule.Cards.First(x => x.Id == cardId);
-
+            
             return card;
         }
     }

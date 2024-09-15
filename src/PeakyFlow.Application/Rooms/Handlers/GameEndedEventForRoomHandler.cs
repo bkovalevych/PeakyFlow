@@ -14,7 +14,6 @@ namespace PeakyFlow.Application.Rooms.Handlers
         protected override async Task Handle(GameEndedEvent notification, Room room, CancellationToken cancellationToken)
         {
             await RoomRepository.DeleteAsync(room, cancellationToken);
-            await RoomRepository.SaveChangesAsync(cancellationToken);
             Logger.LogInformation("Room {id} was removed", room.Id);
         }
     }

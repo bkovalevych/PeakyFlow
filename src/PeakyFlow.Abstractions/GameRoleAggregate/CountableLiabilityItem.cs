@@ -2,11 +2,14 @@
 {
     public record CountableLiabilityItem(
         string Id,
-        string Name, 
-        FinancialType FinancialType, 
-        int Count, 
+        string Name,
+        FinancialType FinancialType,
+        int Count,
         int PriceForOne,
         int LiabilityForOne = 0,
-        string? Group = null) 
-        : FinancialItemBase(Id, Name, FinancialType, 0, LiabilityForOne * Count, -PriceForOne * Count, Group);
+        string? Group = null)
+        : FinancialItemBase(Id, Name, FinancialType, 0, LiabilityForOne * Count, -PriceForOne * Count, Group, Count)
+    {
+        public new int Count { get; init; } 
+    }
 }

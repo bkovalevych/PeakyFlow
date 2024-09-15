@@ -22,8 +22,7 @@ namespace PeakyFlow.Application.LobbyGame.LeaveLobby
         {
             lobby.RemovePlayer(request.PlayerId);
             await Repository.UpdateAsync(lobby, cancellationToken);
-            await Repository.SaveChangesAsync(cancellationToken);
-
+            
             var playerLeft = new PlayerLeftLobbyEvent(lobby.Id, request.PlayerId);
 
             await _mediator.Publish(playerLeft, cancellationToken);

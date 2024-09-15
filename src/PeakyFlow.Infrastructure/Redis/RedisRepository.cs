@@ -24,7 +24,7 @@ namespace PeakyFlow.Infrastructure.Redis
         public RedisRepository(RedisConnectionProvider provider, IMapper mapper, ILogger<RedisRepository<T, TModel>> logger)
         {
             _redisProvider = provider;
-            _redisCollection = (RedisCollection<TModel>)_redisProvider.RedisCollection<TModel>();
+            _redisCollection = (RedisCollection<TModel>)_redisProvider.RedisCollection<TModel>(false);
             _mapper = mapper;
             _logger = logger;
         }
@@ -112,7 +112,8 @@ namespace PeakyFlow.Infrastructure.Redis
 
             foreach (var where in specification.WhereExpressions)
             {
-                initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
+                var filter = _mapper.Map<Expression<Func<TModel, bool>>>(where.Filter);
+                initialExpression = initialExpression.Where(filter);
             }
 
             return _mapper.Map<T>(await initialExpression.FirstOrDefaultAsync());
@@ -196,11 +197,12 @@ namespace PeakyFlow.Infrastructure.Redis
             return list.Select(x => selector(x)).ToList();
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            await _redisCollection.SaveAsync();
+            throw new NotSupportedException();
+            //await _redisCollection.SaveAsync();
             //TODO implement transaction
-            return 0;
+            //return 0;
         }
 
         public async Task<T?> SingleOrDefaultAsync(ISingleResultSpecification<T> specification, CancellationToken cancellationToken = default)

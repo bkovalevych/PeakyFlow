@@ -81,6 +81,7 @@ message LobbyClosedAndGameStartedMessage {
     repeated PlayerMessage players = 1;
     google.protobuf.StringValue lobbyId = 2;
     google.protobuf.StringValue name = 3;
+    google.protobuf.StringValue takingTurnPlayerId = 4;
 }
 
 message PlayerMessage {

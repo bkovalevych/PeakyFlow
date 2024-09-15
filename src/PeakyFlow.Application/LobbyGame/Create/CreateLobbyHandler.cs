@@ -33,7 +33,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
             };
 
             lobby.SetTeamSize(request.TeamSize);
-            lobby.AddPlayer(new PlayerInLobby() { Id = ownerId, LobbyId = lobbyId, Name = request.Owner, IsOwner = true });
+            lobby.AddPlayer(new PlayerInLobby() { Id = ownerId, LobbyId = lobbyId, Name = request.Owner, IsOwner = true, IsReady = true });
 
             try
             {

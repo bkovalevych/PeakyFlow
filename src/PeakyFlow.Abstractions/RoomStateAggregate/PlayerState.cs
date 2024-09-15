@@ -4,7 +4,7 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
 {
     public class PlayerState : PlayerBase
     {
-        public int Savings { get; set; }
+        public int Savings { get; set; } //InitialSavings + Flows.Sum(x => x.AssetAmount);
 
         public float PercentageToWin => Expenses == 0 ? 1.0f : (Income - Salary) / Expenses * 1.0f;
 

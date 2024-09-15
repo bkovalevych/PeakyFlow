@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.LobbyGame
 {
@@ -26,7 +25,7 @@ namespace PeakyFlow.Application.LobbyGame
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken)
         {
             Logger.LogInformation("Request lobby {lobbyId}", request.LobbyId);
-            var lobby = await Repository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<Lobby>(request.LobbyId));
+            var lobby = await Repository.GetByIdAsync(request.LobbyId, cancellationToken);
 
             if (lobby == null)
             {

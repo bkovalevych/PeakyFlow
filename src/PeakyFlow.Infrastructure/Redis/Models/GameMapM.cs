@@ -10,5 +10,7 @@ namespace PeakyFlow.Infrastructure.Redis.Models
         [Indexed(JsonPath = "$.Id")]
         public GameMapPlayerM[] GameMapPlayers { get; set; } = [];
         public StepType[] Steps { get; set; } = [];
+
+        public string? TakingTurnPlayer { get; set; }
     }
 }

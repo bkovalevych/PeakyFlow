@@ -6,9 +6,9 @@ namespace PeakyFlow.Application.Roles.GetRoleForPlayer
 {
     public class GetRoleForPlayerService : IGetRoleForPlayerService
     {
-        private readonly IRepository<GameRole> _gameRoleRepository;
+        private readonly IReadRepository<GameRole> _gameRoleRepository;
 
-        public GetRoleForPlayerService(IRepository<GameRole> gameRoleRepository)
+        public GetRoleForPlayerService(IReadRepository<GameRole> gameRoleRepository)
         {
             _gameRoleRepository = gameRoleRepository;
         }
@@ -24,7 +24,7 @@ namespace PeakyFlow.Application.Roles.GetRoleForPlayer
                 throw new ArgumentException("Game has no roles");
             }
 
-            var index = random.Next(count - 1);
+            var index = random.Next(count);
 
             var role = await _gameRoleRepository.FirstOrDefaultAsync(new GetRoleForPlayerSpecification(index));
 

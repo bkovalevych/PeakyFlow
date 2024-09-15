@@ -24,7 +24,6 @@ namespace PeakyFlow.Application.Rooms.Handlers
             player.Status = PlayerInRoomStatus.Lost;
 
             await RoomRepository.UpdateAsync(room, cancellationToken);
-            await RoomRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

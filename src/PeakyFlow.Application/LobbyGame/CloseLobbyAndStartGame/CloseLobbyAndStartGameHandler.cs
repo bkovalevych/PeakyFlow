@@ -24,8 +24,7 @@ namespace PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame
         {
             lobby.IsClosed = true;
             await Repository.UpdateAsync(lobby, cancellationToken);
-            await Repository.SaveChangesAsync(cancellationToken);
-
+            
             var players = lobby.Players
                     .Where(x => x.IsReady);
             var response = new CloseLobbyAndStartGameResponse(
@@ -33,7 +32,7 @@ namespace PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame
                 lobby.Name,
                 players);
 
-            var closedLobby = new LobbyClosedAndGameStartedEvent(request.LobbyId, lobby.Name, players);
+            var closedLobby = new LobbyClosedAndGameStartedEvent(request.LobbyId, lobby.Name, players.FirstOrDefault()?.Id, players);
 
             await _mediator.Publish(closedLobby, cancellationToken);
 

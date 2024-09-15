@@ -39,7 +39,7 @@ namespace PeakyFlow.Application.GameMaps.Handlers
 
             var players = new List<GameMapPlayer>();
 
-            foreach (var item in notification.players)
+            foreach (var item in notification.Players)
             {
                 var player = new GameMapPlayer()
                 {

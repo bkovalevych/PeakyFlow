@@ -5,9 +5,9 @@ namespace PeakyFlow.Application.GameMapRules.GetMapRulesForRoom
 {
     public class GetMapRulesForRoomService : IGetMapRulesForRoomService
     {
-        private IRepository<GameMapRule> _repository;
+        private IReadRepository<GameMapRule> _repository;
 
-        public GetMapRulesForRoomService(IRepository<GameMapRule> repository)
+        public GetMapRulesForRoomService(IReadRepository<GameMapRule> repository)
         {
             _repository = repository;
         }

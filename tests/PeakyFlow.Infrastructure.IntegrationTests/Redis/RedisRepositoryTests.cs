@@ -210,7 +210,6 @@ namespace PeakyFlow.Infrastructure.IntegrationTests.Redis
             });
 
             await rep.UpdateAsync(rooms[0]);
-            await rep.SaveChangesAsync();
 
             await rep.DeleteAsync(result);
             await hosted.StopAsync(default);

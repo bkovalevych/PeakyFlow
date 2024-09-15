@@ -25,7 +25,15 @@
         bool IsStock,
         bool IsBusiness,
         bool IsRealEstate
-        );
+        )
+    {
+        public static Card GetDefault()
+        {
+            return new Card("", "", "", CardType.Default, false, "", "", "", "", "", 0, 0, 0, 0, StockAction.Default, false, false, false);
+        }
+    }
+
+    public record Proposition(string Id, int Count);
 
     public enum CardType
     {
@@ -52,6 +60,7 @@
         Market,
         Deal,
         MoneyToTheWind,
-        Downsize
+        Downsize,
+        DownsizeWait
     }
 }

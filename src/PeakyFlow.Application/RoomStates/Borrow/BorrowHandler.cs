@@ -3,7 +3,6 @@ using MediatR;
 using PeakyFlow.Abstractions.RoomStateAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.RoomStates.Borrow
 {
@@ -23,7 +22,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
         public async Task<Result<PlayerStateDto>> Handle(BorrowCommand request, CancellationToken cancellationToken)
         {
             var state = await _roomStateRepository
-                .FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<RoomState>(request.RoomId), cancellationToken);
+                .GetByIdAsync(request.RoomId, cancellationToken);
 
             if (state == null)
             {
@@ -31,6 +30,7 @@ namespace PeakyFlow.Application.RoomStates.Borrow
             }
 
             var p = state.Borrow(request.PlayerId, request.Money, _guid.NewId());
+            await _roomStateRepository.UpdateAsync(state, cancellationToken);
 
             if (p == null)
             {
@@ -38,8 +38,8 @@ namespace PeakyFlow.Application.RoomStates.Borrow
             }
 
             await _mediator.Publish(new AnotherPlayerStateChangedEvent(
-                request.RoomId, 
-                request.PlayerId, 
+                request.RoomId,
+                request.PlayerId,
                 p.PercentageToWin,
                 p.HasWon,
                 p.HasLost), cancellationToken);
@@ -56,7 +56,8 @@ namespace PeakyFlow.Application.RoomStates.Borrow
                 p.CashFlow,
                 p.PercentageToWin,
                 p.HasWon,
-                p.HasLost));
+                p.HasLost,
+                p.ExpensesForOneChild));
         }
     }
 }

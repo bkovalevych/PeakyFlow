@@ -3,7 +3,6 @@ using MediatR;
 using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 
 namespace PeakyFlow.Application.GameMaps.EndTurn
 {
@@ -20,7 +19,7 @@ namespace PeakyFlow.Application.GameMaps.EndTurn
 
         public async Task<Result> Handle(EndTurnCommand request, CancellationToken cancellationToken)
         {
-            var gameMap = await _gameMapRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<GameMap>(request.RoomId), cancellationToken);
+            var gameMap = await _gameMapRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (gameMap == null || !gameMap.GameMapPlayers.Any(x => x.Id == request.PlayerId))
             {

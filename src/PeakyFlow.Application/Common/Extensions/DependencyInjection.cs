@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PeakyFlow.Abstractions.Common.Interfaces;
+using PeakyFlow.Abstractions.Common.Services;
 using PeakyFlow.Application.Common.Behaviors;
 using PeakyFlow.Application.LobbyGame.Create;
 using PeakyFlow.Application.Roles.GetRoleForPlayer;
@@ -18,8 +20,29 @@ namespace PeakyFlow.Application.Common.Extensions
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>))
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(PlayerIsTakingTurnBehavior<,>))
                 .AddAutoMapper(Assembly.GetExecutingAssembly())
+                .AddTransient<IStringConverter, MyStringConverter>()
                 .AddValidatorsFromAssemblyContaining<CreateLobbyValidator>()
                 .AddTransient<IGetRoleForPlayerService, GetRoleForPlayerService>();
+        }
+
+        public static IServiceCollection RegisterAllImplementations(this IServiceCollection services, Type type, ServiceLifetime lifetime) 
+        {
+            var implementations = type.Assembly.GetTypes()
+                .Where(t => t.GetInterfaces()
+                    .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == type)
+                && !t.IsGenericType);
+            
+            foreach (var implementation in implementations)
+            {
+                foreach (var interfaceDefinition in implementation.GetInterfaces()
+                    .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == type))
+                {
+                    services.Add(new ServiceDescriptor(interfaceDefinition, implementation, lifetime));
+                }
+                
+            }
+            
+            return services;
         }
     }
 }

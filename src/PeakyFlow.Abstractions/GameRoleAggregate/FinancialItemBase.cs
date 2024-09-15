@@ -7,5 +7,6 @@
         int AssetAmount, 
         int LiabilityAmount, 
         int FlowAmount,
-        string? Group);
+        string? Group,
+        int? Count);
 }

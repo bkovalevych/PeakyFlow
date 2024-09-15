@@ -3,7 +3,6 @@ using MediatR;
 using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Common.Specifications;
 using PeakyFlow.Application.RoomStates;
 
 namespace PeakyFlow.Application.GameMaps.ThrowDice
@@ -21,7 +20,7 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
 
         public async Task<Result<ThrowDiceResponse>> Handle(ThrowDiceCommand request, CancellationToken cancellationToken)
         {
-            var gameMap = await _gameMapRepository.FirstOrDefaultAsync(new FirstOrDefaultByIdSpecification<GameMap>(request.RoomId), cancellationToken);
+            var gameMap = await _gameMapRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (gameMap == null)
             {
@@ -35,8 +34,8 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
                 return Result<ThrowDiceResponse>.NotFound();
             }
 
-            await _gameMapRepository.SaveChangesAsync(cancellationToken);
-
+            await _gameMapRepository.UpdateAsync(gameMap);
+            
             var playerThrewDiceEvent = new PlayerThrewDiceEvent(request.RoomId, request.PlayerId, step.Value, withSalary);
 
             await _mediator.Publish(playerThrewDiceEvent, cancellationToken);
@@ -68,7 +67,8 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
                     pst.CashFlow,
                     pst.PercentageToWin,
                     pst.HasWon,
-                    pst.HasLost));
+                    pst.HasLost,
+                    pst.ExpensesForOneChild));
         }
     }
 }
