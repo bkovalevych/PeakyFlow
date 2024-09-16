@@ -2,13 +2,17 @@
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameRoleAggregate;
+using PeakyFlow.Abstractions.RoomAggregate;
 using PeakyFlow.Application.GameMaps.ThrowDice;
+using PeakyFlow.Application.Rooms.LeaveRoom;
 using PeakyFlow.Application.RoomStates;
 using PeakyFlow.Application.RoomStates.AcceptCard;
+using PeakyFlow.Application.RoomStates.BankruptAction;
 using PeakyFlow.Application.RoomStates.IsCardAcceptable;
 using PeakyFlow.GrpcProtocol.Game;
 using static PeakyFlow.GrpcProtocol.Game.CardMsg.Types;
 using static PeakyFlow.GrpcProtocol.Game.GameMapResp.Types;
+using static PeakyFlow.GrpcProtocol.Game.LeaveRoomMsg.Types;
 
 namespace PeakyFlow.Server.Common.Mappings
 {
@@ -32,7 +36,12 @@ namespace PeakyFlow.Server.Common.Mappings
             CreateMap<IsCardAcceptableResponse, IsCardAcceptableResp>().ReverseMap();
             CreateMap<PropositionMsg, Proposition>().ReverseMap();
 
-            CreateMap<AcceptCardResponse, AcceptCardResp>();
+            CreateMap<AcceptCardResponse, AcceptCardResp>().ReverseMap();
+
+            CreateMap<LeaveRoomMsg, LeaveRoomCommand>().ReverseMap();
+            CreateMap<PlayerInRoomStatus, PlayerInRoomStatusMsg>().ReverseMap();
+
+            CreateMap<BankruptActionMsg, BankruptActionCommand>().ReverseMap();
         }
     }
 }

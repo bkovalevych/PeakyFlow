@@ -21,7 +21,36 @@ service GameRpcService {
     rpc IsCardAcceptable (IsCardAcceptableMsg) returns (IsCardAcceptableResp);
     rpc AcceptCard (AcceptCardMsg) returns (AcceptCardResp);
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
+    rpc LeaveRoom(LeaveRoomMsg) returns (Common.RespBase);
+    rpc BankruptAction(BankruptActionMsg) returns (BankruptActionResp);
 }
+
+message BankruptActionMsg {
+    string roomId = 1;
+    string playerId = 2;
+    repeated string assetIdsToSell = 3;
+    repeated PropositionMsg stocksToSell = 4; 
+}
+
+message BankruptActionResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg player = 2;
+}
+
+message LeaveRoomMsg {
+    string roomId = 1;
+    string playerId = 2;
+
+    enum PlayerInRoomStatusMsg {
+        Unknown = 0;
+        Active = 1;
+        Out = 2;
+        Lost = 3;
+        Won = 4;
+    }
+}
+
+
 
 message PropositionMsg {
     string Id = 1;

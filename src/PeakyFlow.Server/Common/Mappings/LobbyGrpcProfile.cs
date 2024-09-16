@@ -3,6 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Abstractions.LobbyAggregate.Events;
+using PeakyFlow.Application.LobbyGame;
 using PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame;
 using PeakyFlow.Application.LobbyGame.JoinLobby;
 using PeakyFlow.Application.LobbyGame.List;
@@ -19,7 +20,11 @@ namespace PeakyFlow.Server.Common.Mappings
 
             CreateMap<LobbyItem, LobbyCreatedEvent>()
                 .ForMember(x => x.Created, x => x.MapFrom(x => x.Created.ToDateTimeOffset()));
-            CreateMap<PlayerInLobby, PlayerMessage>().ReverseMap();
+
+            CreateMap<LobbyDto, LobbyMsg>()
+                .ForMember(x => x.Created, x => x.MapFrom(x => Timestamp.FromDateTimeOffset(x.Created)));
+            CreateMap<PlayerInLobby, LobbyPlayerMsg>().ReverseMap();
+            CreateMap<LobbyPlayerDto, LobbyPlayerMsg>().ReverseMap();
 
             CreateMap<CloseLobbyAndStartGameResponse, CloseLobbyAndStartGameResp>()
                 .ReverseMap();
@@ -31,8 +36,6 @@ namespace PeakyFlow.Server.Common.Mappings
 
             CreateMap<LobbyClosedAndGameStartedEvent, LobbyClosedAndGameStartedMessage>()
                 .ReverseMap();
-
-            CreateMap<PlayerBase, PlayerMessage>().ReverseMap();
 
             CreateMap<PlayerJoinedEvent, PlayerJoinedToLobbyMessage>();
 

@@ -4,10 +4,13 @@ using Grpc.Core;
 using MediatR;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
+using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.GameMaps.EndTurn;
 using PeakyFlow.Application.GameMaps.GetGameMap;
 using PeakyFlow.Application.GameMaps.ThrowDice;
+using PeakyFlow.Application.Rooms.LeaveRoom;
 using PeakyFlow.Application.RoomStates.AcceptCard;
+using PeakyFlow.Application.RoomStates.BankruptAction;
 using PeakyFlow.Application.RoomStates.Borrow;
 using PeakyFlow.Application.RoomStates.GetPlayerState;
 using PeakyFlow.Application.RoomStates.IsCardAcceptable;
@@ -23,6 +26,7 @@ namespace PeakyFlow.Server.Services
 {
     public class GameGrpcService(
         INotificationReceiver<PlayerStartedTurnEvent> playerStartedTurnReceiver,
+        INotificationReceiver<PlayerStateCreatedEvent> playerStateCreatedReceiver,
         IMediator mediator,
         IMapper mapper) : GameRpcService.GameRpcServiceBase
     {
@@ -134,6 +138,26 @@ namespace PeakyFlow.Server.Services
             return resp;
         }
 
+        public override async Task<RespBase> LeaveRoom(LeaveRoomMsg request, ServerCallContext context)
+        {
+            var command = mapper.Map<LeaveRoomCommand>(request);
+            var result = await mediator.Send(command, context.CancellationToken);
+            var resp = result.ToRespBase(mapper);
+            return resp;
+        }
+
+        public override async Task<BankruptActionResp> BankruptAction(BankruptActionMsg request, ServerCallContext context)
+        {
+            var command = mapper.Map<BankruptActionCommand>(request);
+            var result = await mediator.Send(command, context.CancellationToken);
+            var resp = new BankruptActionResp()
+            {
+                BaseResp = result.ToRespBase(mapper),
+                Player = mapper.Map<PlayerStateMsg>(result.Value)
+            };
+            return resp;
+        }
+
         public override async Task OnPlayerStartTurn(PlayerSubscriptionMessage request, IServerStreamWriter<Empty> responseStream, ServerCallContext context)
         {
             var events = playerStartedTurnReceiver.ReceiveNotifications()
@@ -144,6 +168,20 @@ namespace PeakyFlow.Server.Services
             await foreach(var startTurn in events)
             {
                 await responseStream.WriteAsync(new Empty(), context.CancellationToken);
+            }
+        }
+
+        public override async Task OnPlayerCreated(PlayerSubscriptionMessage request, IServerStreamWriter<PlayerCreatedEventMsg> responseStream, ServerCallContext context)
+        {
+            var events = playerStateCreatedReceiver.ReceiveNotifications()
+                .Where(x => x.RoomId == request.RoomId)
+                .Where(x => x.Id == request.PlayerId)
+                .Select(x => mapper.Map<PlayerCreatedEventMsg>(x))
+                .ToAsyncEnumerable();
+            
+            await foreach(var e in events)
+            {
+                await responseStream.WriteAsync(e, context.CancellationToken);
             }
         }
     }
