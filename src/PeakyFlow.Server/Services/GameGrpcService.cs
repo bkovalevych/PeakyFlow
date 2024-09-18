@@ -4,6 +4,7 @@ using Grpc.Core;
 using MediatR;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
+using PeakyFlow.Abstractions.RoomAggregate.Events;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.GameMaps.EndTurn;
 using PeakyFlow.Application.GameMaps.GetGameMap;
@@ -27,6 +28,8 @@ namespace PeakyFlow.Server.Services
     public class GameGrpcService(
         INotificationReceiver<PlayerStartedTurnEvent> playerStartedTurnReceiver,
         INotificationReceiver<PlayerStateCreatedEvent> playerStateCreatedReceiver,
+        INotificationReceiver<AnotherPlayerStateChangedEvent> anotherPlayerStateChangedReceiver,
+        INotificationReceiver<PlayerLostEvent> playerLostEventReceiver,
         IMediator mediator,
         IMapper mapper) : GameRpcService.GameRpcServiceBase
     {
@@ -111,7 +114,7 @@ namespace PeakyFlow.Server.Services
             var resp = mapper.Map<IsCardAcceptableResp>(result.Value) ?? new IsCardAcceptableResp();
 
             resp.BaseResp = result.ToRespBase(mapper);
-
+           
             return resp;
         }
 
@@ -158,16 +161,18 @@ namespace PeakyFlow.Server.Services
             return resp;
         }
 
-        public override async Task OnPlayerStartTurn(PlayerSubscriptionMessage request, IServerStreamWriter<Empty> responseStream, ServerCallContext context)
+        public override async Task OnPlayerStartTurn(PlayerSubscriptionMessage request, IServerStreamWriter<PlayerStartTurnResp> responseStream, ServerCallContext context)
         {
             var events = playerStartedTurnReceiver.ReceiveNotifications()
                 .Where(x => x.RoomId == request.RoomId)
-                .Where(x => x.PlayerId == request.PlayerId)
                 .ToAsyncEnumerable();
 
-            await foreach(var startTurn in events)
+            await foreach (var startTurn in events.WithCancellation(context.CancellationToken))
             {
-                await responseStream.WriteAsync(new Empty(), context.CancellationToken);
+                await responseStream.WriteAsync(new PlayerStartTurnResp() 
+                {
+                    PlayerId = startTurn.PlayerId
+                }, context.CancellationToken);
             }
         }
 
@@ -176,9 +181,40 @@ namespace PeakyFlow.Server.Services
             var events = playerStateCreatedReceiver.ReceiveNotifications()
                 .Where(x => x.RoomId == request.RoomId)
                 .Where(x => x.Id == request.PlayerId)
-                .Select(x => mapper.Map<PlayerCreatedEventMsg>(x))
+                .Select(mapper.Map<PlayerCreatedEventMsg>)
+                .ToAsyncEnumerable();
+
+            await foreach (var e in events)
+            {
+                await responseStream.WriteAsync(e, context.CancellationToken);
+            }
+        }
+
+        public override async Task OnPlayerLeftRoom(PlayerSubscriptionMessage request, IServerStreamWriter<PlayerLeftRoomMsg> responseStream, ServerCallContext context)
+        {
+            var events = playerLostEventReceiver.ReceiveNotifications()
+                .Where(x => x.RoomId == request.RoomId)
+                .Where(x => x.PlayerId != request.PlayerId)
                 .ToAsyncEnumerable();
             
+            await foreach (var e in events)
+            {
+                await responseStream.WriteAsync(new PlayerLeftRoomMsg() 
+                {
+                    PlayerId = e.PlayerId,
+                    RoomId = e.RoomId,
+                }, context.CancellationToken);
+            }
+        }
+
+        public override async Task OnAnotherPlayerStateChanged(PlayerSubscriptionMessage request, IServerStreamWriter<AnotherPlayerStateChangedMsg> responseStream, ServerCallContext context)
+        {
+            var events = anotherPlayerStateChangedReceiver.ReceiveNotifications()
+                .Where(x => x.RoomStateId == request.RoomId)
+                .Where(x => x.PlayerId != request.PlayerId)
+                .Select(mapper.Map<AnotherPlayerStateChangedMsg>)
+                .ToAsyncEnumerable();
+
             await foreach(var e in events)
             {
                 await responseStream.WriteAsync(e, context.CancellationToken);

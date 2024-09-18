@@ -3,6 +3,7 @@ using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameRoleAggregate;
 using PeakyFlow.Abstractions.RoomAggregate;
+using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.GameMaps.ThrowDice;
 using PeakyFlow.Application.Rooms.LeaveRoom;
 using PeakyFlow.Application.RoomStates;
@@ -42,6 +43,8 @@ namespace PeakyFlow.Server.Common.Mappings
             CreateMap<PlayerInRoomStatus, PlayerInRoomStatusMsg>().ReverseMap();
 
             CreateMap<BankruptActionMsg, BankruptActionCommand>().ReverseMap();
+
+            CreateMap<AnotherPlayerStateChangedEvent, AnotherPlayerStateChangedMsg>().ReverseMap();
         }
     }
 }

@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
 
@@ -12,7 +11,7 @@ service GameRpcService {
     rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
     rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
     rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
-    rpc OnPlayerStartTurn (PlayerSubscriptionMessage) returns (stream google.protobuf.Empty);
+    rpc OnPlayerStartTurn (PlayerSubscriptionMessage) returns (stream PlayerStartTurnResp);
 
     rpc ThrowDice (ThrowDiceMsg) returns (ThrowDiceResp);
     rpc Borrow (BorrowMsg) returns (BorrowResp);
@@ -23,6 +22,10 @@ service GameRpcService {
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
     rpc LeaveRoom(LeaveRoomMsg) returns (Common.RespBase);
     rpc BankruptAction(BankruptActionMsg) returns (BankruptActionResp);
+}
+
+message PlayerStartTurnResp {
+    string playerId = 1;
 }
 
 message BankruptActionMsg {
