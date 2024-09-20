@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using MediatR;
 using PeakyFlow.Abstractions;
@@ -48,7 +47,7 @@ namespace PeakyFlow.Server.Services
         public override async Task<GetGameMapResp> GetGameMap(GetGameMapMessage request, ServerCallContext context)
         {
             var result = await mediator.Send(new GetGameMapQuery(request.Id), context.CancellationToken);
-            var resp = new GetGameMapResp() 
+            var resp = new GetGameMapResp()
             {
                 BaseResp = result.ToRespBase(mapper),
                 GameMap = mapper.Map<GameMapResp>(result.Value)
@@ -97,7 +96,7 @@ namespace PeakyFlow.Server.Services
         {
             var cardType = mapper.Map<CardType>(request.CardType);
             var result = await mediator.Send(new PullDealCardCommand(request.RoomId, request.PlayerId, cardType), context.CancellationToken);
-            
+
             var resp = new PullDealCardResp()
             {
                 BaseResp = result.ToRespBase(mapper),
@@ -114,7 +113,7 @@ namespace PeakyFlow.Server.Services
             var resp = mapper.Map<IsCardAcceptableResp>(result.Value) ?? new IsCardAcceptableResp();
 
             resp.BaseResp = result.ToRespBase(mapper);
-           
+
             return resp;
         }
 
@@ -122,7 +121,7 @@ namespace PeakyFlow.Server.Services
         {
             var propositions = mapper.Map<IEnumerable<Proposition>>(request.Propositions);
 
-            var result = await mediator.Send(new AcceptCardCommand(request.RoomId, request.PlayerId, request.CardId, request.Count, request.FinancialItemIds, propositions), 
+            var result = await mediator.Send(new AcceptCardCommand(request.RoomId, request.PlayerId, request.CardId, request.Count, request.FinancialItemIds, propositions),
                 context.CancellationToken);
 
             var resp = mapper.Map<AcceptCardResp>(result.Value) ?? new AcceptCardResp();
@@ -169,7 +168,7 @@ namespace PeakyFlow.Server.Services
 
             await foreach (var startTurn in events.WithCancellation(context.CancellationToken))
             {
-                await responseStream.WriteAsync(new PlayerStartTurnResp() 
+                await responseStream.WriteAsync(new PlayerStartTurnResp()
                 {
                     PlayerId = startTurn.PlayerId
                 }, context.CancellationToken);
@@ -196,10 +195,10 @@ namespace PeakyFlow.Server.Services
                 .Where(x => x.RoomId == request.RoomId)
                 .Where(x => x.PlayerId != request.PlayerId)
                 .ToAsyncEnumerable();
-            
+
             await foreach (var e in events)
             {
-                await responseStream.WriteAsync(new PlayerLeftRoomMsg() 
+                await responseStream.WriteAsync(new PlayerLeftRoomMsg()
                 {
                     PlayerId = e.PlayerId,
                     RoomId = e.RoomId,
@@ -215,7 +214,7 @@ namespace PeakyFlow.Server.Services
                 .Select(mapper.Map<AnotherPlayerStateChangedMsg>)
                 .ToAsyncEnumerable();
 
-            await foreach(var e in events)
+            await foreach (var e in events)
             {
                 await responseStream.WriteAsync(e, context.CancellationToken);
             }
