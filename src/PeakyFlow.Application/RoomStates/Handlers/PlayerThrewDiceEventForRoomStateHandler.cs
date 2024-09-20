@@ -45,14 +45,16 @@ namespace PeakyFlow.Application.RoomStates.Handlers
             }
 
             notification.Card = cardRule.Cards.FirstOrDefault(x => x.Id == cardId);
+            
+            var player = room.PlayerStates
+                .FirstOrDefault(x => x.Id == notification.PlayerId);
 
             if (notification.WithSalary)
             {
                 room.CountSalary(notification.PlayerId);
             }
-
-            notification.PlayerState = room.PlayerStates
-                .FirstOrDefault(x => x.Id == notification.PlayerId);
+            
+            notification.PlayerState = player;
 
             await RoomRepository.UpdateAsync(room, cancellationToken);
         }

@@ -59,7 +59,7 @@ namespace PeakyFlow.Server.Services
             var resp = new CreateLobbyResp();
 
             resp.BaseResp = result.ToRespBase(mapper);
-            resp.Id = result.Value;
+            resp.Lobby = mapper.Map<LobbyMsg>(result.Value);
 
             return resp;
         }

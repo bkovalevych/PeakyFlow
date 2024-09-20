@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 import "common.proto";
 
@@ -12,7 +11,7 @@ service GameRpcService {
     rpc OnPlayerCreated (PlayerSubscriptionMessage) returns (stream PlayerCreatedEventMsg);
     rpc OnAnotherPlayerStateChanged (PlayerSubscriptionMessage) returns (stream AnotherPlayerStateChangedMsg);
     rpc OnPlayerLeftRoom (PlayerSubscriptionMessage) returns (stream PlayerLeftRoomMsg);
-    rpc OnPlayerStartTurn (PlayerSubscriptionMessage) returns (stream google.protobuf.Empty);
+    rpc OnPlayerStartTurn (PlayerSubscriptionMessage) returns (stream PlayerStartTurnResp);
 
     rpc ThrowDice (ThrowDiceMsg) returns (ThrowDiceResp);
     rpc Borrow (BorrowMsg) returns (BorrowResp);
@@ -21,7 +20,40 @@ service GameRpcService {
     rpc IsCardAcceptable (IsCardAcceptableMsg) returns (IsCardAcceptableResp);
     rpc AcceptCard (AcceptCardMsg) returns (AcceptCardResp);
     rpc EndTurn (EndTurnMsg) returns (Common.RespBase);
+    rpc LeaveRoom(LeaveRoomMsg) returns (Common.RespBase);
+    rpc BankruptAction(BankruptActionMsg) returns (BankruptActionResp);
 }
+
+message PlayerStartTurnResp {
+    string playerId = 1;
+}
+
+message BankruptActionMsg {
+    string roomId = 1;
+    string playerId = 2;
+    repeated string assetIdsToSell = 3;
+    repeated PropositionMsg stocksToSell = 4; 
+}
+
+message BankruptActionResp {
+    Common.RespBase baseResp = 1;
+    optional PlayerStateMsg player = 2;
+}
+
+message LeaveRoomMsg {
+    string roomId = 1;
+    string playerId = 2;
+
+    enum PlayerInRoomStatusMsg {
+        Unknown = 0;
+        Active = 1;
+        Out = 2;
+        Lost = 3;
+        Won = 4;
+    }
+}
+
+
 
 message PropositionMsg {
     string Id = 1;

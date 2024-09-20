@@ -21,7 +21,6 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
         private readonly IReadOnlyDictionary<string, Func<string, Card, Card>> BigDelaRetrievers = new Dictionary<string, Func<string, Card, Card>>()
         {
             ["Id"] = (val, card) => card with { Id = $"bigDeal-{val}" },
-            ["Type"] = (val, card) => card with { CardType = Enum.Parse<CardType>(val.Replace(" ", ""), true) },
             ["Name"] = (val, card) => card with { Name = val },
             ["Header"] = (val, card) => card with { Header = val },
             ["Description"] = (val, card) => card with { Description = val },
@@ -92,11 +91,12 @@ namespace PeakyFlow.Infrastructure.SpreadSheets
             };
 
             rule.Cards = [
-            .. ProcessObjects(ranges[0], BigDelaRetrievers),
+            .. ProcessObjects(ranges[0], BigDelaRetrievers,
+                card => card with {CardType = CardType.BigDeal }),
             .. ProcessObjects(ranges[1], MoneyToTheWindRetrievers, 
                 card => card with { CardType = CardType.MoneyToTheWind, Required = true }),
             .. ProcessObjects(ranges[2], SmallDealRetrievers, 
-                card => card with { CardType = CardType.SmallDeal } ),
+                card => card with { CardType = CardType.SmallDeal }),
             .. ProcessObjects(ranges[3], StockRetrievers,
                 card => card with { CardType = CardType.SmallDeal, IsStock = true }),
             .. ProcessObjects(ranges[4], MarketRetrievers,

@@ -5,6 +5,7 @@
         Unknown,
         Active,
         Out,
-        Lost
+        Lost,
+        Won
     }
 }

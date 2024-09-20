@@ -2,6 +2,7 @@ using AutoMapper.Extensions.ExpressionMapping;
 using PeakyFlow.Application.Common.Extensions;
 using PeakyFlow.Infrastructure.Extensions;
 using PeakyFlow.Server.Common.Interfaces;
+using PeakyFlow.Server.Interceptors;
 using PeakyFlow.Server.Services;
 using System.Reflection;
 
@@ -11,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(conf => conf.Interceptors.Add<ExceptionHanlerInterceptor>());
 builder.Services.AddAutoMapper(conf => conf.AddExpressionMapping(), Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddInfrastructure(builder.Configuration);

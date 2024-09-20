@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using MediatR;
 using PeakyFlow.Abstractions;
 using PeakyFlow.Abstractions.GameMapAggregate.Events;
+using PeakyFlow.Abstractions.RoomAggregate.Events;
+using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.GameMaps.EndTurn;
 using PeakyFlow.Application.GameMaps.GetGameMap;
 using PeakyFlow.Application.GameMaps.ThrowDice;
+using PeakyFlow.Application.Rooms.LeaveRoom;
 using PeakyFlow.Application.RoomStates.AcceptCard;
+using PeakyFlow.Application.RoomStates.BankruptAction;
 using PeakyFlow.Application.RoomStates.Borrow;
 using PeakyFlow.Application.RoomStates.GetPlayerState;
 using PeakyFlow.Application.RoomStates.IsCardAcceptable;
@@ -23,6 +26,9 @@ namespace PeakyFlow.Server.Services
 {
     public class GameGrpcService(
         INotificationReceiver<PlayerStartedTurnEvent> playerStartedTurnReceiver,
+        INotificationReceiver<PlayerStateCreatedEvent> playerStateCreatedReceiver,
+        INotificationReceiver<AnotherPlayerStateChangedEvent> anotherPlayerStateChangedReceiver,
+        INotificationReceiver<PlayerLostEvent> playerLostEventReceiver,
         IMediator mediator,
         IMapper mapper) : GameRpcService.GameRpcServiceBase
     {
@@ -41,7 +47,7 @@ namespace PeakyFlow.Server.Services
         public override async Task<GetGameMapResp> GetGameMap(GetGameMapMessage request, ServerCallContext context)
         {
             var result = await mediator.Send(new GetGameMapQuery(request.Id), context.CancellationToken);
-            var resp = new GetGameMapResp() 
+            var resp = new GetGameMapResp()
             {
                 BaseResp = result.ToRespBase(mapper),
                 GameMap = mapper.Map<GameMapResp>(result.Value)
@@ -90,7 +96,7 @@ namespace PeakyFlow.Server.Services
         {
             var cardType = mapper.Map<CardType>(request.CardType);
             var result = await mediator.Send(new PullDealCardCommand(request.RoomId, request.PlayerId, cardType), context.CancellationToken);
-            
+
             var resp = new PullDealCardResp()
             {
                 BaseResp = result.ToRespBase(mapper),
@@ -115,7 +121,7 @@ namespace PeakyFlow.Server.Services
         {
             var propositions = mapper.Map<IEnumerable<Proposition>>(request.Propositions);
 
-            var result = await mediator.Send(new AcceptCardCommand(request.RoomId, request.PlayerId, request.CardId, request.Count, request.FinancialItemIds, propositions), 
+            var result = await mediator.Send(new AcceptCardCommand(request.RoomId, request.PlayerId, request.CardId, request.Count, request.FinancialItemIds, propositions),
                 context.CancellationToken);
 
             var resp = mapper.Map<AcceptCardResp>(result.Value) ?? new AcceptCardResp();
@@ -134,16 +140,83 @@ namespace PeakyFlow.Server.Services
             return resp;
         }
 
-        public override async Task OnPlayerStartTurn(PlayerSubscriptionMessage request, IServerStreamWriter<Empty> responseStream, ServerCallContext context)
+        public override async Task<RespBase> LeaveRoom(LeaveRoomMsg request, ServerCallContext context)
+        {
+            var command = mapper.Map<LeaveRoomCommand>(request);
+            var result = await mediator.Send(command, context.CancellationToken);
+            var resp = result.ToRespBase(mapper);
+            return resp;
+        }
+
+        public override async Task<BankruptActionResp> BankruptAction(BankruptActionMsg request, ServerCallContext context)
+        {
+            var command = mapper.Map<BankruptActionCommand>(request);
+            var result = await mediator.Send(command, context.CancellationToken);
+            var resp = new BankruptActionResp()
+            {
+                BaseResp = result.ToRespBase(mapper),
+                Player = mapper.Map<PlayerStateMsg>(result.Value)
+            };
+            return resp;
+        }
+
+        public override async Task OnPlayerStartTurn(PlayerSubscriptionMessage request, IServerStreamWriter<PlayerStartTurnResp> responseStream, ServerCallContext context)
         {
             var events = playerStartedTurnReceiver.ReceiveNotifications()
                 .Where(x => x.RoomId == request.RoomId)
-                .Where(x => x.PlayerId == request.PlayerId)
                 .ToAsyncEnumerable();
 
-            await foreach(var startTurn in events)
+            await foreach (var startTurn in events.WithCancellation(context.CancellationToken))
             {
-                await responseStream.WriteAsync(new Empty(), context.CancellationToken);
+                await responseStream.WriteAsync(new PlayerStartTurnResp()
+                {
+                    PlayerId = startTurn.PlayerId
+                }, context.CancellationToken);
+            }
+        }
+
+        public override async Task OnPlayerCreated(PlayerSubscriptionMessage request, IServerStreamWriter<PlayerCreatedEventMsg> responseStream, ServerCallContext context)
+        {
+            var events = playerStateCreatedReceiver.ReceiveNotifications()
+                .Where(x => x.RoomId == request.RoomId)
+                .Where(x => x.Id == request.PlayerId)
+                .Select(mapper.Map<PlayerCreatedEventMsg>)
+                .ToAsyncEnumerable();
+
+            await foreach (var e in events)
+            {
+                await responseStream.WriteAsync(e, context.CancellationToken);
+            }
+        }
+
+        public override async Task OnPlayerLeftRoom(PlayerSubscriptionMessage request, IServerStreamWriter<PlayerLeftRoomMsg> responseStream, ServerCallContext context)
+        {
+            var events = playerLostEventReceiver.ReceiveNotifications()
+                .Where(x => x.RoomId == request.RoomId)
+                .Where(x => x.PlayerId != request.PlayerId)
+                .ToAsyncEnumerable();
+
+            await foreach (var e in events)
+            {
+                await responseStream.WriteAsync(new PlayerLeftRoomMsg()
+                {
+                    PlayerId = e.PlayerId,
+                    RoomId = e.RoomId,
+                }, context.CancellationToken);
+            }
+        }
+
+        public override async Task OnAnotherPlayerStateChanged(PlayerSubscriptionMessage request, IServerStreamWriter<AnotherPlayerStateChangedMsg> responseStream, ServerCallContext context)
+        {
+            var events = anotherPlayerStateChangedReceiver.ReceiveNotifications()
+                .Where(x => x.RoomStateId == request.RoomId)
+                .Where(x => x.PlayerId != request.PlayerId)
+                .Select(mapper.Map<AnotherPlayerStateChangedMsg>)
+                .ToAsyncEnumerable();
+
+            await foreach (var e in events)
+            {
+                await responseStream.WriteAsync(e, context.CancellationToken);
             }
         }
     }

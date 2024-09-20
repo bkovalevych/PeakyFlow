@@ -51,7 +51,7 @@ message CloseLobbyAndStartGameMessage {
 
 message CloseLobbyAndStartGameResp {
     Common.RespBase baseResp = 1;
-    repeated PlayerMessage players = 2;
+    repeated LobbyPlayerMsg players = 2;
     google.protobuf.StringValue lobbyId = 3;
     google.protobuf.StringValue name = 4;
 }
@@ -78,15 +78,10 @@ message PlayerJoinedToLobbyMessage {
 }
 
 message LobbyClosedAndGameStartedMessage {
-    repeated PlayerMessage players = 1;
+    repeated LobbyPlayerMsg players = 1;
     google.protobuf.StringValue lobbyId = 2;
     google.protobuf.StringValue name = 3;
     google.protobuf.StringValue takingTurnPlayerId = 4;
-}
-
-message PlayerMessage {
-    google.protobuf.StringValue id = 1;
-    google.protobuf.StringValue name = 2;
 }
 
 message LobbyListEvent {
@@ -105,7 +100,7 @@ message CreateLobbyMessage {
 
 message CreateLobbyResp {
 	Common.RespBase baseResp = 1;
-    google.protobuf.StringValue id = 2;
+    optional LobbyMsg lobby = 2;
 }
 
 message CloseLobbyMessage {
@@ -132,4 +127,26 @@ message LobbyItem {
     bool isFree = 6;
     int32 playersNumber = 7;
     google.protobuf.Timestamp created = 8;
+}
+
+message LobbyMsg {
+    string id = 1;
+    string owner = 2;
+    string name = 3;
+    google.protobuf.StringValue password = 4;
+    google.protobuf.Timestamp created = 5;
+    int32 playersNumber = 6;
+    bool isFree = 7;
+    bool isPublic = 8;
+    int32 teamSize = 9;
+    bool isClosed = 10;
+    repeated LobbyPlayerMsg players = 11;
+}
+
+message LobbyPlayerMsg {
+    string id = 1;
+    string name = 2;
+    string lobbyId = 3;
+    bool isReady = 4;
+    bool isOwner = 5;
 }

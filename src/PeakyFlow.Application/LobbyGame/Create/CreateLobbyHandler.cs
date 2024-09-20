@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions.LobbyAggregate;
@@ -12,11 +13,12 @@ namespace PeakyFlow.Application.LobbyGame.Create
         IRepository<Lobby> _lobbyRepository, 
         IGuid _guid,
         IDateProvider _date,
+        IMapper mapper,
         ILogger<CreateLobbyHandler> _logger) 
-        : IRequestHandler<CreateLobbyCommand, Result<string?>>
+        : IRequestHandler<CreateLobbyCommand, Result<LobbyDto>>
     {    
 
-        public async Task<Result<string?>> Handle(CreateLobbyCommand request, CancellationToken cancellationToken)
+        public async Task<Result<LobbyDto>> Handle(CreateLobbyCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Start creating lobby with name {name}", request.Name);
             var lobbyId = _guid.NewId();
@@ -42,7 +44,7 @@ namespace PeakyFlow.Application.LobbyGame.Create
                 if (lobbyResult == null) 
                 {
                     _logger.LogWarning("Data created lobby {lobby} error", request.Name);
-                    return Result<string?>.Error("Data created error");
+                    return Result<LobbyDto>.Error("Data created error");
                 }
 
                 _logger.LogInformation("Created lobby with name {name}", request.Name);
@@ -53,10 +55,12 @@ namespace PeakyFlow.Application.LobbyGame.Create
             catch (Exception ex) 
             {
                 _logger.LogWarning(ex, "Creeating lobby {lobby} error", request.Name);
-                return Result<string?>.Error("Data created error. Exception was thrown");
+                return Result<LobbyDto>.Error("Data created error. Exception was thrown");
             }
 
-            return lobbyId;
+            var result = mapper.Map<LobbyDto>(lobby);
+            
+            return result;
         }
     }
 }

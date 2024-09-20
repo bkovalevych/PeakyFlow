@@ -316,6 +316,54 @@ namespace PeakyFlow.Abstractions.RoomStateAggregate
             });
         }
 
+        public PlayerState? BankruptAction(string playerId,
+            IEnumerable<string>? asssetIdsToSell,
+            IEnumerable<Proposition>? stocksToSell)
+        {
+            return WithExistingPlayer(playerId, player =>
+            {
+                if (!player.IsBankrupt)
+                {
+                    return;
+                }
+
+                if (asssetIdsToSell?.Any() ?? false) 
+                { 
+                    foreach (var assetId in  asssetIdsToSell) 
+                    {
+                        var asset = player.FinancialItems.FirstOrDefault(x => x.Id == assetId);
+                        
+                        if (asset == null || asset.AssetAmount <= 0)
+                        {
+                            continue;
+                        }
+
+                        player.FinancialItems.Remove(asset);
+                        player.Savings += asset.AssetAmount;
+                    }
+                }
+
+                if (stocksToSell?.Any() ?? false)
+                {
+                    foreach(var proposition in stocksToSell)
+                    {
+                        var stockId = proposition.Id;
+                        var count = proposition.Count;
+
+                        var stock = player.Stocks.FirstOrDefault(x => x.Id == stockId);
+
+                        if (stock == null || count <= 0)
+                        {
+                            continue;
+                        }
+
+                        player.Stocks.Remove(stock);
+                        player.Savings += stock.AssetAmount;
+                    }
+                }
+            });
+        }
+
         private PlayerState? WithExistingPlayer(string playerId, Action<PlayerState> action)
         {
             var player = PlayerStates.FirstOrDefault(x => x.Id == playerId);

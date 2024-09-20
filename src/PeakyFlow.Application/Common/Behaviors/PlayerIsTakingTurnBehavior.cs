@@ -39,13 +39,13 @@ namespace PeakyFlow.Application.Common.Behaviors
             var method = resultTypeDefinition
                         .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                         .FirstOrDefault(m => m.Name == "Conflict" && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string[]));
-
+            
             if (method == null)
             {
                 return await next();
             }
 
-            var result = (TResponse?)(object?)method.Invoke(null, [Msg]);
+            var result = (TResponse?)(object?)method.Invoke(null, [new string[] { Msg }]);
             if (result == null)
             {
                 return await next();
