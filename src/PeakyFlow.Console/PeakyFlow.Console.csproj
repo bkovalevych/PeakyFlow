@@ -8,14 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.28.2" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.66.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.66.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.49.1" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\PeakyFlow.Abstractions\PeakyFlow.Abstractions.csproj" />
-    <ProjectReference Include="..\PeakyFlow.Application\PeakyFlow.Application.csproj" />
-    <ProjectReference Include="..\PeakyFlow.Infrastructure\PeakyFlow.Infrastructure.csproj" />
+	<Protobuf Include="../Proto/*.proto" GrpcServices="Client" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
