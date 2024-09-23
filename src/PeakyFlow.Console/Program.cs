@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using PeakyFlow.Console.Services;
 using PeakyFlow.GrpcProtocol.Game;
 using PeakyFlow.GrpcProtocol.Lobby;
@@ -13,9 +14,10 @@ var host = Host.CreateDefaultBuilder()
     )
     .ConfigureServices((context, services) =>
     {
-        services
+        services.AddLogging(x => x.ClearProviders())
         //.AddLogging(x => x.AddDebug().AddConsole().SetMinimumLevel(LogLevel.Information))
         .AddSingleton<MainService>()
+        .AddTransient<MenuStateProvider>()
         .AddGrpcClient<LobbyRpcService.LobbyRpcServiceClient>(conf =>
         {
             conf.Address = new Uri(context.Configuration.GetConnectionString("Server")!);
@@ -30,7 +32,7 @@ var host = Host.CreateDefaultBuilder()
 await host.StartAsync();
 var main = host.Services.GetRequiredService<MainService>();
 
-main.StartMap();
+await main.StartMap();
 
 Console.WriteLine("Press any key to quit...");
 Console.ReadKey();
