@@ -22,6 +22,8 @@ namespace PeakyFlow.Console.Services
         private LobbyItem _currentLobby;
         private List<PlayerJoinedToLobbyMessage> _playersInLobby = new List<PlayerJoinedToLobbyMessage>();
         private Dictionary<string, bool> _playerIsRedy = new Dictionary<string, bool>();
+        private LobbyMsg? _currentLobbyWithOwner;
+        private LobbyPlayerMsg? _currentOwner;
 
         public MainService(
             GameRpcService.GameRpcServiceClient gameRpcService,
@@ -36,7 +38,79 @@ namespace PeakyFlow.Console.Services
             _menu.OnEnterListLobbies += OnEnterListLobbies;
             _menu.OnEnterLobbyMenuForPlayer += OnEnterLobbyMenuForPlayer;
             _menu.OnRefreshLobbies += OnRefreshLobbies;
+            _menu.OnEnterLobbyMenuForOwner += OnEnterLobbyMenuForOwner;
+            _menu.OnRefreshLobbyForOwner += OnRefreshGamersForOwner;
             _layout = new Layout("Root");
+        }
+
+
+        private  void OnEnterLobbyMenuForOwner(CreateLobbyMessage msg)
+        {
+            AnsiConsole.Clear();
+            CreateLobbyResp? lobbyResult = null;
+
+            _actionsList = _menu.AvailableActions().ToList();
+            AnsiConsole.Status()
+                .Spinner(Spinner.Known.Dots9)
+                .Start("Loading...", ctx =>
+                {
+                    lobbyResult = _lobbyRpcService.CreateLobby(msg);
+                    if (lobbyResult == null)
+                    {
+                        ctx.Status("Unsuccessful operation");
+                    }
+                    else
+                    {
+                        ctx.Status("Done");
+                    }
+                    
+                });
+            
+            if (lobbyResult == null)
+            {
+                return;
+            }
+
+            AnsiConsole.Clear();
+            _currentLobbyWithOwner = lobbyResult.Lobby;
+            _currentOwner = _currentLobbyWithOwner.Players.FirstOrDefault(x => x.IsOwner);
+            OnRefreshGamersForOwner();
+        }
+
+        private void OnRefreshGamersForOwner()
+        {
+            AnsiConsole.Clear();
+            if (_currentLobbyWithOwner == null)
+            {
+                return;
+            }
+
+            var table = new Table().AddColumns("Player", "Is ready");
+
+            var lobby = _lobbyRpcService.GetLobby(new GetLobbyMsg()
+            {
+                LobbyId = _currentLobbyWithOwner.Id,
+                PlayerId = _currentOwner?.Id
+            });
+            
+            foreach (var player in lobby.Lobby.Players)
+            {
+                table.AddRow(player.Name, player.IsReady ? "yes" : "no");
+            }
+
+            var p = new Panel(table)
+                .Header($"Game: {_currentLobbyWithOwner.Name}");
+            
+
+            AnsiConsole.Write(p);
+
+            _actionsList = _menu.AvailableActions().ToList();
+            var action = AnsiConsole.Prompt(new SelectionPrompt<MenuAction>()
+                .AddChoices(_actionsList
+                    .Select(x => x)));
+
+            
+            _menu.Fire(action);
         }
 
         private void OnRefreshLobbies()
@@ -270,8 +344,12 @@ namespace PeakyFlow.Console.Services
         {
             AnsiConsole.Clear();
             _actionsList = _menu.AvailableActions().ToList();
+
+            AnsiConsole.Write(new FigletText("Peaky Flow")
+                .Centered()
+                .Color(Color.LightPink1));
+
             var prompt = AnsiConsole.Prompt(new SelectionPrompt<MenuAction>()
-                .Title("Peaky flow")
                 .AddChoices(_actionsList));
             _menu.Fire(prompt);
         }

@@ -15,7 +15,7 @@ namespace PeakyFlow.Console.Services
         public event Action? OnEnterListLobbies;
         public event Action? OnExitListLobbies;
 
-        public event Action? OnEnterLobbyMenuForOwner;
+        public event Action<CreateLobbyMessage>? OnEnterLobbyMenuForOwner;
         public event Action? OnExitLobbyMenuForOwner;
 
         public event Action<JoinLobbyMessage>? OnEnterLobbyMenuForPlayer;
@@ -24,6 +24,7 @@ namespace PeakyFlow.Console.Services
         public event Action? OnEnterGame;
 
         public event Action? OnRefreshLobbies;
+        public event Action? OnRefreshLobbyForOwner;
 
         public StateMachine<MenuState, MenuAction>.TriggerWithParameters<JoinLobbyMessage> JoinLobbyTrigger { get; }
         public StateMachine<MenuState, MenuAction>.TriggerWithParameters<CreateLobbyMessage> CreateLobbyTrigger { get; }
@@ -54,10 +55,11 @@ namespace PeakyFlow.Console.Services
 
 
             _state.Configure(MenuState.LobbyMenuForOwner)
-                .OnEntry(() => OnEnterLobbyMenuForOwner?.Invoke())
+                .OnEntryFrom(CreateLobbyTrigger, x => OnEnterLobbyMenuForOwner?.Invoke(x))
                 .OnExit(() => OnExitLobbyMenuForOwner?.Invoke())
                 .Permit(MenuAction.CloseLobbyAndStartGame, MenuState.GameMenu)
-                .Permit(MenuAction.CancellCreateLobby, MenuState.ListLobbiesMenu);
+                .Permit(MenuAction.CancellCreateLobby, MenuState.ListLobbiesMenu)
+                .InternalTransition(MenuAction.RefreshLobbyForOwner, () => OnRefreshLobbyForOwner?.Invoke());
 
             _state.Configure(MenuState.LobbyMenuForPlayer)
                 .OnEntryFrom(JoinLobbyTrigger, (arg) => OnEnterLobbyMenuForPlayer?.Invoke(arg))

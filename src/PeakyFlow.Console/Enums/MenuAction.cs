@@ -10,6 +10,7 @@
         LeaveLobby,
         CloseLobbyAndStartGame,
         StartGameForPlayer,
-        RefreshLobby
+        RefreshLobby,
+        RefreshLobbyForOwner
     }
 }

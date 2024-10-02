@@ -13,11 +13,22 @@ service LobbyRpcService {
     rpc CloseLobbyAndStartGame (CloseLobbyAndStartGameMessage) returns (CloseLobbyAndStartGameResp);
     rpc JoinLobby (JoinLobbyMessage) returns (JoinLobbyResp);
     rpc LeaveLobby (LeaveLobbyMessage) returns (Common.RespBase);
-    rpc PlayerIsReady(PlayerIsReadyMessage) returns (Common.RespBase); 
-    rpc OnLobbyEvent(LobbyEventMessage) returns (stream LobbyEvent);
+    rpc PlayerIsReady (PlayerIsReadyMessage) returns (Common.RespBase); 
+    rpc OnLobbyEvent (LobbyEventMessage) returns (stream LobbyEvent);
     
+    rpc GetLobby (GetLobbyMsg) returns (GetLobbyResp);
     rpc ListLobbies (ListLobbyMessage) returns (LobbyListResp);
-    rpc OnLobbyListEvent(google.protobuf.Empty) returns (stream LobbyListEvent);
+    rpc OnLobbyListEvent (google.protobuf.Empty) returns (stream LobbyListEvent);
+}
+
+message GetLobbyMsg {
+    string lobbyId = 1;
+    string playerId = 2;
+}
+
+message GetLobbyResp {
+    Common.RespBase baseResp = 1;
+    optional LobbyMsg lobby = 2;
 }
 
 message PlayerIsReadyMessage {
