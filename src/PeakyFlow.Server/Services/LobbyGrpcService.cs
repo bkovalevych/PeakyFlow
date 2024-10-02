@@ -6,6 +6,7 @@ using PeakyFlow.Abstractions.LobbyAggregate.Events;
 using PeakyFlow.Application.LobbyGame.CloseLobby;
 using PeakyFlow.Application.LobbyGame.CloseLobbyAndStartGame;
 using PeakyFlow.Application.LobbyGame.Create;
+using PeakyFlow.Application.LobbyGame.GetLobby;
 using PeakyFlow.Application.LobbyGame.JoinLobby;
 using PeakyFlow.Application.LobbyGame.LeaveLobby;
 using PeakyFlow.Application.LobbyGame.List;
@@ -84,6 +85,19 @@ namespace PeakyFlow.Server.Services
             var result = await mediator.Send(command, context.CancellationToken);
 
             var resp = result.ToRespBase(mapper);
+
+            return resp;
+        }
+
+        public override async Task<GetLobbyResp> GetLobby(GetLobbyMsg request, ServerCallContext context)
+        {
+            var query = new GetLobbyQuery(request.LobbyId, request.PlayerId);
+
+            var result = await mediator.Send(query, context.CancellationToken);
+
+            var resp = new GetLobbyResp();
+            resp.Lobby = mapper.Map<LobbyMsg>(result.Value);
+            resp.BaseResp = result.ToRespBase(mapper);
 
             return resp;
         }

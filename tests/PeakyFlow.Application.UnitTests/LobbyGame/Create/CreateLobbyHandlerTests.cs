@@ -1,9 +1,11 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Abstractions.LobbyAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
+using PeakyFlow.Application.Common.Mappings;
 using PeakyFlow.Application.LobbyGame.Create;
 
 namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
@@ -45,7 +47,12 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
             };
             lobby.SetTeamSize(1);
 
-            var handler = new CreateLobbyHandler(_fakeMediator.Object, _fakeLobbyRepository.Object, _fakeGuid.Object, _fakeDateTime.Object, _fakeLogger.Object);
+            var mapper = new Mapper(new MapperConfiguration(x =>
+            {
+                x.AddProfile<LobbyMapperProfies>();
+            }));
+
+            var handler = new CreateLobbyHandler(_fakeMediator.Object, _fakeLobbyRepository.Object, _fakeGuid.Object, _fakeDateTime.Object, mapper, _fakeLogger.Object);
             _fakeLobbyRepository.Setup(x => x.AddAsync(It.IsAny<Lobby>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(lobby);
 
@@ -58,7 +65,7 @@ namespace PeakyFlow.Application.UnitTests.LobbyGame.Create
             Assert.NotNull(result);
             Assert.True(result.IsSuccess);
             Assert.NotNull(result.Value);
-            Assert.Equal("1", result.Value);
+            Assert.Equal("1", result.Value.Id);
             _fakeMediator.Verify(x => x.Publish(It.IsAny<LobbyCreatedEvent>(), It.IsAny<CancellationToken>()), Times.Once());
         }
     }

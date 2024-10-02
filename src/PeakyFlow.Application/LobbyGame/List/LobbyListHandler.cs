@@ -10,6 +10,10 @@ namespace PeakyFlow.Application.LobbyGame.List
     {
         public async Task<Result<IEnumerable<LobbyListResponse>>> Handle(LobbyListQuery request, CancellationToken cancellationToken)
         {
+            if (request.PaginationCount == 0)
+            {
+                request.PaginationCount = 20;
+            }
             var entities = await _repository.ListAsync(new LobbyListSpecification(request), cancellationToken);
             var mapped = _mapper.Map<IEnumerable<LobbyListResponse>>(entities);
 
