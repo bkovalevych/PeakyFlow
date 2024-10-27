@@ -7,7 +7,7 @@ using PeakyFlow.Abstractions.RoomAggregate.Events;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
 using PeakyFlow.Application.GameMaps.EndTurn;
 using PeakyFlow.Application.GameMaps.GetGameMap;
-using PeakyFlow.Application.GameMaps.ThrowDice;
+using PeakyFlow.Application.GameMaps.RollTheDice;
 using PeakyFlow.Application.Rooms.LeaveRoom;
 using PeakyFlow.Application.RoomStates.AcceptCard;
 using PeakyFlow.Application.RoomStates.BankruptAction;
@@ -84,7 +84,7 @@ namespace PeakyFlow.Server.Services
 
         public override async Task<ThrowDiceResp> ThrowDice(ThrowDiceMsg request, ServerCallContext context)
         {
-            var result = await mediator.Send(new ThrowDiceCommand(request.RoomId, request.PlayerId, request.Dice), context.CancellationToken);
+            var result = await mediator.Send(new RollTheDiceCommand(request.RoomId, request.PlayerId, request.Dice), context.CancellationToken);
             var resp = mapper.Map<ThrowDiceResp>(result.Value) ?? new ThrowDiceResp();
 
             resp.BaseResp = result.ToRespBase(mapper);

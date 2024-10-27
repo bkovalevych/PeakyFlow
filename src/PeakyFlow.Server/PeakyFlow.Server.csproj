@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PeakyFlow.Abstractions\PeakyFlow.Abstractions.csproj" />
     <ProjectReference Include="..\PeakyFlow.Application\PeakyFlow.Application.csproj" />
+    <ProjectReference Include="..\PeakyFlow.Aspire\PeakyFlow.Aspire.ServiceDefaults\PeakyFlow.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\PeakyFlow.Infrastructure\PeakyFlow.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@ using PeakyFlow.Abstractions.GameMapAggregate;
 using PeakyFlow.Abstractions.GameRoleAggregate;
 using PeakyFlow.Abstractions.RoomAggregate;
 using PeakyFlow.Abstractions.RoomStateAggregate.Events;
-using PeakyFlow.Application.GameMaps.ThrowDice;
+using PeakyFlow.Application.GameMaps.RollTheDice;
 using PeakyFlow.Application.Rooms.LeaveRoom;
 using PeakyFlow.Application.RoomStates;
 using PeakyFlow.Application.RoomStates.AcceptCard;
@@ -29,7 +29,7 @@ namespace PeakyFlow.Server.Common.Mappings
             CreateMap<GameMapPlayer, GameMapPlayerResp>().ReverseMap();
             CreateMap<StepType, StepTypeMsg>();
 
-            CreateMap<ThrowDiceResponse, ThrowDiceResp>().ReverseMap();
+            CreateMap<RollTheDiceResponse, ThrowDiceResp>().ReverseMap();
             CreateMap<Card, CardMsg>().ReverseMap();
             CreateMap<CardType, CardTypeMsg>().ReverseMap();
             CreateMap<StockAction, StockActionMsg>().ReverseMap();

@@ -1,6 +1,8 @@
 using AutoMapper.Extensions.ExpressionMapping;
 using PeakyFlow.Application.Common.Extensions;
+using PeakyFlow.Application.LobbyGame;
 using PeakyFlow.Infrastructure.Extensions;
+using PeakyFlow.Infrastructure.SpreadSheets;
 using PeakyFlow.Server.Common.Interfaces;
 using PeakyFlow.Server.Interceptors;
 using PeakyFlow.Server.Services;
@@ -13,13 +15,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddGrpc(conf => conf.Interceptors.Add<ExceptionHanlerInterceptor>());
-builder.Services.AddAutoMapper(conf => conf.AddExpressionMapping(), Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(conf => conf.AddExpressionMapping(), Assembly.GetExecutingAssembly(), Assembly.GetAssembly(typeof(SheetsSettings)), Assembly.GetAssembly(typeof(LobbyDto)));
 builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.AddInfrastructure(builder.Configuration);
+
+
+
+
 builder.Services.AddApplication();
 builder.Services.AddScoped<LobbyGrpcEventReceiver>();
-
 builder.Services.AddSingleton(typeof(INotificationReceiver<>), typeof(NotificationReceiver<>));
+builder.AddServiceDefaults();
 
 var app = builder.Build();
 
@@ -54,6 +60,8 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapGrpcService<LobbyGrpcService>();
 app.MapGrpcService<GameGrpcService>();
+
+app.MapDefaultEndpoints();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
