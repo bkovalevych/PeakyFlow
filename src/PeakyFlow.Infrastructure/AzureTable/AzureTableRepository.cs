@@ -68,29 +68,21 @@ namespace PeakyFlow.Infrastructure.AzureTable
 
         public async Task<bool> AnyAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default)
         {
-            try
+            var mappedFilter = _mapper.Map<Expression<Func<TMappingEntity, bool>>>(specification.WhereExpressions.FirstOrDefault()?.Filter ?? (x => true));
+            var filter = AddPartitionKeyLambda(mappedFilter, PartitionKey);
+
+
+            var query = _tableClient.QueryAsync(filter, 1, ["PartitionKey", "RowKey"], cancellationToken);
+
+            await foreach (var page in query)
             {
-                var mappedFilter = _mapper.Map<Expression<Func<TMappingEntity, bool>>>(specification.WhereExpressions.FirstOrDefault()?.Filter ?? (x => true));
-                var filter = AddPartitionKeyLambda(mappedFilter, PartitionKey);
-
-
-                var query = _tableClient.QueryAsync(filter, 1, ["PartitionKey", "RowKey"], cancellationToken);
-
-                await foreach (var page in query)
+                if (page != null)
                 {
-                    if (page != null)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
+            }
 
-                return false;
-            }
-            catch (Exception e) 
-            { 
-                return false;
-            }
-            
+            return false;
         }
 
         public async Task<bool> AnyAsync(CancellationToken cancellationToken = default)
@@ -278,7 +270,7 @@ namespace PeakyFlow.Infrastructure.AzureTable
 
                 return list;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return list;
             }

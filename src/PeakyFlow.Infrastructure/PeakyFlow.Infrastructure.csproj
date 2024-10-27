@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Azure.Data.Tables" Version="8.2.1" />
+    <PackageReference Include="Aspire.StackExchange.Redis" Version="8.2.1" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="7.0.1" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.68.0.3498" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
@@ -15,6 +18,11 @@
     <PackageReference Include="Redis.OM" Version="0.7.4" />
   </ItemGroup>
 
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>PeakyFlow.Infrastructure.IntegrationTests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PeakyFlow.Abstractions\PeakyFlow.Abstractions.csproj" />
     <ProjectReference Include="..\PeakyFlow.Application\PeakyFlow.Application.csproj" />
