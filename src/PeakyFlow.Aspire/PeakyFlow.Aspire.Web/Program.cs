@@ -1,22 +1,33 @@
-using PeakyFlow.Aspire.Web;
 using PeakyFlow.Aspire.Web.Components;
+using PeakyFlow.GrpcProtocol.Game;
+using PeakyFlow.GrpcProtocol.Lobby;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
-builder.AddRedisOutputCache("cache");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
-    {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
-    });
+builder.Services.AddGrpcClient<LobbyRpcService.LobbyRpcServiceClient>((x) =>
+{
+    x.Address = new(builder.Configuration["services__server__https__0"] ?? builder.Configuration["services:server:https:0"] ?? string.Empty);
+})
+.ConfigureChannel((s, ch) =>
+{
+    ch.LoggerFactory = s.GetRequiredService<ILoggerFactory>();
+});
+
+builder.Services.AddGrpcClient<GameRpcService.GameRpcServiceClient>(o =>
+{
+    o.Address = new(builder.Configuration["services__server__https__0"] ?? builder.Configuration["services:server:https:0"] ?? string.Empty);
+})
+.ConfigureChannel((s, ch) =>
+{
+    ch.LoggerFactory = s.GetRequiredService<ILoggerFactory>();
+});
 
 var app = builder.Build();
 
@@ -32,7 +43,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.UseOutputCache();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
