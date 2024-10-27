@@ -14,12 +14,11 @@ namespace PeakyFlow.Console.Services
         
         private readonly Layout _layout;
         private Dictionary<int, (string, string)> _stepCords = new Dictionary<int, (string, string)>();
-        private int _currentIndex;
-        private List<MenuAction> _actionsList;
+        private List<MenuAction> _actionsList = [];
         private string? _playerId;
         private string? _playerName;
         
-        private LobbyItem _currentLobby;
+        private LobbyItem? _currentLobby;
         private List<PlayerJoinedToLobbyMessage> _playersInLobby = new List<PlayerJoinedToLobbyMessage>();
         private Dictionary<string, bool> _playerIsRedy = new Dictionary<string, bool>();
         private LobbyMsg? _currentLobbyWithOwner;
@@ -364,12 +363,12 @@ namespace PeakyFlow.Console.Services
                         i.ToString(), 
                         new Markup(x.ToString(), new Style(i == 0 ? Color.Blue: Color.White))))
                 .ToArray());
-            _currentIndex = 0;
         }
 
-        public async Task StartMap()
+        public Task StartMap()
         {
             _menu.Start();
+            return Task.CompletedTask;
             //var lobbies = await _lobbyRpcService.ListLobbiesAsync(new ListLobbyMessage());
             //InitMap();
 
@@ -459,9 +458,9 @@ namespace PeakyFlow.Console.Services
                         .ToArray()))
                 .ToArray());
 
-            var vec = (x: 1, y: 0);
-            var p = (x: 0, y: 0);
-            var i = 0;
+            //var vec = (x: 1, y: 0);
+            //var p = (x: 0, y: 0);
+            //var i = 0;
 
             //foreach (var step in _gameMap!.Steps)
             //{
