@@ -19,6 +19,7 @@ namespace PeakyFlow.Application.GameMaps.EndTurn
 
         public async Task<Result> Handle(EndTurnCommand request, CancellationToken cancellationToken)
         {
+            await _gameMapRepository.Init();
             var gameMap = await _gameMapRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (gameMap == null || !gameMap.GameMapPlayers.Any(x => x.Id == request.PlayerId))

@@ -10,6 +10,7 @@ namespace PeakyFlow.Application.LobbyGame.List
     {
         public async Task<Result<IEnumerable<LobbyListResponse>>> Handle(LobbyListQuery request, CancellationToken cancellationToken)
         {
+            await _repository.Init();
             if (request.PaginationCount == 0)
             {
                 request.PaginationCount = 20;

@@ -9,6 +9,7 @@ namespace PeakyFlow.Application.RoomStates.GetPlayerState
     {
         public async Task<Result<PlayerStateDto>> Handle(GetPlayerStateQuery request, CancellationToken cancellationToken)
         {
+            await rep.Init();
             var roomState = await rep.GetByIdAsync(request.RoomId);
 
             if (roomState == null) 

@@ -25,6 +25,7 @@ namespace PeakyFlow.Application.LobbyGame
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken)
         {
             Logger.LogInformation("Request lobby {lobbyId}", request.LobbyId);
+            await Repository.Init();
             var lobby = await Repository.GetByIdAsync(request.LobbyId, cancellationToken);
 
             if (lobby == null)

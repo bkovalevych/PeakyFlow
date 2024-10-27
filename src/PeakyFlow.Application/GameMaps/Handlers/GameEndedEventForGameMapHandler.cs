@@ -16,6 +16,7 @@ namespace PeakyFlow.Application.GameMaps.Handlers
 
         public async Task Handle(GameEndedEvent notification, CancellationToken cancellationToken)
         {
+            await _rep.Init();
             var gameMap = await _rep.GetByIdAsync(notification.RoomId, cancellationToken);
             if (gameMap == null) 
             {

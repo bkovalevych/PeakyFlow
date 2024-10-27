@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using PeakyFlow.Abstractions.RoomAggregate;
 using PeakyFlow.Abstractions.RoomAggregate.Interfaces;
 using PeakyFlow.Application.Common.Interfaces;
-using PeakyFlow.Application.Rooms.Specifications;
 
 namespace PeakyFlow.Application.Rooms.Handlers
 {
@@ -22,7 +21,7 @@ namespace PeakyFlow.Application.Rooms.Handlers
 
         public async Task Handle(TEvent notification, CancellationToken cancellationToken)
         {
-            var room = await RoomRepository.FirstOrDefaultAsync(new FirstOrDefaultRoomSpecification(notification.RoomId), cancellationToken);
+            var room = await RoomRepository.GetByIdAsync(notification.RoomId, cancellationToken);
             
             if (room == null) 
             {

@@ -16,6 +16,7 @@ namespace PeakyFlow.Application.Rooms.LeaveRoom
 
         public async Task<Result> Handle(LeaveRoomCommand request, CancellationToken cancellationToken)
         {
+            await _roomRep.Init();
             var room = await _roomRep.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (room == null)

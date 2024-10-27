@@ -16,6 +16,7 @@ namespace PeakyFlow.Application.RoomStates.BankruptAction
 
         public async Task<Result<PlayerStateDto>> Handle(BankruptActionCommand request, CancellationToken cancellationToken)
         {
+            await _roomStateRep.Init();
             var room = await _roomStateRep.GetByIdAsync(request.RoomId);
             
             if (room == null)

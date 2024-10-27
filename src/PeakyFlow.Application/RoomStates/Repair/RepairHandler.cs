@@ -19,6 +19,7 @@ namespace PeakyFlow.Application.RoomStates.Repair
 
         public async Task<Result<PlayerStateDto>> Handle(RepairCommand request, CancellationToken cancellationToken)
         {
+            await _roomStateRepository.Init();
             var state = await _roomStateRepository
                 .GetByIdAsync(request.RoomId, cancellationToken);
 

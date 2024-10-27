@@ -9,6 +9,7 @@ namespace PeakyFlow.Application.GameMaps.GetGameMap
     {
         public async Task<Result<GameMap>> Handle(GetGameMapQuery request, CancellationToken cancellationToken)
         {
+            await rep.Init();
             var result = await rep.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (result == null) 

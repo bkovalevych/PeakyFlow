@@ -5,33 +5,34 @@ using PeakyFlow.Abstractions.GameMapAggregate.Events;
 using PeakyFlow.Application.Common.Interfaces;
 using PeakyFlow.Application.RoomStates;
 
-namespace PeakyFlow.Application.GameMaps.ThrowDice
+namespace PeakyFlow.Application.GameMaps.RollTheDice
 {
-    public class ThrowDiceHandler : IRequestHandler<ThrowDiceCommand, Result<ThrowDiceResponse>>
+    public class RollTheDiceHandler : IRequestHandler<RollTheDiceCommand, Result<RollTheDiceResponse>>
     {
         private readonly IMediator _mediator;
         private readonly IRepository<GameMap> _gameMapRepository;
 
-        public ThrowDiceHandler(IMediator mediator, IRepository<GameMap> gameMapRepository)
+        public RollTheDiceHandler(IMediator mediator, IRepository<GameMap> gameMapRepository)
         {
             _mediator = mediator;
             _gameMapRepository = gameMapRepository;
         }
 
-        public async Task<Result<ThrowDiceResponse>> Handle(ThrowDiceCommand request, CancellationToken cancellationToken)
+        public async Task<Result<RollTheDiceResponse>> Handle(RollTheDiceCommand request, CancellationToken cancellationToken)
         {
+            await _gameMapRepository.Init();
             var gameMap = await _gameMapRepository.GetByIdAsync(request.RoomId, cancellationToken);
 
             if (gameMap == null)
             {
-                return Result<ThrowDiceResponse>.NotFound();
+                return Result<RollTheDiceResponse>.NotFound();
             }
 
             var (step, withSalary) = gameMap.MovePlayer(request.PlayerId, request.Dice);
 
             if (step == null)
             {
-                return Result<ThrowDiceResponse>.NotFound();
+                return Result<RollTheDiceResponse>.NotFound();
             }
 
             await _gameMapRepository.UpdateAsync(gameMap);
@@ -42,12 +43,12 @@ namespace PeakyFlow.Application.GameMaps.ThrowDice
 
             if (playerThrewDiceEvent.PlayerState == null)
             {
-                return Result<ThrowDiceResponse>.NotFound();
+                return Result<RollTheDiceResponse>.NotFound();
             }
 
             var pst = playerThrewDiceEvent.PlayerState;
 
-            return new ThrowDiceResponse(
+            return new RollTheDiceResponse(
                 request.RoomId,
                 request.PlayerId,
                 step.Value,
