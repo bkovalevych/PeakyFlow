@@ -1,15 +1,19 @@
 using PeakyFlow.Aspire.Web.Components;
 using PeakyFlow.GrpcProtocol.Game;
 using PeakyFlow.GrpcProtocol.Lobby;
+using Radzen;
+//using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+    //.AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddRadzenComponents();
 
 builder.Services.AddGrpcClient<LobbyRpcService.LobbyRpcServiceClient>((x) =>
 {
@@ -46,6 +50,7 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+    //.AddInteractiveWebAssemblyRenderMode();
 
 app.MapDefaultEndpoints();
 

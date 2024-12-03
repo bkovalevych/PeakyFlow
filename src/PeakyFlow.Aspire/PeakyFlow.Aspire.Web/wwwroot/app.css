@@ -2,6 +2,14 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+.txt-title-color {
+    color: var(--rz-text-title-color);
+}
+
+.txt-primary-color {
+    color: var(--rz-text-color);
+}
+
 a, .btn-link {
     color: #006bb7;
 }
@@ -10,6 +18,30 @@ a, .btn-link {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
+}
+
+.starter {
+    width: 100%;
+    height: 100vh;
+    background: #aab9a0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-image: url(starter-bg.jpg);
+    transition-property: height;
+    transition-duration: 1500ms;
+    overflow: hidden;
+}
+
+.starter-block {
+    width: 75%;
+    margin: auto;
+    padding: 20px;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.btn-play {
+    font-size: 32px !important;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

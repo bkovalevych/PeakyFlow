@@ -1,7 +1,33 @@
 ﻿@page "/"
+@attribute [StreamRendering(true)]
+
+@inject LobbyRpcServiceClient LobbyService;
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="starter">
+    <div class="starter-block">
+        <span>
+            <RadzenButton Text="Refresh"/>
+            <RadzenButton Text="Add" />
+        </span>
+        <RadzenDataGrid TItem="LobbyItem" Data="@lobbies">
+            <Columns>
+                <RadzenDataGridColumn Property="Name" Title="Name" Width="5rem" />
+                <RadzenDataGridColumn Property="Created" Title="Created" FormatString="{0:d}"/>
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>
 
-Welcome to your new app.
+@code {
+
+    private List<LobbyItem>? lobbies { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        lobbies = (await LobbyService.ListLobbiesAsync(new ListLobbyMessage() { PaginationSkip = 0, PaginationCount = 100 }))
+        .Lobbies
+        .ToList();
+    }
+}

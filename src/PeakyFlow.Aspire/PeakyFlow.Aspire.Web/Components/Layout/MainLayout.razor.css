@@ -35,8 +35,46 @@ main {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+.starter-collapsed {
+    height: 0;
+}
+
+.starter-details {
+}
+
+.starter-img {
+    width: min(75%, 600px);
+    height: min(75vh, 600px);
+    margin-bottom: 10px;
+    background-image: url(main-bg.png);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-blend-mode: difference;
+    border-radius: 500px 500px 0 0;
+}
+
+.name-app {
+    text-align: center;
+    color: var(--rz-secondary);
+    padding: 10px;
+    border-radius: var(--rz-border-radius-5);
+    background: var(--rz-info-lighter);
+    align-self: stretch;
+}
+
+.starter-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
 
 @media (max-width: 640.98px) {
+    .starter-block {
+        width: 100%;
+    }
+
     .top-row {
         justify-content: space-between;
     }
