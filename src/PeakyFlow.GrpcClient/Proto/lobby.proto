@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "Proto/common.proto";
+
+option csharp_namespace = "PeakyFlow.GrpcProtocol.Lobby";
+
+service LobbyRpcService {
+	rpc CreateLobby (CreateLobbyMessage) returns (CreateLobbyResp);
+	rpc CloseLobby (CloseLobbyMessage) returns (Common.RespBase);
+    rpc CloseLobbyAndStartGame (CloseLobbyAndStartGameMessage) returns (CloseLobbyAndStartGameResp);
+    rpc JoinLobby (JoinLobbyMessage) returns (JoinLobbyResp);
+    rpc LeaveLobby (LeaveLobbyMessage) returns (Common.RespBase);
+    rpc PlayerIsReady (PlayerIsReadyMessage) returns (Common.RespBase); 
+    rpc OnLobbyEvent (LobbyEventMessage) returns (stream LobbyEvent);
+    
+    rpc GetLobby (GetLobbyMsg) returns (GetLobbyResp);
+    rpc ListLobbies (ListLobbyMessage) returns (LobbyListResp);
+    rpc OnLobbyListEvent (google.protobuf.Empty) returns (stream LobbyListEvent);
+}
+
+message GetLobbyMsg {
+    string lobbyId = 1;
+    string playerId = 2;
+}
+
+message GetLobbyResp {
+    Common.RespBase baseResp = 1;
+    optional LobbyMsg lobby = 2;
+}
+
+message PlayerIsReadyMessage {
+    string LobbyId = 1;
+    string PlayerId = 2; 
+    bool IsReady = 3;
+}
+
+message LeaveLobbyMessage {
+    string lobbyId = 1; 
+    string playerId = 2;
+}
+
+message JoinLobbyMessage {
+    string lobbyId = 1; 
+    string playerName = 2;
+    google.protobuf.StringValue Password = 3;
+}
+
+message JoinLobbyResp {
+    Common.RespBase baseResp = 1;
+    optional bool successfully = 2; 
+    google.protobuf.StringValue displayMessage = 3; 
+    google.protobuf.StringValue playerId = 4;
+}
+
+message CloseLobbyAndStartGameMessage {
+    string lobbyId = 1;
+    string playerId = 2;
+}
+
+message CloseLobbyAndStartGameResp {
+    Common.RespBase baseResp = 1;
+    repeated LobbyPlayerMsg players = 2;
+    google.protobuf.StringValue lobbyId = 3;
+    google.protobuf.StringValue name = 4;
+}
+
+message LobbyEventMessage {
+    string LobbyId = 1;
+}
+
+message LobbyEvent {
+    oneof reason {
+        google.protobuf.StringValue lobbyClosedId = 1;
+        google.protobuf.StringValue playerLeftId = 2;
+        google.protobuf.StringValue playerIsReadyId = 3;
+        google.protobuf.StringValue playerIsNotReadyId = 4;
+        PlayerJoinedToLobbyMessage playerJoined = 5;
+        LobbyClosedAndGameStartedMessage lobbyClosedAndGameStarted = 6;
+    }
+}
+
+message PlayerJoinedToLobbyMessage {
+    string LobbyId = 1; 
+    string PlayerId = 2; 
+    string PlayerName = 3;
+}
+
+message LobbyClosedAndGameStartedMessage {
+    repeated LobbyPlayerMsg players = 1;
+    google.protobuf.StringValue lobbyId = 2;
+    google.protobuf.StringValue name = 3;
+    google.protobuf.StringValue takingTurnPlayerId = 4;
+}
+
+message LobbyListEvent {
+    oneof reason {
+        LobbyItem added = 1;
+        google.protobuf.StringValue closedId = 2;
+    }
+}
+
+message CreateLobbyMessage {
+	string owner = 1;
+	string name = 2;
+	int32 teamSize = 3;
+	google.protobuf.StringValue password = 4; 
+}
+
+message CreateLobbyResp {
+	Common.RespBase baseResp = 1;
+    optional LobbyMsg lobby = 2;
+}
+
+message CloseLobbyMessage {
+	string lobbyId = 1;
+	string playerId = 2;
+}
+
+message ListLobbyMessage {
+	int32 paginationCount = 1;
+	int32 paginationSkip = 2;
+}
+
+message LobbyListResp {
+    Common.RespBase baseResp = 1;
+	repeated LobbyItem lobbies = 2;
+}
+
+message LobbyItem {
+    google.protobuf.StringValue id = 1;
+    google.protobuf.StringValue owner = 2; 
+    google.protobuf.StringValue name = 3; 
+    int32 teamSize = 4; 
+    bool isPublic = 5; 
+    bool isFree = 6;
+    int32 playersNumber = 7;
+    google.protobuf.Timestamp created = 8;
+}
+
+message LobbyMsg {
+    string id = 1;
+    string owner = 2;
+    string name = 3;
+    google.protobuf.StringValue password = 4;
+    google.protobuf.Timestamp created = 5;
+    int32 playersNumber = 6;
+    bool isFree = 7;
+    bool isPublic = 8;
+    int32 teamSize = 9;
+    bool isClosed = 10;
+    repeated LobbyPlayerMsg players = 11;
+}
+
+message LobbyPlayerMsg {
+    string id = 1;
+    string name = 2;
+    string lobbyId = 3;
+    bool isReady = 4;
+    bool isOwner = 5;
+}
