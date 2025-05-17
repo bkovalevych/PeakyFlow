@@ -10,6 +10,7 @@ if (!string.IsNullOrEmpty(azureSecret))
 }
 
 var azureStorage = builder.AddAzureStorage("peakystorage")
+    .RunAsEmulator() 
     .AddTables("peakytables");
 
 var server = builder.AddProject<Projects.PeakyFlow_Server>("server")

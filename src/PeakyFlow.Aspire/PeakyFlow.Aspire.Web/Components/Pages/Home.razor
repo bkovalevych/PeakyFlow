@@ -2,19 +2,22 @@
 @attribute [StreamRendering(true)]
 
 @inject LobbyRpcServiceClient LobbyService;
+@inject DialogService DialogService
 
 <PageTitle>Home</PageTitle>
 
 <div class="starter">
     <div class="starter-block">
         <span>
-            <RadzenButton Text="Refresh"/>
-            <RadzenButton Text="Add" />
+            <RadzenButton Text="Refresh" Click="RefreshLobbies"/>
+            <RadzenButton Text="Add" Click="GoToFormToCreate"/>
         </span>
         <RadzenDataGrid TItem="LobbyItem" Data="@lobbies">
             <Columns>
                 <RadzenDataGridColumn Property="Name" Title="Name" Width="5rem" />
-                <RadzenDataGridColumn Property="Created" Title="Created" FormatString="{0:d}"/>
+                <RadzenDataGridColumn Property="Created" Title="Created" FormatString="{0:yyyy-MM-dd}"/>
+                <RadzenDataGridColumn Property="Owner" Title="Owner" />
+                <RadzenDataGridColumn Property="TeamSize" Title="Team" />
             </Columns>
         </RadzenDataGrid>
     </div>
@@ -26,8 +29,22 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await RefreshLobbies();
+    }
+
+    private async Task RefreshLobbies()
+    {
         lobbies = (await LobbyService.ListLobbiesAsync(new ListLobbyMessage() { PaginationSkip = 0, PaginationCount = 100 }))
         .Lobbies
         .ToList();
+    }
+
+    private async Task GoToFormToCreate()
+    {
+        await DialogService.OpenAsync<DialogCreateLobbyPage>("Create Lobby", null, new DialogOptions()
+        {
+            Width = "500px",
+            Height = "600px"
+        });
     }
 }

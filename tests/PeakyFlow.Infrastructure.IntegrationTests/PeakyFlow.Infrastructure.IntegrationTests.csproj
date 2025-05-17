@@ -28,4 +28,13 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  
+  <!--<Target Name="StartAzurite" BeforeTargets="Build">!-->
+    <PropertyGroup>
+      <AzuriteDataDir>$(OutputPath)azurite_data</AzuriteDataDir>
+    </PropertyGroup>
+    
+    <!--<Exec Command="azurite -location &quot;$(AzuriteDataDir)&quot; -silent -debug &quot;$(AzuriteDataDir)\debug.log&quot;"
+          ContinueOnError="false" />!-->
+  <!--</Target>!-->
 </Project>
