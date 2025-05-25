@@ -1,0 +1,125 @@
+﻿@page "/MyLobby"
+@implements IDisposable
+@using PeakyFlow.Aspire.Web.Components.Services
+@inject CreateLobbyAndStartGameService CreateLobbyService
+@inject NavigationManager NavigationManager
+@inject ILogger<LobbyOwnerPage> Logger
+
+<h3>LobbyOwnerPage</h3>
+
+@if (Lobby != null)
+{
+	<div>Owner: @Owner</div>
+	<h2>Players</h2>
+	<ul>
+		@foreach(var player in Lobby.Players)
+		{
+			<li>@player.Name @(player.IsReady ? "Is ready": "Not ready")</li>
+		}
+	</ul>
+	
+}
+else {
+	<div>Loading...</div>
+}
+
+@code {
+	public LobbyMsg? Lobby { get; set; }
+	public string? Owner => Lobby?.Players.FirstOrDefault(x => x.IsOwner)?.Name;
+
+	private CancellationTokenSource _ctPage = new CancellationTokenSource();
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (!firstRender)
+		{
+			return;
+		}
+
+		try
+		{
+			await CreateLobbyService.OnInit();
+			Lobby = CreateLobbyService.CreatedLobby;
+			await SubscribeForLobbyEvents();
+		}
+		catch (Exception e)
+		{
+			Logger.LogError(e, "Failed to init");
+			var query = $"?message={Uri.EscapeDataString(e.Message)}";
+
+			NavigationManager.NavigateTo($"/FallbackPage/{query}");
+		}
+	}
+
+	public void Dispose()
+	{
+		_ctPage.Cancel();
+	}
+
+	private async Task SubscribeForLobbyEvents()
+	{
+		var call = CreateLobbyService.StartListenLobbyEvents();
+
+		while(await call.MoveNext(_ctPage.Token))
+		{
+			var eventN = call.Current;
+			switch(eventN.ReasonCase)
+			{
+				case LobbyEvent.ReasonOneofCase.PlayerJoined:
+					OnPlayerJoined(eventN.PlayerJoined);
+					break;
+				case LobbyEvent.ReasonOneofCase.PlayerLeftId:
+					OnPlayerLeft(eventN.PlayerLeftId);
+					break;
+				case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
+					SetPlayerIsReady(eventN.PlayerIsReadyId, false);
+					break;
+				case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
+					SetPlayerIsReady(eventN.PlayerIsReadyId, true);
+					break;
+				default:
+					continue;
+			}
+
+			StateHasChanged();
+		}
+	}
+
+	private void OnPlayerJoined(PlayerJoinedToLobbyMessage playerMsg)
+	{
+		if (Lobby?.Players.Any(x => x.Id == playerMsg.PlayerId) ?? true) 
+		{
+			Logger.LogInformation("Player already joined");
+			return;
+		}
+
+		Lobby?.Players.Add(new LobbyPlayerMsg() 
+		{ 
+			LobbyId = playerMsg.LobbyId, 
+			Id = playerMsg.PlayerId, 
+			IsOwner = false, 
+			IsReady = false 
+		});	
+	}
+
+	private void OnPlayerLeft(string playerId)
+	{
+		var player = Lobby?.Players.FirstOrDefault(x => playerId == x.Id);
+
+		if (player != null)
+		{
+			Lobby?.Players.Remove(player);
+		}
+	}
+
+	private void SetPlayerIsReady(string playerId, bool isReady)
+	{
+		var player = Lobby?.Players.FirstOrDefault(x => playerId == x.Id);
+
+		if (player != null)
+		{
+			player.IsReady = isReady;
+		}
+	}
+}

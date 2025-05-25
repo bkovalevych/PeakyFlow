@@ -1,4 +1,6 @@
+using Blazored.SessionStorage;
 using PeakyFlow.Aspire.Web.Components;
+using PeakyFlow.Aspire.Web.Components.Services;
 using PeakyFlow.GrpcProtocol.Game;
 using PeakyFlow.GrpcProtocol.Lobby;
 using Radzen;
@@ -14,6 +16,10 @@ builder.Services.AddRazorComponents()
     //.AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddRadzenComponents();
+builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddTransient<CreateLobbyAndStartGameService>();
+builder.Services.AddLogging();
 
 builder.Services.AddGrpcClient<LobbyRpcService.LobbyRpcServiceClient>((x) =>
 {
@@ -43,7 +49,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 

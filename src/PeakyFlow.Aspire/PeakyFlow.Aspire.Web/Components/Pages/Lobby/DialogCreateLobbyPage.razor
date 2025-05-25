@@ -1,17 +1,23 @@
 @page "/DialogCreateLobbyPage"
+@using Blazored.SessionStorage
+@using PeakyFlow.Aspire.Web.Components.Services
 @inject DialogService DialogService
 @inject LobbyRpcServiceClient LobbyService;
+@inject ISessionStorageService SessionStorage;
+
+@inject CreateLobbyAndStartGameService CreateLobbyService
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%">
     <RadzenStack>
         <RadzenRow>
             <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1">
-                <RadzenText TextStyle="TextStyle.Subtitle1">Your Name</RadzenText>
-                <RadzenTextBox Change=@OnChangeOwner/>
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1">
                 <RadzenText TextStyle="TextStyle.Subtitle1">Game Name</RadzenText>
-                <RadzenTextBox Change=@OnChangeGame/>
+                <RadzenTextBox Change=@OnChangeGame />
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Your Name</RadzenText>
+                <RadzenTextBox @bind-Value=@_createLobbyMessage.Owner Change=@OnChangeOwner/>
             </RadzenColumn>
         </RadzenRow>
     </RadzenStack>
@@ -32,28 +38,34 @@
     
 </RadzenStack>
 @code {
-    
+
     CreateLobbyMessage _createLobbyMessage = new CreateLobbyMessage() { TeamSize = 1 };
-    
-    
+
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
         _createLobbyMessage = new CreateLobbyMessage() { TeamSize = 1 };
+        var name = await SessionStorage.GetItemAsStringAsync("lobbyPlayerName");
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            _createLobbyMessage.Owner = name;
+        }
     }
 
     private void OnChangeOwner(string value) => _createLobbyMessage.Owner = value;
-    
+
     private void OnChangeGame(string value) => _createLobbyMessage.Name = value;
-    
-    
+
+
 
     private async Task CreateLobby()
     {
-        var createdMessage = await LobbyService.CreateLobbyAsync(_createLobbyMessage);
-        
+        var createdMessage = await CreateLobbyService.CreateLobby(_createLobbyMessage);
+        DialogService.Close(new CloseResult(true, createdMessage));
     }
 
-    public record CloseResult(bool IsCreated = false);
+    public record CloseResult(bool IsCreated = false, CreateLobbyResp? Loddy = null);
 
 }

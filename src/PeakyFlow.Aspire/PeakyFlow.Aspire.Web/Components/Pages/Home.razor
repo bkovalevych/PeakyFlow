@@ -3,6 +3,7 @@
 
 @inject LobbyRpcServiceClient LobbyService;
 @inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Home</PageTitle>
 
@@ -41,10 +42,18 @@
 
     private async Task GoToFormToCreate()
     {
-        await DialogService.OpenAsync<DialogCreateLobbyPage>("Create Lobby", null, new DialogOptions()
+        var dialogResult = await DialogService.OpenAsync<DialogCreateLobbyPage>("Create Lobby", null, new DialogOptions()
         {
             Width = "500px",
             Height = "600px"
         });
+
+        if (dialogResult is DialogCreateLobbyPage.CloseResult closeResult 
+            && closeResult.IsCreated 
+            && closeResult.Loddy.BaseResp.Status == ResultStatusMsg.Ok)
+        {
+
+            NavigationManager.NavigateTo("MyLobby");
+        }
     }
 }

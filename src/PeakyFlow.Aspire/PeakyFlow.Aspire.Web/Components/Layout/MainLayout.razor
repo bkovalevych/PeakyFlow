@@ -1,5 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using Blazored.SessionStorage
+@using PeakyFlow.Aspire.Web.Components.Pages.Starter
+@inherits LayoutComponentBase
 @inject IJSRuntime JS
+@inject ISessionStorageService SessionStorage
+@inject DialogService DialogService
 
 <RadzenComponents @rendermode="InteractiveServer" />
 <div class="starter">
@@ -29,6 +33,23 @@
 </div>
 
 @code {
+
+    protected override async Task OnAfterRenderAsync(bool isFirstRender)
+    {
+        var name = await SessionStorage.GetItemAsStringAsync("lobbyPlayerName");
+        
+        if (string.IsNullOrEmpty(name))
+        {
+            var dialogResult = await DialogService.OpenAsync<WhatIsYourNamePopupPage>("Welcome");
+            if (dialogResult?.NameCreated ?? false)
+            {
+                await SessionStorage.SetItemAsStringAsync("lobbyPlayerName", dialogResult.Name);
+            }
+        }
+
+        await JS.InvokeVoidAsync("scrollYByVh");
+    }
+
     private async Task ScrollPage()
     {
         await JS.InvokeVoidAsync("scrollYByVh");
