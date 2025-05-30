@@ -25,7 +25,7 @@ namespace PeakyFlow.Aspire.Web.Components.Services
                     new OwnedLobbyState()
                     {
                         LobbyId = res.Lobby.Id, 
-                        OwnerId = res.Lobby.Name,
+                        OwnerId = res.Lobby.Players.First(x => x.IsOwner).Id,
                     });
             }
             

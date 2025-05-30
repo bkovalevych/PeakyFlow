@@ -41,7 +41,8 @@ else {
 		{
 			await CreateLobbyService.OnInit();
 			Lobby = CreateLobbyService.CreatedLobby;
-			await SubscribeForLobbyEvents();
+			StateHasChanged();
+			SubscribeForLobbyEvents();
 		}
 		catch (Exception e)
 		{
@@ -57,34 +58,41 @@ else {
 		_ctPage.Cancel();
 	}
 
-	private async Task SubscribeForLobbyEvents()
+	private void SubscribeForLobbyEvents() => Task.Run(async () =>
 	{
-		var call = CreateLobbyService.StartListenLobbyEvents();
-
-		while(await call.MoveNext(_ctPage.Token))
+		try
 		{
-			var eventN = call.Current;
-			switch(eventN.ReasonCase)
-			{
-				case LobbyEvent.ReasonOneofCase.PlayerJoined:
-					OnPlayerJoined(eventN.PlayerJoined);
-					break;
-				case LobbyEvent.ReasonOneofCase.PlayerLeftId:
-					OnPlayerLeft(eventN.PlayerLeftId);
-					break;
-				case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
-					SetPlayerIsReady(eventN.PlayerIsReadyId, false);
-					break;
-				case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
-					SetPlayerIsReady(eventN.PlayerIsReadyId, true);
-					break;
-				default:
-					continue;
-			}
+			var call = CreateLobbyService.StartListenLobbyEvents();
 
-			StateHasChanged();
+			while (await call.MoveNext(_ctPage.Token))
+			{
+				var eventN = call.Current;
+				switch (eventN.ReasonCase)
+				{
+					case LobbyEvent.ReasonOneofCase.PlayerJoined:
+						OnPlayerJoined(eventN.PlayerJoined);
+						break;
+					case LobbyEvent.ReasonOneofCase.PlayerLeftId:
+						OnPlayerLeft(eventN.PlayerLeftId);
+						break;
+					case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
+						SetPlayerIsReady(eventN.PlayerIsReadyId, false);
+						break;
+					case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
+						SetPlayerIsReady(eventN.PlayerIsReadyId, true);
+						break;
+					default:
+						continue;
+				}
+
+				StateHasChanged();
+			}
 		}
-	}
+		catch (Exception e)
+		{
+			Logger.LogError(e, "Failed on lobby event");
+		}
+	});
 
 	private void OnPlayerJoined(PlayerJoinedToLobbyMessage playerMsg)
 	{
