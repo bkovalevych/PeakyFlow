@@ -19,20 +19,38 @@
         </div>
     </div>
 </div>
-
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebar1Expanded = !sidebar1Expanded)" />
+                <RadzenLabel Text="Peaky Flow"/>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Home" Icon="home" />
+            <RadzenPanelMenuItem Text="Users" Icon="account_box" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
 <div class="page">
     <main>
         @Body
     </main>
 </div>
-
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+    </RadzenBody>
+</RadzenLayout>
+
+
+
 
 @code {
+    bool sidebar1Expanded = true;
 
     protected override async Task OnAfterRenderAsync(bool isFirstRender)
     {

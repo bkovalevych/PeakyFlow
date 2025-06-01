@@ -20,9 +20,15 @@
   <ItemGroup>
 	<Protobuf Include="../../Proto/*.proto" GrpcServices="Client" />
   </ItemGroup>
-
+	<Target Name="CompileGlobalSass" BeforeTargets="Compile">
+		<Message Text="Compiling global SCSS files" Importance="high" />
+		<Exec Command="sass --style=compressed themes:wwwroot/themes" />
+	</Target>
 	<ItemGroup>
     <ProjectReference Include="..\PeakyFlow.Aspire.ServiceDefaults\PeakyFlow.Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
+	<ItemGroup>
+	  <Folder Include="wwwroot\themes\" />
+	</ItemGroup>
 
 </Project>
