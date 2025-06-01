@@ -1,5 +1,6 @@
 ﻿@page "/MyLobby"
 @implements IDisposable
+@using Grpc.Core
 @using PeakyFlow.Aspire.Web.Components.Services
 @inject CreateLobbyAndStartGameService CreateLobbyService
 @inject NavigationManager NavigationManager
@@ -11,6 +12,7 @@
 {
 	<div>Owner: @Owner</div>
 	<h2>Players</h2>
+	<small>Id: @Lobby.Id</small>
 	<ul>
 		@foreach(var player in Lobby.Players)
 		{
@@ -76,7 +78,7 @@ else {
 						OnPlayerLeft(eventN.PlayerLeftId);
 						break;
 					case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
-						SetPlayerIsReady(eventN.PlayerIsReadyId, false);
+						SetPlayerIsReady(eventN.PlayerIsNotReadyId, false);
 						break;
 					case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
 						SetPlayerIsReady(eventN.PlayerIsReadyId, true);
@@ -85,8 +87,12 @@ else {
 						continue;
 				}
 
-				StateHasChanged();
+				await InvokeAsync(StateHasChanged);
 			}
+		}
+		catch(RpcException cancelled) when (cancelled.StatusCode == StatusCode.Cancelled)
+		{
+			Logger.LogWarning(cancelled, "Cancelled");
 		}
 		catch (Exception e)
 		{
@@ -105,7 +111,8 @@ else {
 		Lobby?.Players.Add(new LobbyPlayerMsg() 
 		{ 
 			LobbyId = playerMsg.LobbyId, 
-			Id = playerMsg.PlayerId, 
+			Id = playerMsg.PlayerId,
+			Name = playerMsg.PlayerName,
 			IsOwner = false, 
 			IsReady = false 
 		});	

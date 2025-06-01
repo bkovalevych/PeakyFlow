@@ -28,6 +28,10 @@ builder.Services.AddGrpcClient<LobbyRpcService.LobbyRpcServiceClient>((x) =>
 .ConfigureChannel((s, ch) =>
 {
     ch.LoggerFactory = s.GetRequiredService<ILoggerFactory>();
+    ch.HttpHandler = new SocketsHttpHandler()
+    {
+        ConnectTimeout = TimeSpan.FromSeconds(builder.Configuration.GetValue<int>("GrpcConnectionTimeoutInSec", 900))
+    };
 });
 
 builder.Services.AddGrpcClient<GameRpcService.GameRpcServiceClient>(o =>
@@ -37,6 +41,10 @@ builder.Services.AddGrpcClient<GameRpcService.GameRpcServiceClient>(o =>
 .ConfigureChannel((s, ch) =>
 {
     ch.LoggerFactory = s.GetRequiredService<ILoggerFactory>();
+    ch.HttpHandler = new SocketsHttpHandler()
+    {
+        ConnectTimeout = TimeSpan.FromSeconds(builder.Configuration.GetValue<int>("GrpcConnectionTimeoutInSec", 900))
+    };
 });
 
 var app = builder.Build();

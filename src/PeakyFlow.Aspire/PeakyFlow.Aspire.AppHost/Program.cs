@@ -18,6 +18,7 @@ var server = builder.AddProject<Projects.PeakyFlow_Server>("server")
 
 builder.AddProject<Projects.PeakyFlow_Aspire_Web>("webfrontend")
     .WithExternalHttpEndpoints()
-    .WithReference(server);
+    .WithReference(server)
+    .WithEnvironment("GrpcConnectionTimeoutInSec", builder.Configuration["GrpcConnectionTimeoutInSec"]);
 
 builder.Build().Run();
