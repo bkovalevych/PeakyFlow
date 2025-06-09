@@ -4,6 +4,7 @@
 @inject IJSRuntime JS
 @inject ISessionStorageService SessionStorage
 @inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <RadzenComponents @rendermode="InteractiveServer" />
 <div class="starter">
@@ -28,7 +29,9 @@
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Home" Icon="home" />
+            <RadzenPanelMenuItem Text="Home"
+								 Icon="home"
+								 Click=@(() => NavigationManager.NavigateTo("/"))/>
             <RadzenPanelMenuItem Text="Users" Icon="account_box" />
         </RadzenPanelMenu>
     </RadzenSidebar>

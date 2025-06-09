@@ -29,7 +29,6 @@ else {
 	public LobbyMsg? Lobby { get; set; }
 	public string? Owner => Lobby?.Players.FirstOrDefault(x => x.IsOwner)?.Name;
 
-	private CancellationTokenSource _ctPage = new CancellationTokenSource();
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		await base.OnAfterRenderAsync(firstRender);
@@ -42,9 +41,10 @@ else {
 		try
 		{
 			await CreateLobbyService.OnInit();
+			CreateLobbyService.SubscribeOnLobbyEvents();
 			Lobby = CreateLobbyService.CreatedLobby;
 			StateHasChanged();
-			SubscribeForLobbyEvents();
+			CreateLobbyService.OnLobbyEvent += OnLobbyEvent;
 		}
 		catch (Exception e)
 		{
@@ -55,50 +55,28 @@ else {
 		}
 	}
 
-	public void Dispose()
+	private async void OnLobbyEvent(LobbyEvent eventN)
 	{
-		_ctPage.Cancel();
+		switch (eventN.ReasonCase)
+		{
+			case LobbyEvent.ReasonOneofCase.PlayerJoined:
+				OnPlayerJoined(eventN.PlayerJoined);
+				break;
+			case LobbyEvent.ReasonOneofCase.PlayerLeftId:
+				OnPlayerLeft(eventN.PlayerLeftId);
+				break;
+			case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
+				SetPlayerIsReady(eventN.PlayerIsNotReadyId, false);
+				break;
+			case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
+				SetPlayerIsReady(eventN.PlayerIsReadyId, true);
+				break;
+			default:
+				return;
+		}
+
+		await InvokeAsync(StateHasChanged);
 	}
-
-	private void SubscribeForLobbyEvents() => Task.Run(async () =>
-	{
-		try
-		{
-			var call = CreateLobbyService.StartListenLobbyEvents();
-
-			while (await call.MoveNext(_ctPage.Token))
-			{
-				var eventN = call.Current;
-				switch (eventN.ReasonCase)
-				{
-					case LobbyEvent.ReasonOneofCase.PlayerJoined:
-						OnPlayerJoined(eventN.PlayerJoined);
-						break;
-					case LobbyEvent.ReasonOneofCase.PlayerLeftId:
-						OnPlayerLeft(eventN.PlayerLeftId);
-						break;
-					case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
-						SetPlayerIsReady(eventN.PlayerIsNotReadyId, false);
-						break;
-					case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
-						SetPlayerIsReady(eventN.PlayerIsReadyId, true);
-						break;
-					default:
-						continue;
-				}
-
-				await InvokeAsync(StateHasChanged);
-			}
-		}
-		catch(RpcException cancelled) when (cancelled.StatusCode == StatusCode.Cancelled)
-		{
-			Logger.LogWarning(cancelled, "Cancelled");
-		}
-		catch (Exception e)
-		{
-			Logger.LogError(e, "Failed on lobby event");
-		}
-	});
 
 	private void OnPlayerJoined(PlayerJoinedToLobbyMessage playerMsg)
 	{
@@ -136,5 +114,10 @@ else {
 		{
 			player.IsReady = isReady;
 		}
+	}
+
+	public void Dispose()
+	{
+		CreateLobbyService.Dispose();
 	}
 }

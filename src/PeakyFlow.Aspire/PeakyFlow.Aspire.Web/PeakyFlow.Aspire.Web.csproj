@@ -14,7 +14,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Radzen.Blazor" Version="5.5.2" />
+    <PackageReference Include="Radzen.Blazor" Version="7.0.8" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.3" />
   </ItemGroup>
   <ItemGroup>

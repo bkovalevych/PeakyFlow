@@ -19,6 +19,7 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddTransient<CreateLobbyAndStartGameService>();
+builder.Services.AddTransient<JoinLobbyService>();
 builder.Services.AddLogging();
 
 builder.Services.AddGrpcClient<LobbyRpcService.LobbyRpcServiceClient>((x) =>

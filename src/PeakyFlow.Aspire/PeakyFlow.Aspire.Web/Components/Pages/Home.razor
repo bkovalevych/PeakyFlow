@@ -1,9 +1,11 @@
 ﻿@page "/"
+@using PeakyFlow.Aspire.Web.Components.Services
 @attribute [StreamRendering(true)]
 
-@inject LobbyRpcServiceClient LobbyService;
+@inject LobbyRpcServiceClient LobbyService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject JoinLobbyService JoinLobbyService
 
 <PageTitle>Home</PageTitle>
 
@@ -18,7 +20,16 @@
                 <RadzenDataGridColumn Property="Name" Title="Name" Width="5rem" />
                 <RadzenDataGridColumn Property="Created" Title="Created" FormatString="{0:yyyy-MM-dd}"/>
                 <RadzenDataGridColumn Property="Owner" Title="Owner" />
-                <RadzenDataGridColumn Property="TeamSize" Title="Team" />
+                <RadzenDataGridColumn Property="TeamSize"  Title="Team" />
+                <RadzenDataGridColumn Property="Id" Title="Actions">
+                     <Template Context="data">
+                        <RadzenButton ButtonStyle="ButtonStyle.Info"
+									  Variant="Variant.Flat"
+									  Shade="Shade.Lighter"
+									  Click=@(() => JoinLobby(data))
+									  Text="Join" />
+                    </Template>
+                </RadzenDataGridColumn>
             </Columns>
         </RadzenDataGrid>
     </div>
@@ -38,6 +49,25 @@
         lobbies = (await LobbyService.ListLobbiesAsync(new ListLobbyMessage() { PaginationSkip = 0, PaginationCount = 100 }))
         .Lobbies
         .ToList();
+    }
+
+    public async Task JoinLobby(LobbyItem lobby)
+    {
+        var dialogResult = await DialogService.OpenAsync<DialogJoinLobbyPage>("Join Lobby", new Dictionary<string, object> ()
+        {
+            { "LobbyId", lobby.Id },
+            { "LobbyName", lobby.Name }
+        }, new DialogOptions()
+        {
+            Width = "500px",
+            Height = "600px"
+        });
+
+        if (dialogResult is DialogJoinLobbyPage.CloseResult closeResult
+            && closeResult.IsJoined)
+        {
+            NavigationManager.NavigateTo("Lobby");
+        }
     }
 
     private async Task GoToFormToCreate()

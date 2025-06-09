@@ -7,10 +7,14 @@ namespace PeakyFlow.Aspire.Web.Components.Services
 {
     public class CreateLobbyAndStartGameService
         (LobbyRpcService.LobbyRpcServiceClient lobbyRpc,
-        ISessionStorageService sessionStorageService)
+        ISessionStorageService sessionStorageService,
+        ILogger<CreateLobbyAndStartGameService> logger) 
+        : IDisposable
     {
         public LobbyMsg? CreatedLobby { get; private set; }
         private const string LobbyStateKey = "createdLobbyState";
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        public event Action<LobbyEvent>? OnLobbyEvent;
 
         public async Task<CreateLobbyResp?> CreateLobby(CreateLobbyMessage msg)
         {
@@ -51,12 +55,25 @@ namespace PeakyFlow.Aspire.Web.Components.Services
             CreatedLobby = resp.Lobby;
         }
 
-
-
-        public IAsyncStreamReader<LobbyEvent> StartListenLobbyEvents()
+        public async void SubscribeOnLobbyEvents()
         {
-            var call = lobbyRpc.OnLobbyEvent(new LobbyEventMessage() { LobbyId = CreatedLobby.Id });
-            return call.ResponseStream;
+            try
+            {
+                var call = lobbyRpc.OnLobbyEvent(new LobbyEventMessage() { LobbyId = CreatedLobby.Id });
+                
+                while (await call.ResponseStream.MoveNext(_cancellationTokenSource.Token))
+                {
+                    OnLobbyEvent?.Invoke(call.ResponseStream.Current);
+                }
+            }
+            catch (RpcException cancelled) when (cancelled.StatusCode == StatusCode.Cancelled)
+            {
+                logger.LogWarning(cancelled, "Cancelled");
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed on lobby event");
+            }
         }
 
         public async Task CancelLobby()
@@ -76,6 +93,12 @@ namespace PeakyFlow.Aspire.Web.Components.Services
                 LobbyId = CreatedLobby?.Id,
                 PlayerId = CreatedLobby?.Owner
             });
+        }
+
+        public void Dispose()
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
         }
     }
 }

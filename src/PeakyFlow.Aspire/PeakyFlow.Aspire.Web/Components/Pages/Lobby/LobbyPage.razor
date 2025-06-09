@@ -1,0 +1,44 @@
+﻿@page "/Lobby"
+@using PeakyFlow.Aspire.Web.Components.Services
+@inject JoinLobbyService JoinLobbyService
+@implements IDisposable
+
+<h3>LobbyPage</h3>
+
+@if (Lobby == null)
+{
+	<div>Loading..</div>
+}
+else {
+	<div>Lobby @Lobby.Name</div>
+	<small>LobbyId: @Lobby.Id</small>
+	<ul>
+		@foreach(var item in Lobby.Players)
+		{
+			<li>@item.Name @(item.IsOwner ? "Owner" : "") @(item.IsReady ? "is ready" : "is not ready")</li>
+		}
+	</ul>
+}
+
+@code {
+	public LobbyMsg? Lobby;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (!firstRender)
+		{
+			return;
+		}
+
+		await JoinLobbyService.OnInit();
+		Lobby = JoinLobbyService.Lobby;
+		StateHasChanged();
+	}
+
+	public void Dispose()
+	{
+		JoinLobbyService.Dispose();	
+	}
+}
