@@ -12,11 +12,12 @@ namespace PeakyFlow.Aspire.Web.Components.Services
         private readonly CancellationTokenSource _cancellationTokenService;
         private readonly ILogger<JoinLobbyService> _logger;
 
-        private event Action<LobbyEvent>? OnLobbyEvent;
+        public event Action<LobbyEvent>? OnLobbyEvent;
 
         private const string LobbyStateKey = "PlayerInLobby";
 
         public LobbyMsg? Lobby { get; private set; }
+        public LobbyPlayerMsg? Player => Lobby?.Players.FirstOrDefault(x => State != null && x.Id == State.PlayerId);
         public JoinedLobbyState? State { get; private set; }
 
         public JoinLobbyService(LobbyRpcService.LobbyRpcServiceClient 
