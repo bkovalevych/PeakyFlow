@@ -7,19 +7,22 @@
 @inject NavigationManager NavigationManager
 
 <RadzenComponents @rendermode="InteractiveServer" />
-<div class="starter">
-    <div class="starter-block">
-        <div class="starter-details">
+<header class="starter">
+    <div class="starter-overlay"></div>
+    <div class="starter-content">
             <h1 class="name-app">Peaky Flow</h1>
+        <p class="tagline">Learn to manage money the fun way.</p>
             <div class="starter-img"></div>
             <RadzenButton Size="ButtonSize.Large"
-                          Text="Play"
+                      Text="Start Playing"
                           ButtonStyle="ButtonStyle.Primary"
                           class="btn-play"
                           Click="ScrollPage" />
+        <div class="scroll-indicator" @onclick="ScrollPage">
+            <i class="material-icons">expand_more</i>
         </div>
     </div>
-</div>
+</header>
 <RadzenLayout>
     <RadzenHeader>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
