@@ -60,6 +60,10 @@
 
     protected override async Task OnAfterRenderAsync(bool isFirstRender)
     {
+        if (!isFirstRender)
+        {
+            return;
+        }
         var name = await SessionStorage.GetItemAsStringAsync("lobbyPlayerName");
         
         if (string.IsNullOrEmpty(name))
