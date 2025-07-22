@@ -1,23 +1,24 @@
-﻿@using Blazored.SessionStorage
+@using Blazored.SessionStorage
 @using PeakyFlow.Aspire.Web.Components.Pages.Starter
 @inherits LayoutComponentBase
 @inject IJSRuntime JS
 @inject ISessionStorageService SessionStorage
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject LobbyRpcService.LobbyRpcServiceClient rpc
 
 <RadzenComponents @rendermode="InteractiveServer" />
 <header class="starter">
     <div class="starter-overlay"></div>
     <div class="starter-content">
-            <h1 class="name-app">Peaky Flow</h1>
+        <h1 class="name-app">Peaky Flow</h1>
         <p class="tagline">Learn to manage money the fun way.</p>
-            <div class="starter-img"></div>
-            <RadzenButton Size="ButtonSize.Large"
+        <div class="starter-img"></div>
+        <RadzenButton Size="ButtonSize.Large"
                       Text="Start Playing"
-                          ButtonStyle="ButtonStyle.Primary"
-                          class="btn-play"
-                          Click="ScrollPage" />
+                      ButtonStyle="ButtonStyle.Primary"
+                      class="btn-play"
+                      Click="ScrollPage" />
         <div class="scroll-indicator" @onclick="ScrollPage">
             <i class="material-icons">expand_more</i>
         </div>
@@ -39,16 +40,16 @@
         </RadzenPanelMenu>
     </RadzenSidebar>
     <RadzenBody>
-<div class="page">
-    <main>
-        @Body
-    </main>
-</div>
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+        <div class="page">
+            <main>
+                @Body
+            </main>
+        </div>
+        <div id="blazor-error-ui">
+            An unhandled error has occurred.
+            <a href="" class="reload">Reload</a>
+            <a class="dismiss">🗙</a>
+        </div>
     </RadzenBody>
 </RadzenLayout>
 
@@ -64,6 +65,15 @@
         {
             return;
         }
+        //TODO: remove this line
+        // await SessionStorage.SetItemAsStringAsync("lobbyPlayerName", "gamer");
+        // await rpc.CreateLobbyAsync(new CreateLobbyMessage()
+        // {
+        //     Name = "TestGame",
+        //     Owner = "gamer",
+        //     TeamSize = 4
+        // });
+
         var name = await SessionStorage.GetItemAsStringAsync("lobbyPlayerName");
         
         if (string.IsNullOrEmpty(name))
