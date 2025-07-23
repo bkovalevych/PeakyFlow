@@ -1,0 +1,47 @@
+@page "/profession"
+
+<div class="screen-container">
+    <h2 class="screen-title">Вибір професії</h2>
+
+    <div class="card">
+        <div class="hero-img-wrapper">
+        <img src="Hero1.png" alt="Hero portrait" class="hero-img" />
+    </div>
+
+    <h3 class="profession-name">Казначей</h3>
+
+    <p class="profession-desc">
+        Казначей із холодним розумом і впливовими звʼязками. Багато витрачає, але і заробляє значно більше.
+        Його борги — частина великої гри.
+    </p>
+
+    <table class="income-table">
+        <thead>
+            <tr><th colspan="2">ДОХІД</th></tr>
+        </thead>
+        <tbody>
+            <tr class="highlight"><td colspan="2">£950</td></tr>
+            <tr><td>ПОДАТКИ</td><td>£100</td></tr>
+            <tr><td>ІПОТЕКА</td><td>£200</td></tr>
+            <tr><td>ІНШІ ВИТРАТИ</td><td>£150</td></tr>
+            <tr><td>КРОВНИЙ БОРГ</td><td>£200</td></tr>
+        </tbody>
+    </table>
+
+        <div class="slide-nav">
+        <button class="btn-nav" @onclick="GoBack">←</button>
+        <button class="btn-nav-primary" @onclick="StartGame">ПОЧАТИ</button>
+            </div> <!-- slide-nav -->
+    </div> <!-- card -->
+</div>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    private void GoBack() => Navigation.NavigateTo("/");
+
+    private void StartGame()
+    {
+        // TODO: Navigate to next part of flow
+    }
+}
