@@ -1,0 +1,545 @@
+@page "/game"
+@using Microsoft.AspNetCore.Components
+
+<div class="game-screen">
+    <!-- Header with back button -->
+    <div class="header">
+        <button class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="title">ГРАВЦІ</div>
+    </div>
+
+    <!-- Players Row -->
+    <div class="players-row">
+        <div class="player-card">
+            <div class="player-avatar">
+                <img src="Hero1.png" alt="Player" />
+            </div>
+            <div class="player-name">ТИ</div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 75%;"></div>
+            </div>
+        </div>
+        
+        <div class="player-card">
+            <div class="player-avatar">
+                <img src="Hero2.png" alt="Player 2" />
+            </div>
+            <div class="player-name">ГРАВЕЦЬ 2</div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 50%;"></div>
+            </div>
+        </div>
+        
+        <div class="player-card">
+            <div class="player-avatar">
+                <img src="Hero3.png" alt="Player 3" />
+            </div>
+            <div class="player-name">ГРАВЕЦЬ 3</div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 25%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Board -->
+    <div class="game-board">
+        <div class="section-title">КАРТА</div>
+        
+        <div class="grid-container">
+            <!-- Row 1 - Top row (clockwise: 1, 2, 3) -->
+            <div class="grid-card blue">
+                <div class="card-number">1</div>
+                <i class="fas fa-handshake"></i>
+                <div>УГОДА</div>
+            </div>
+            <div class="grid-card green">
+                <div class="card-number">2</div>
+                <i class="fas fa-hand-holding-usd"></i>
+                <div>ВИПЛАТА</div>
+            </div>
+            <div class="grid-card red">
+                <div class="card-number">3</div>
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>МИТТЄВІ ВИТРАТИ</div>
+            </div>
+            
+            <!-- Row 2 - Middle row (clockwise: 12, DICE, 4) -->
+            <div class="grid-card red">
+                <div class="card-number">12</div>
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>МИТТЄВІ ВИТРАТИ</div>
+            </div>
+            <div class="grid-card center-dice">
+                <div class="dice">
+                    <i class="fas fa-dice"></i>
+                </div>
+            </div>
+            <div class="grid-card blue">
+                <div class="card-number">4</div>
+                <i class="fas fa-handshake"></i>
+                <div>УГОДА</div>
+            </div>
+            
+            <!-- Row 3 - Middle row (clockwise: 11, DICE continues, 5) -->
+            <div class="grid-card yellow">
+                <div class="card-number">11</div>
+                <i class="fas fa-shopping-cart"></i>
+                <div>РИНОК</div>
+            </div>
+            <!-- Dice continues here (row 2 of 3) -->
+            <div class="grid-card yellow">
+                <div class="card-number">5</div>
+                <i class="fas fa-shopping-cart"></i>
+                <div>РИНОК</div>
+            </div>
+            
+            <!-- Row 4 - Middle row (clockwise: 10, DICE continues, 6) -->
+            <div class="grid-card red">
+                <div class="card-number">10</div>
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>МИТТЄВІ ВИТРАТИ</div>
+            </div>
+            <!-- Dice continues here (row 3 of 3) -->
+            <div class="grid-card purple">
+                <div class="card-number">6</div>
+                <i class="fas fa-heart-broken"></i>
+                <div>КРОВНИЙ БОРГ</div>
+            </div>
+            
+            <!-- Row 5 - Bottom row (clockwise: 9, 8, 7) -->
+            <div class="grid-card green">
+                <div class="card-number">9</div>
+                <i class="fas fa-hand-holding-usd"></i>
+                <div>ВИПЛАТА</div>
+            </div>
+            <div class="grid-card orange">
+                <div class="card-number">8</div>
+                <i class="fas fa-user-times"></i>
+                <div>ЗВІЛЬНЕННЯ</div>
+            </div>
+            <div class="grid-card blue">
+                <div class="card-number">7</div>
+                <i class="fas fa-handshake"></i>
+                <div>УГОДА</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button class="credit-button">
+            <i class="fas fa-coins"></i> КРЕДИТ
+        </button>
+        <button class="turn-button">
+            <i class="fas fa-dice"></i> ХІД
+        </button>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+        <div class="savings">
+            <div>SAVINGS:</div>
+            <div class="amount">£1250</div>
+        </div>
+        <button class="up-arrow">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+        <div class="cash-flow">
+            <div>CASH FLOW:</div>
+            <div class="amount">£250</div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    // Game state
+    private int savings = 1250;
+    private int cashFlow = 250;
+
+    // Navigation methods
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
+
+<style>
+    /* Base styles */
+    :root {
+        --primary-bg: #121212;
+        --secondary-bg: #1e1e1e;
+        --card-bg: #252525;
+        --accent: #ff6b6b;
+        --text: #ffffff;
+        --text-muted: #aaaaaa;
+        --grid-gap: 10px;
+        --border-radius: 5px;
+        
+        /* Card colors */
+        --blue-card: #3498db;
+        --yellow-card: #f1c40f;
+        --red-card: #e74c3c;
+        --green-card: #2ecc71;
+        --purple-card: #9b59b6;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+    }
+
+    body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+    }
+
+    .game-screen {
+        max-width: 500px;
+        width: 100%;
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--color-card);
+    }
+
+    /* Header */
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        margin-bottom: 10px;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: var(--color-text);
+        font-size: 20px;
+        margin-right: 15px;
+        cursor: pointer;
+    }
+
+    .title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    /* Players Row */
+    .players-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .player-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 10px;
+        text-align: center;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .player-avatar {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 5px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid var(--accent);
+    }
+
+    .player-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .player-name {
+        font-size: 12px;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 6px;
+        background-color: #333;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: var(--accent);
+        border-radius: 3px;
+    }
+
+    /* Game Board */
+    .game-board {
+        flex-grow: 1;
+        margin-bottom: 10px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        padding: 0 5px;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(5, auto);
+        gap: var(--grid-gap);
+        margin-bottom: 10px;
+        max-width: 100%;
+    }
+
+    .grid-card {
+        aspect-ratio: 5/3;
+        background-color: var(--card-bg);
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        text-align: center;
+        padding: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .grid-card i {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .card-number {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .grid-card.blue { background-color: var(--blue-card); }
+    .grid-card.yellow { background-color: var(--yellow-card); }
+    .grid-card.red { background-color: var(--red-card); }
+    .grid-card.green { background-color: var(--green-card); }
+    .grid-card.purple { background-color: var(--purple-card); }
+    .grid-card.orange { background-color: #ff8c00; }
+    .grid-card.empty { background-color: transparent; border: 2px dashed #444; }
+    .grid-card.center-dice { 
+        background-color: var(--card-bg); 
+        grid-row: 2 / 5;
+        grid-column: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        min-height: 200px;
+    }
+
+    .dice {
+        width: 80px;
+        height: 80px;
+        background-color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: black;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .credit-button, .turn-button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .credit-button {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    .turn-button {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    /* Bottom Bar */
+    .bottom-bar {
+        display: flex;
+        align-items: center;
+        background-color: var(--card-bg);
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin-top: auto;
+    }
+
+    .savings, .cash-flow {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .savings {
+        margin-right: auto;
+    }
+
+    .cash-flow {
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .amount {
+        font-weight: bold;
+        color: white;
+        font-size: 14px;
+    }
+
+    .up-arrow {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 16px;
+        cursor: pointer;
+        padding: 0 15px;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* Responsive adjustments */
+    @@media (max-width: 1024px) {
+        .main-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats {
+            display: none;
+        }
+    }
+</style>
