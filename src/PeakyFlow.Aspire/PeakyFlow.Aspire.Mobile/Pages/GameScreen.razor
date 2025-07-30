@@ -21,83 +21,22 @@
     <div class="game-board">
         <div class="section-title">КАРТА</div>
         
-        <div class="grid-container">
-            <!-- Row 1 - Top row (clockwise: 1, 2, 3) -->
-            <div class="grid-card blue">
-                <div class="card-number">1</div>
-                <i class="fas fa-handshake"></i>
-                <div>УГОДА</div>
-            </div>
-            <div class="grid-card green">
-                <div class="card-number">2</div>
-                <i class="fas fa-hand-holding-usd"></i>
-                <div>ВИПЛАТА</div>
-            </div>
-            <div class="grid-card red">
-                <div class="card-number">3</div>
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>МИТТЄВІ ВИТРАТИ</div>
-            </div>
+        <div class="grid-container @(isExpanded ? "small-tiles" : "")">
+            <GameTile Number="1" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" />
+            <GameTile Number="12" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" />
+            <GameTile Number="11" Title="РИНОК" Icon="fas fa-shopping-cart" TileType="TileType.Yellow" Size="@GetTileSize()" />
+            <GameTile Number="10" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" />
+            <GameTile Number="9" Title="ВИПЛАТА" Icon="fas fa-hand-holding-usd" TileType="TileType.Green" Size="@GetTileSize()" />
             
-            <!-- Row 2 - Middle row (clockwise: 12, DICE, 4) -->
-            <div class="grid-card red">
-                <div class="card-number">12</div>
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>МИТТЄВІ ВИТРАТИ</div>
-            </div>
-            <div class="grid-card center-dice">
-                <div class="dice">
-                    <i class="fas fa-dice"></i>
-                </div>
-            </div>
-            <div class="grid-card blue">
-                <div class="card-number">4</div>
-                <i class="fas fa-handshake"></i>
-                <div>УГОДА</div>
-            </div>
+            <GameTile Number="2" Title="ВИПЛАТА" Icon="fas fa-hand-holding-usd" TileType="TileType.Green" Size="@GetTileSize()" />
+            <GameTile Title="" Icon="fas fa-dice" TileType="TileType.Dice" Size="@GetDiceSize()" />
+            <GameTile Number="8" Title="ЗВІЛЬНЕННЯ" Icon="fas fa-user-times" TileType="TileType.Orange" Size="@GetTileSize()" />
             
-            <!-- Row 3 - Middle row (clockwise: 11, DICE continues, 5) -->
-            <div class="grid-card yellow">
-                <div class="card-number">11</div>
-                <i class="fas fa-shopping-cart"></i>
-                <div>РИНОК</div>
-            </div>
-            <!-- Dice continues here (row 2 of 3) -->
-            <div class="grid-card yellow">
-                <div class="card-number">5</div>
-                <i class="fas fa-shopping-cart"></i>
-                <div>РИНОК</div>
-            </div>
-            
-            <!-- Row 4 - Middle row (clockwise: 10, DICE continues, 6) -->
-            <div class="grid-card red">
-                <div class="card-number">10</div>
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>МИТТЄВІ ВИТРАТИ</div>
-            </div>
-            <!-- Dice continues here (row 3 of 3) -->
-            <div class="grid-card purple">
-                <div class="card-number">6</div>
-                <i class="fas fa-heart-broken"></i>
-                <div>КРОВНИЙ БОРГ</div>
-            </div>
-            
-            <!-- Row 5 - Bottom row (clockwise: 9, 8, 7) -->
-            <div class="grid-card green">
-                <div class="card-number">9</div>
-                <i class="fas fa-hand-holding-usd"></i>
-                <div>ВИПЛАТА</div>
-            </div>
-            <div class="grid-card orange">
-                <div class="card-number">8</div>
-                <i class="fas fa-user-times"></i>
-                <div>ЗВІЛЬНЕННЯ</div>
-            </div>
-            <div class="grid-card blue">
-                <div class="card-number">7</div>
-                <i class="fas fa-handshake"></i>
-                <div>УГОДА</div>
-            </div>
+            <GameTile Number="3" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" />
+            <GameTile Number="4" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" />
+            <GameTile Number="5" Title="РИНОК" Icon="fas fa-shopping-cart" TileType="TileType.Yellow" Size="@GetTileSize()" />
+            <GameTile Number="6" Title="КРОВНИЙ БОРГ" Icon="fas fa-heart-broken" TileType="TileType.Purple" Size="@GetTileSize()" />
+            <GameTile Number="7" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" />
         </div>
     </div>
 
@@ -208,6 +147,17 @@
         isExpanded = !isExpanded;
     }
 
+    // Tile size methods
+    private TileSize GetTileSize()
+    {
+        return isExpanded ? TileSize.Small : TileSize.Normal;
+    }
+
+    private TileSize GetDiceSize()
+    {
+        return isExpanded ? TileSize.SmallDice : TileSize.NormalDice;
+    }
+
     // Navigation methods
     private void NavigateBack()
     {
@@ -224,7 +174,8 @@
         --accent: #ff6b6b;
         --text: #ffffff;
         --text-muted: #aaaaaa;
-        --grid-gap: 10px;
+        --grid-gap: 8px;
+        --small-grid-gap: 6px;
         --border-radius: 5px;
         
         /* Card colors */
@@ -322,77 +273,25 @@
         grid-template-rows: repeat(5, auto);
         gap: var(--grid-gap);
         margin-bottom: 10px;
+        margin-left: auto;
+        margin-right: auto;
         max-width: 100%;
+        grid-auto-flow: column;
+    }
+    
+    .small-tiles {
+        gap: var(--small-grid-gap);
     }
 
-    .grid-card {
-        aspect-ratio: 5/3;
-        background-color: var(--card-bg);
-        border-radius: 5px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 10px;
-        text-align: center;
-        padding: 8px;
-        position: relative;
-        overflow: hidden;
-    }
+    /*!* Grid layout for GameTile components *!*/
+    /*.grid-container .game-tile:nth-child(5) {*/
+    /*    grid-row: 2 / 5;*/
+    /*    grid-column: 2;*/
+    /*}*/
 
-    .grid-card i {
-        font-size: 20px;
-        margin-bottom: 5px;
-    }
-
-    .card-number {
-        position: absolute;
-        top: 4px;
-        left: 6px;
-        font-size: 14px;
-        font-weight: bold;
-        color: #333;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10;
-    }
-
-    .grid-card.blue { background-color: var(--blue-card); }
-    .grid-card.yellow { background-color: var(--yellow-card); }
-    .grid-card.red { background-color: var(--red-card); }
-    .grid-card.green { background-color: var(--green-card); }
-    .grid-card.purple { background-color: var(--purple-card); }
-    .grid-card.orange { background-color: #ff8c00; }
-    .grid-card.empty { background-color: transparent; border: 2px dashed #444; }
-    .grid-card.center-dice { 
-        background-color: var(--card-bg); 
-        grid-row: 2 / 5;
-        grid-column: 2;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        min-height: 200px;
-    }
-
-    .dice {
-        width: 80px;
-        height: 80px;
-        background-color: white;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        color: black;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    .empty-tile {
+        /* Empty space for grid layout */
+        visibility: hidden;
     }
 
     /* Action Buttons */

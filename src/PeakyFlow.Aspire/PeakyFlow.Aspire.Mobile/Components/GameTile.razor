@@ -1,0 +1,212 @@
+<div class="game-tile @GetTileClasses()">
+    @if (Number.HasValue)
+    {
+        <div class="tile-number">@Number</div>
+    }
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="@Icon"></i>
+    }
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="tile-title">@Title</div>
+    }
+</div>
+
+@code {
+    [Parameter] public int? Number { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = string.Empty;
+    [Parameter] public TileType TileType { get; set; } = TileType.Blue;
+    [Parameter] public bool IsHighlighted { get; set; } = false;
+    [Parameter] public TileSize Size { get; set; } = TileSize.Normal;
+
+    private string GetTileClasses()
+    {
+        var classes = new List<string>();
+        
+        // Base tile type
+        classes.Add(TileType.ToString().ToLower());
+        
+        // Size
+        classes.Add(Size.ToString().ToLower());
+        
+        // Highlighted state
+        if (IsHighlighted)
+        {
+            classes.Add("highlighted");
+        }
+        
+        return string.Join(" ", classes);
+    }
+}
+
+<style>
+    .game-tile {
+        background-color: #2a2a2a;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        font-weight: bold;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Tile Types */
+    .game-tile.blue {
+        background-color: #3b82f6;
+    }
+
+    .game-tile.green {
+        background-color: #22c55e;
+    }
+
+    .game-tile.red {
+        background-color: #ef4444;
+    }
+
+    .game-tile.yellow {
+        background-color: #eab308;
+    }
+
+    .game-tile.purple {
+        background-color: #a855f7;
+    }
+
+    .game-tile.orange {
+        background-color: #f97316;
+    }
+    
+
+    /* Sizes */
+    .game-tile.normal {
+        height: 80px;
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .game-tile.small {
+        height: 60px;
+        font-size: 10px;
+        padding: 6px;
+    }
+
+    .game-tile.normaldice {
+        height: 120px;
+        font-size: 24px;
+        padding: 12px;
+    }
+
+    .game-tile.smalldice {
+        height: 190px !important;
+        font-size: 18px;
+        padding: 8px;
+    }
+
+    /* Dice specific styling */
+    .game-tile.dice {
+        border: 2px solid #444;
+        background-color: white;
+        color: black;
+        grid-row: span 3;
+        height: 270px;
+    }
+
+    .game-tile.dice i {
+        font-size: inherit;
+    }
+
+    /* Tile Number */
+    .tile-number {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .game-tile.small .tile-number {
+        font-size: 12px;
+        width: 16px;
+        height: 16px;
+        top: 3px;
+        left: 4px;
+    }
+
+    .game-tile.dice .tile-number {
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+    }
+
+    /* Tile Title */
+    .tile-title {
+        margin-top: 4px;
+        line-height: 1.2;
+        font-size: inherit;
+    }
+
+    .game-tile.small .tile-title {
+        margin-top: 2px;
+        font-size: 9px;
+    }
+
+    /* Icon */
+    .game-tile i {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .game-tile.small i {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    /* Highlighted state */
+    .game-tile.highlighted {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        z-index: 10;
+    }
+
+    .game-tile.highlighted::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid #fff;
+        border-radius: 10px;
+        animation: pulse 1.5s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
