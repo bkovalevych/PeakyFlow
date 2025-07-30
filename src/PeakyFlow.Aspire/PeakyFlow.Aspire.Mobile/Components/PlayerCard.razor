@@ -1,0 +1,164 @@
+<div class="player-card @GetPlayerClass()">
+    <div class="player-avatar">
+        <img src="@ImagePath" alt="@Name" />
+        @if (IsTakingTurn)
+        {
+            <div class="turn-indicator">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        }
+    </div>
+    <div class="player-name">@Name</div>
+    <div class="progress-container">
+        <div class="progress-bar" style="width: @(Percentage)%;"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+    [Parameter] public string ImagePath { get; set; } = string.Empty;
+    [Parameter] public int Percentage { get; set; } = 0;
+    [Parameter] public PlayerType Type { get; set; } = PlayerType.Player1;
+    [Parameter] public bool IsTakingTurn { get; set; } = false;
+
+    private string GetPlayerClass()
+    {
+        var baseClass = Type switch
+        {
+            PlayerType.Player1 => "player1",
+            PlayerType.Player2 => "player2",
+            PlayerType.Player3 => "player3",
+            _ => "player1"
+        };
+        
+        return IsTakingTurn ? $"{baseClass} taking-turn" : baseClass;
+    }
+}
+
+<style>
+    .player-card {
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        flex: 1;
+        min-width: 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Player 1 - Blue */
+    .player-card.player1 {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.05));
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .player-card.player1 .player-avatar {
+        border: 3px solid #3b82f6;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Player 2 - Green */
+    .player-card.player2 {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(21, 128, 61, 0.05));
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .player-card.player2 .player-avatar {
+        border: 3px solid #22c55e;
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Player 3 - Red */
+    .player-card.player3 {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(185, 28, 28, 0.05));
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .player-card.player3 .player-avatar {
+        border: 3px solid #ef4444;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Taking Turn Highlight */
+    .player-card.taking-turn {
+        transform: scale(1.05);
+        z-index: 10;
+    }
+
+    .player-card.taking-turn.player1 {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.1));
+        border: 2px solid #3b82f6;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .player-card.taking-turn.player2 {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.1));
+        border: 2px solid #22c55e;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .player-card.taking-turn.player3 {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1));
+        border: 2px solid #ef4444;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .player-card.taking-turn .player-avatar {
+        transform: scale(1.1);
+    }
+
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .player-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .turn-indicator {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #333;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .player-name {
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .progress-container {
+        height: 4px;
+        background-color: #333;
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ff4444, #ffaa00);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+</style>

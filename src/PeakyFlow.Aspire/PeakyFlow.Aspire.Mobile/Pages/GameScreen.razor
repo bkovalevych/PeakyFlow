@@ -11,36 +11,10 @@
     </div>
 
     <!-- Players Row -->
-    <div class="players-row">
-        <div class="player-card">
-            <div class="player-avatar">
-                <img src="Hero1.png" alt="Player" />
-            </div>
-            <div class="player-name">ТИ</div>
-            <div class="progress-container">
-                <div class="progress-bar" style="width: 75%;"></div>
-            </div>
-        </div>
-        
-        <div class="player-card">
-            <div class="player-avatar">
-                <img src="Hero2.png" alt="Player 2" />
-            </div>
-            <div class="player-name">ГРАВЕЦЬ 2</div>
-            <div class="progress-container">
-                <div class="progress-bar" style="width: 50%;"></div>
-            </div>
-        </div>
-        
-        <div class="player-card">
-            <div class="player-avatar">
-                <img src="Hero3.png" alt="Player 3" />
-            </div>
-            <div class="player-name">ГРАВЕЦЬ 3</div>
-            <div class="progress-container">
-                <div class="progress-bar" style="width: 25%;"></div>
-            </div>
-        </div>
+    <div class="players-row @(isExpanded ? "hidden" : "")">
+        <PlayerCard Name="ТИ" ImagePath="Hero1.png" Percentage="75" Type="PlayerType.Player1" IsTakingTurn="false" />
+        <PlayerCard Name="ГРАВЕЦЬ 2" ImagePath="Hero2.png" Percentage="50" Type="PlayerType.Player2" IsTakingTurn="true" />
+        <PlayerCard Name="ГРАВЕЦЬ 3" ImagePath="Hero3.png" Percentage="25" Type="PlayerType.Player3" IsTakingTurn="false" />
     </div>
 
     <!-- Game Board -->
@@ -138,18 +112,85 @@
     </div>
 
     <!-- Bottom Bar -->
-    <div class="bottom-bar">
-        <div class="savings">
-            <div>SAVINGS:</div>
-            <div class="amount">£1250</div>
+    <div class="bottom-bar @(isExpanded ? "expanded" : "")">
+        
+        
+        <!-- Collapsed View -->
+        <div class="collapsed-content">
+            <div class="savings">
+                <div>SAVINGS:</div>
+                <div class="amount">£@savings</div>
+            </div>
+            <button class="expand-button" @onclick="ToggleExpand" @onclick:stopPropagation="true">
+                <i class="fas @(isExpanded ? "fa-chevron-down" : "fa-chevron-up")"></i>
+            </button>
+            <div class="cash-flow">
+                <div>CASH FLOW:</div>
+                <div class="amount">£@cashFlow</div>
+            </div>
         </div>
-        <button class="up-arrow">
-            <i class="fas fa-chevron-up"></i>
-        </button>
-        <div class="cash-flow">
-            <div>CASH FLOW:</div>
-            <div class="amount">£250</div>
-        </div>
+
+        <!-- Expanded Content -->
+        @if (isExpanded)
+        {
+            <div class="expanded-content scrollable">
+                <!-- Надходження -->
+                <div class="financial-section income">
+                    <div class="section-header">НАДХОДЖЕННЯ</div>
+                    <div class="financial-item">
+                        <span>Зарплата Казначея</span>
+                        <span class="amount">£950</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Відсотки/Дивіденди</span>
+                        <span class="amount"></span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Бар Бірмінгем</span>
+                        <span class="amount">£100</span>
+                    </div>
+                </div>
+
+                <!-- Витрати -->
+                <div class="financial-section expenses">
+                    <div class="section-header">ВИТРАТИ</div>
+                    <div class="financial-item">
+                        <span>Податки</span>
+                        <span class="amount">£100</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Іпотека</span>
+                        <span class="amount">£200</span>
+                    </div>
+                </div>
+
+                <!-- Активи -->
+                <div class="financial-section assets">
+                    <div class="section-header">АКТИВИ</div>
+                    <div class="financial-item">
+                        <span>Бар Бірмінгем</span>
+                        <span class="amount">£15 000</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Відсотки/Дивіденди</span>
+                        <span class="amount">£0</span>
+                    </div>
+                </div>
+
+                <!-- Пасиви -->
+                <div class="financial-section liabilities">
+                    <div class="section-header">ПАСИВИ</div>
+                    <div class="financial-item">
+                        <span>Кредит</span>
+                        <span class="amount">£2 000</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Іпотека</span>
+                        <span class="amount">£20 000</span>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
@@ -159,6 +200,13 @@
     // Game state
     private int savings = 1250;
     private int cashFlow = 250;
+    private bool isExpanded = false;
+
+    // Expand/Collapse functionality
+    private void ToggleExpand()
+    {
+        isExpanded = !isExpanded;
+    }
 
     // Navigation methods
     private void NavigateBack()
@@ -238,53 +286,22 @@
         justify-content: space-between;
         margin-bottom: 20px;
         gap: 10px;
-    }
-
-    .player-card {
-        background-color: var(--card-bg);
-        border-radius: var(--border-radius);
-        padding: 10px;
-        text-align: center;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .player-avatar {
-        width: 50px;
-        height: 50px;
-        margin: 0 auto 5px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid var(--accent);
-    }
-
-    .player-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .player-name {
-        font-size: 12px;
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .progress-container {
-        width: 100%;
-        height: 6px;
-        background-color: #333;
-        border-radius: 3px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 200px;
         overflow: hidden;
     }
 
-    .progress-bar {
-        height: 100%;
-        background-color: var(--accent);
-        border-radius: 3px;
+    .players-row.hidden {
+        opacity: 0;
+        transform: translateY(-20px);
+        max-height: 0;
+        margin-bottom: 0;
+        pointer-events: none;
     }
+
+
 
     /* Game Board */
     .game-board {
@@ -411,12 +428,73 @@
 
     /* Bottom Bar */
     .bottom-bar {
-        display: flex;
-        align-items: center;
         background-color: var(--card-bg);
         border-radius: 5px;
         padding: 10px 15px;
         margin-top: auto;
+        position: relative;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.3s ease;
+        max-height: 60px;
+        overflow: hidden;
+        will-change: max-height;
+    }
+
+    .bottom-bar.expanded {
+        max-height: 80vh;
+        padding-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .collapsed-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .expanded-content {
+        margin-top: 20px;
+        padding-right: 10px;
+        animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: top;
+    }
+
+    .expanded-content.scrollable {
+        max-height: 60vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 15px;
+        margin-right: -5px;
+    }
+
+    .expanded-content.scrollable::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .expanded-content.scrollable::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+
+    .expanded-content.scrollable::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+    }
+
+    .expanded-content.scrollable::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .savings, .cash-flow {
@@ -441,13 +519,123 @@
         font-size: 14px;
     }
 
-    .up-arrow {
+    .expand-button {
         background: none;
         border: none;
         color: var(--text-muted);
         font-size: 16px;
         cursor: pointer;
         padding: 0 15px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 50%;
+    }
+
+    .expand-button:hover {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
+    }
+
+    .expand-button:active {
+        transform: scale(0.95);
+    }
+
+    .expand-button i {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Financial Sections */
+    .financial-section {
+        margin-bottom: 15px;
+        animation: slideInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        opacity: 0;
+    }
+
+    .financial-section:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .financial-section:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .financial-section:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .financial-section:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .section-header {
+        font-size: 12px;
+        font-weight: bold;
+        padding: 8px 12px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+        text-align: center;
+        color: white;
+        transition: all 0.2s ease;
+        transform: scale(1);
+    }
+
+    .section-header:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .financial-section.income .section-header {
+        background-color: #4CAF50;
+    }
+
+    .financial-section.expenses .section-header {
+        background-color: #F44336;
+    }
+
+    .financial-section.assets .section-header {
+        background-color: #4CAF50;
+    }
+
+    .financial-section.liabilities .section-header {
+        background-color: #F44336;
+    }
+
+    .financial-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 12px;
+        font-size: 12px;
+        color: var(--text-muted);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+        transition: all 0.2s ease;
+        border-radius: 3px;
+    }
+
+    .financial-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding-left: 16px;
+        transform: translateX(4px);
+    }
+
+    .financial-item:last-child {
+        border-bottom: none;
+    }
+
+    .financial-item .amount {
+        color: white;
+        font-weight: bold;
     }
 
 
