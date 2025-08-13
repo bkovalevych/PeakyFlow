@@ -42,7 +42,7 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-        <button class="credit-button">
+        <button class="credit-button" @onclick="ShowCreditPopup">
             <i class="fas fa-coins"></i> КРЕДИТ
         </button>
         <button class="turn-button" @onclick="RollDice" disabled="@isRolling">
@@ -133,6 +133,29 @@
     </div>
 </div>
 
+<!-- Credit Popup -->
+@if (showCreditPopup)
+{
+    <div class="popup-overlay" @onclick="CloseCreditPopup">
+        <div class="popup-content" @onclick:stopPropagation="true">
+            <h2>КРЕДИТ</h2>
+            <p>Сума кредиту: £@(selectedLoanAmount * 1000)</p>
+            <p>Процентна ставка: 10%</p>
+            <p>До повернення: £@((int)(selectedLoanAmount * 1000 * 1.1))</p>
+            <select @bind="selectedLoanAmount">
+                <option value="1">£1,000</option>
+                <option value="2">£2,000</option>
+                <option value="3">£3,000</option>
+                <option value="4">£4,000</option>
+                <option value="5">£5,000</option>
+            </select>
+            <br><br>
+            <button @onclick="CloseCreditPopup">ВІДМІНИТИ</button>
+            <button @onclick="TakeLoan">ВЗЯТИ КРЕДИТ</button>
+        </div>
+    </div>
+}
+
 @code {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
@@ -140,6 +163,10 @@
     private int savings = 1250;
     private int cashFlow = 250;
     private bool isExpanded = false;
+    
+    // Credit popup state
+    private bool showCreditPopup = false;
+    private int selectedLoanAmount = 2;
     
     // Dice state
     private bool isRolling = false;
@@ -200,6 +227,32 @@
         currentDiceIcon = diceIcons[finalDiceIndex];
         isRolling = false;
         Console.WriteLine($"Dice roll finished: final result {currentDiceIcon}");
+        StateHasChanged();
+    }
+
+    // Credit popup methods
+    private void ShowCreditPopup()
+    {
+        Console.WriteLine("КРЕДИТ button clicked!");
+        Console.WriteLine("Opening credit popup");
+        showCreditPopup = true;
+        StateHasChanged();
+        Console.WriteLine($"showCreditPopup is now: {showCreditPopup}");
+    }
+    
+    private void CloseCreditPopup()
+    {
+        Console.WriteLine("Closing credit popup");
+        showCreditPopup = false;
+        StateHasChanged();
+    }
+    
+    private void TakeLoan()
+    {
+        int loanAmount = selectedLoanAmount * 1000;
+        Console.WriteLine($"Loan taken: £{loanAmount}");
+        savings += loanAmount;
+        showCreditPopup = false;
         StateHasChanged();
     }
 

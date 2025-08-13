@@ -1,0 +1,87 @@
+@if (IsVisible)
+{
+    <div class="popup-overlay" @onclick="OnCancel">
+        <div class="popup-content" @onclick:stopPropagation="true">
+            <h2>КРЕДИТ</h2>
+            <p>Сума кредиту: £@(SelectedAmount * 1000)</p>
+            <p>Процентна ставка: 10%</p>
+            <select @bind="SelectedAmount">
+                <option value="1">£1,000</option>
+                <option value="2">£2,000</option>
+                <option value="3">£3,000</option>
+            </select>
+            <br><br>
+            <button @onclick="OnCancel">ВІДМІНИТИ</button>
+            <button @onclick="OnTakeLoan">ВЗЯТИ КРЕДИТ</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; } = false;
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<int> OnLoanTaken { get; set; }
+    
+    private int SelectedAmount { get; set; } = 2;
+    
+    private async Task OnCancel()
+    {
+        IsVisible = false;
+        await OnClose.InvokeAsync();
+    }
+    
+    private async Task OnTakeLoan()
+    {
+        await OnLoanTaken.InvokeAsync(SelectedAmount * 1000);
+        IsVisible = false;
+        await OnClose.InvokeAsync();
+    }
+}
+
+<style>
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    
+    .popup-content {
+        background-color: #3B2E2A;
+        border-radius: 16px;
+        padding: 20px;
+        width: 90%;
+        max-width: 350px;
+        color: #EADDC8;
+        text-align: center;
+    }
+    
+    .popup-content h2 {
+        color: #EADDC8;
+        margin-bottom: 15px;
+    }
+    
+    .popup-content button {
+        background-color: #A67C52;
+        color: #EADDC8;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    .popup-content select {
+        background-color: #1A1A1A;
+        color: #EADDC8;
+        border: 1px solid #6E5842;
+        padding: 8px;
+        margin: 10px 0;
+    }
+</style>
