@@ -1,5 +1,6 @@
 @page "/game"
 @using Microsoft.AspNetCore.Components
+@using PeakyFlow.Aspire.Mobile.Models
 
 <div class="game-screen">
     <!-- Header with back button -->
@@ -21,7 +22,7 @@
     <div class="game-board">
         <div class="section-title">КАРТА</div>
         
-        <div class="grid-container @(isExpanded ? "small-tiles" : "")">
+        <div class="grid-container @(isExpanded ? "small-tiles" : "")" style="position: relative;">
             <GameTile Number="1" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" />
             <GameTile Number="12" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" />
             <GameTile Number="11" Title="РИНОК" Icon="fas fa-shopping-cart" TileType="TileType.Yellow" Size="@GetTileSize()" />
@@ -37,6 +38,20 @@
             <GameTile Number="5" Title="РИНОК" Icon="fas fa-shopping-cart" TileType="TileType.Yellow" Size="@GetTileSize()" />
             <GameTile Number="6" Title="КРОВНИЙ БОРГ" Icon="fas fa-heart-broken" TileType="TileType.Purple" Size="@GetTileSize()" />
             <GameTile Number="7" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" />
+            
+            <!-- Player Neeples -->
+            <!-- Player 2 (Green) - Selected -->
+            <div class="player-neeple player2 selected" style="top: 30px; left: 30px;">
+                <i class="fas fa-user"></i>
+            </div>
+            <!-- Player 1 (Red) -->
+            <div class="player-neeple player1" style="top: 50px; left: 50px;">
+                <i class="fas fa-user"></i>
+            </div>
+            <!-- Player 3 (Blue) -->
+            <div class="player-neeple player3" style="top: 30px; left: 70px;">
+                <i class="fas fa-user"></i>
+            </div>
         </div>
     </div>
 

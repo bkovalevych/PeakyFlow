@@ -374,6 +374,71 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* Player Neeple Styles */
+.player-neeple {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Player Colors */
+.player-neeple.player1 {
+    background-color: #FF6B6B; /* Red */
+}
+
+.player-neeple.player2 {
+    background-color: #4ECDC4; /* Green */
+}
+
+.player-neeple.player3 {
+    background-color: #45B7D1; /* Blue */
+}
+
+.player-neeple.player4 {
+    background-color: #FFA07A; /* Orange */
+}
+
+/* Selected State */
+.player-neeple.selected {
+    border-color: #FFD700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    animation: neeple-pulse 1.5s infinite;
+    transform: scale(1.1);
+}
+
+@keyframes neeple-pulse {
+    0% {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+}
+
+/* Hover Effect */
+.player-neeple:hover {
+    transform: scale(1.05);
+}
+
+.player-neeple.selected:hover {
+    transform: scale(1.15);
+}
+
 ::deep .collapsed-content {
     display: flex;
     align-items: center;
