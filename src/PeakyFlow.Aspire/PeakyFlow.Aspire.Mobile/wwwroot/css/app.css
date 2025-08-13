@@ -1,6 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Lora:wght@400&display=swap');
 
 /* -------------------------------------------------- */
+/* Mobile Window Constraints                          */
+/* -------------------------------------------------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+}
+
+#app {
+  width: 393px;
+  height: 720px;
+  max-width: 393px;
+  max-height: 720px;
+  overflow: auto;
+  position: relative;
+  background: var(--color-bg, #1A1A1A);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* -------------------------------------------------- */
 /* Global Design Tokens                               */
 /* -------------------------------------------------- */
 :root {

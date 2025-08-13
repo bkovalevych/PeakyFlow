@@ -21,6 +21,12 @@
     [Parameter] public bool IsHighlighted { get; set; } = false;
     [Parameter] public TileSize Size { get; set; } = TileSize.Normal;
 
+    protected override void OnInitialized()
+    {
+        Console.WriteLine($"GameTile initialized - TileType: {TileType}, Size: {Size}, Icon: {Icon}, Title: {Title}");
+        base.OnInitialized();
+    }
+
     private string GetTileClasses()
     {
         var classes = new List<string>();
@@ -37,7 +43,9 @@
             classes.Add("highlighted");
         }
         
-        return string.Join(" ", classes);
+        var result = string.Join(" ", classes);
+        Console.WriteLine($"GameTile classes for {TileType}: {result}");
+        return result;
     }
 }
 
@@ -120,11 +128,41 @@
         background-color: white;
         color: black;
         grid-row: span 3;
-        height: 270px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .game-tile.dice.normaldice {
+        height: 280px;
+        font-size: 24px;
+        padding: 12px;
+    }
+
+    .game-tile.dice.smalldice {
+        height: 190px;
+        font-size: 18px;
+        padding: 8px;
     }
 
     .game-tile.dice i {
-        font-size: inherit;
+        font-size: 48px;
+        transition: transform 0.1s ease-in-out;
+    }
+
+    .game-tile.dice.smalldice i {
+        font-size: 36px;
+    }
+
+    .game-tile.dice.rolling i {
+        animation: diceRoll 0.1s infinite;
+    }
+
+    @@keyframes diceRoll {
+        0% { transform: rotateX(0deg) rotateY(0deg); }
+        25% { transform: rotateX(90deg) rotateY(90deg); }
+        50% { transform: rotateX(180deg) rotateY(180deg); }
+        75% { transform: rotateX(270deg) rotateY(270deg); }
+        100% { transform: rotateX(360deg) rotateY(360deg); }
     }
 
     /* Tile Number */
