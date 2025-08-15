@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorWebAssemblyLoadAllGlobalizationData>false</BlazorWebAssemblyLoadAllGlobalizationData>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <StaticWebAssetBasePath>/PeakyFlow</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>
