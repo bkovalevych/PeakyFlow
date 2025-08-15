@@ -4,10 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <PublishProfile>FolderProfile</PublishProfile>
     <BlazorWebAssemblyLoadAllGlobalizationData>false</BlazorWebAssemblyLoadAllGlobalizationData>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <StaticWebAssetBasePath>/PeakyFlow</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>
