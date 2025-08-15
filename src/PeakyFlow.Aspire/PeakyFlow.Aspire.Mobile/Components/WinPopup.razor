@@ -1,0 +1,35 @@
+@if (IsVisible)
+{
+    <div class="win-popup-overlay" @onclick="OnClose">
+        <div class="win-popup-content" @onclick:stopPropagation="true">
+            <div class="win-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h1 class="win-title">ПЕРЕМОГА!</h1>
+            <h2 class="win-player">@GetPlayerName(WinningPlayer)</h2>
+            <p class="win-message">Вітаємо! Ви зібрали 3 великі угоди та виграли гру!</p>
+            <button class="wow-button" @onclick="OnWowClick">
+                <i class="fas fa-star"></i>
+                WOW!
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public PlayerType WinningPlayer { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnWowClick { get; set; }
+
+    private string GetPlayerName(PlayerType playerType)
+    {
+        return playerType switch
+        {
+            PlayerType.Player1 => "ТИ ПЕРЕМІГ!",
+            PlayerType.Player2 => "ГРАВЕЦЬ 2 ПЕРЕМІГ!",
+            PlayerType.Player3 => "ГРАВЕЦЬ 3 ПЕРЕМІГ!",
+            _ => "ПЕРЕМОЖЕЦЬ!"
+        };
+    }
+}

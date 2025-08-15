@@ -1,0 +1,107 @@
+/* Expenses Popup Styles - Reddish Theme */
+.expenses-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(139, 0, 0, 0.8); /* Dark red overlay */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Higher than credit popup */
+}
+
+.expenses-popup-content {
+    background-color: #2a1a1a; /* Dark background with red tint */
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 350px;
+    color: #ffffff;
+    text-align: center;
+    border: 2px solid #8B0000; /* Dark red border */
+    box-shadow: 0 10px 30px rgba(139, 0, 0, 0.5);
+    animation: expensesPopupFadeIn 0.3s ease-out;
+}
+
+@keyframes expensesPopupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.expenses-popup-content h2 {
+    color: #FF6B6B; /* Red title */
+    margin-bottom: 20px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(139, 0, 0, 0.3);
+}
+
+.expenses-description {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(139, 0, 0, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #FF6B6B;
+}
+
+.expenses-description p {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+    color: #f0f0f0;
+}
+
+.expenses-amount {
+    margin-bottom: 25px;
+    padding: 10px;
+    background-color: rgba(255, 107, 107, 0.1);
+    border-radius: 8px;
+    border: 1px solid #FF6B6B;
+}
+
+.expenses-amount strong {
+    color: #FF6B6B;
+    font-size: 16px;
+    font-family: 'Cinzel', serif;
+}
+
+.expenses-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.expenses-ok-button {
+    background-color: #8B0000; /* Dark red button */
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+}
+
+.expenses-ok-button:hover {
+    background-color: #A52A2A; /* Lighter red on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(139, 0, 0, 0.4);
+}
+
+.expenses-ok-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(139, 0, 0, 0.3);
+}

@@ -1,4 +1,4 @@
-<div class="game-tile @GetTileClasses()">
+<div class="game-tile @GetTileClasses()" @onclick="HandleClick">
     @if (Number.HasValue)
     {
         <div class="tile-number">@Number</div>
@@ -11,6 +11,19 @@
     {
         <div class="tile-title">@Title</div>
     }
+    
+    <!-- Neeples on this tile -->
+    @if (Neeples != null && Neeples.Any())
+    {
+        <div class="tile-neeples">
+            @foreach (var neeple in Neeples)
+            {
+                <div class="neeple @GetNeepleClass(neeple.player) @(neeple.isSelected ? "selected" : "")">
+                    <i class="fas fa-user"></i>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 @code {
@@ -20,6 +33,8 @@
     [Parameter] public TileType TileType { get; set; } = TileType.Blue;
     [Parameter] public bool IsHighlighted { get; set; } = false;
     [Parameter] public TileSize Size { get; set; } = TileSize.Normal;
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public List<(PlayerType player, bool isSelected)>? Neeples { get; set; }
 
     protected override void OnInitialized()
     {
@@ -46,6 +61,32 @@
         var result = string.Join(" ", classes);
         Console.WriteLine($"GameTile classes for {TileType}: {result}");
         return result;
+    }
+    
+    private string GetNeepleClass(PlayerType playerType)
+    {
+        return playerType switch
+        {
+            PlayerType.Player1 => "player1",
+            PlayerType.Player2 => "player2", 
+            PlayerType.Player3 => "player3",
+            _ => ""
+        };
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            if (Number.HasValue)
+            {
+                await OnClick.InvokeAsync(Number);
+            }
+            else
+            {
+                await OnClick.InvokeAsync();
+            }
+        }
     }
 }
 
@@ -226,6 +267,51 @@
         animation: pulse 1.5s infinite;
     }
 
+    /* Neeples on tiles */
+    .tile-neeples {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+        z-index: 20;
+    }
+
+    .neeple {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        border: 1px solid #fff;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .neeple.player1 {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    .neeple.player2 {
+        background-color: #22c55e;
+        color: white;
+    }
+
+    .neeple.player3 {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .neeple.selected {
+        transform: scale(1.2);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        animation: glow 1.5s infinite;
+    }
+
     @@keyframes pulse {
         0% {
             opacity: 1;
@@ -235,6 +321,18 @@
         }
         100% {
             opacity: 1;
+        }
+    }
+
+    @@keyframes glow {
+        0% {
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+        50% {
+            box-shadow: 0 0 12px rgba(255, 255, 255, 1);
+        }
+        100% {
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
     }
 </style>

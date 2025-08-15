@@ -1,4 +1,4 @@
-<div class="player-card @GetPlayerClass()">
+<div class="player-card @GetPlayerClass()" @onclick="HandlePlayerClick">
     <div class="player-avatar">
         <img src="@ImagePath" alt="@Name" />
         @if (IsTakingTurn)
@@ -20,6 +20,15 @@
     [Parameter] public int Percentage { get; set; } = 0;
     [Parameter] public PlayerType Type { get; set; } = PlayerType.Player1;
     [Parameter] public bool IsTakingTurn { get; set; } = false;
+    [Parameter] public EventCallback<PlayerType> OnPlayerClick { get; set; }
+
+    private async Task HandlePlayerClick()
+    {
+        if (OnPlayerClick.HasDelegate)
+        {
+            await OnPlayerClick.InvokeAsync(Type);
+        }
+    }
 
     private string GetPlayerClass()
     {

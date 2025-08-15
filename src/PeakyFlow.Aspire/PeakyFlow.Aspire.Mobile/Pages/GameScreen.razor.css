@@ -306,6 +306,7 @@
     z-index: 9999;
 }
 
+
 .popup-content {
     background-color: #2a2a2a;
     border-radius: 16px;
@@ -377,20 +378,17 @@
 /* Player Neeple Styles */
 .player-neeple {
     position: absolute;
-    width: 32px;
-    height: 32px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    border: 3px solid #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-    transition: all 0.3s ease;
+    font-size: 12px;
+    z-index: 100;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    font-size: 14px;
-    color: #ffffff;
-    font-weight: bold;
+    transition: all 0.5s ease-in-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Player Colors */
@@ -437,6 +435,103 @@
 
 .player-neeple.selected:hover {
     transform: scale(1.15);
+}
+
+/* Expenses Popup Styles - Reddish Theme */
+.expenses-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(139, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.expenses-popup-content {
+    background-color: #2a1a1a;
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 350px;
+    color: #ffffff;
+    text-align: center;
+    border: 2px solid #8B0000;
+    box-shadow: 0 10px 30px rgba(139, 0, 0, 0.5);
+    animation: popupFadeIn 0.3s ease-out;
+}
+
+.expenses-popup-content h2 {
+    color: #FF6B6B;
+    margin-bottom: 20px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(139, 0, 0, 0.3);
+}
+
+.expenses-description {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(139, 0, 0, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #FF6B6B;
+}
+
+.expenses-description p {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+    color: #f0f0f0;
+}
+
+.expenses-amount {
+    margin-bottom: 25px;
+    padding: 10px;
+    background-color: rgba(255, 107, 107, 0.1);
+    border-radius: 8px;
+    border: 1px solid #FF6B6B;
+}
+
+.expenses-amount strong {
+    color: #FF6B6B;
+    font-size: 16px;
+    font-family: 'Cinzel', serif;
+}
+
+.expenses-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.expenses-ok-button {
+    background-color: #8B0000;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+}
+
+.expenses-ok-button:hover {
+    background-color: #A52A2A;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(139, 0, 0, 0.4);
+}
+
+.expenses-ok-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(139, 0, 0, 0.3);
 }
 
 ::deep .collapsed-content {
