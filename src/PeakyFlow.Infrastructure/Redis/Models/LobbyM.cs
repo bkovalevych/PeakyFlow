@@ -3,7 +3,7 @@ using Redis.OM.Modeling;
 
 namespace PeakyFlow.Infrastructure.Redis.Models
 {
-    [Document(StorageType = StorageType.Json, Prefixes = [nameof(Lobby)])]
+    [Document(StorageType = StorageType.Hash, Prefixes = [nameof(Lobby)])]
     internal class LobbyM : EntityM
     {
         public string Owner { get; set; } = string.Empty;
@@ -18,7 +18,6 @@ namespace PeakyFlow.Infrastructure.Redis.Models
 
         public bool IsPublic { get; set; }
 
-        [Indexed(JsonPath = "$.Id")]
         public PlayerInLobby[] Players { get; set; } = [];
 
         public int TeamSize { get; set; } = 1;

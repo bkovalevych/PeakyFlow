@@ -1,0 +1,34 @@
+@using PeakyFlow.Aspire.Mobile.Models
+
+<div class="positive-popup-overlay" @onclick="OnClose">
+    <div class="positive-popup-content" @onclick:stopPropagation="true">
+        <h2>@Title</h2>
+        <div class="positive-description">
+            <p>@Description</p>
+        </div>
+        @if (!string.IsNullOrEmpty(Amount))
+        {
+            <div class="positive-amount">
+                <strong>@Amount</strong>
+            </div>
+        }
+        <div class="positive-footer">
+            <button class="positive-ok-button" @onclick="OnOkClick">@FooterText</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "ПОДІЯ";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public string Amount { get; set; } = "";
+    [Parameter] public string FooterText { get; set; } = "OK";
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnEventProcessed { get; set; }
+
+    private async Task OnOkClick()
+    {
+        await OnEventProcessed.InvokeAsync();
+        await OnClose.InvokeAsync();
+    }
+}

@@ -1,0 +1,26 @@
+﻿@page "/FallbackPage"
+@inject NavigationManager NavigationManager
+
+<h3>Oops! Smth went wrong</h3>
+
+@if (string.IsNullOrEmpty(Message))
+{
+	<p>Message: @Message</p>
+}
+
+<RadzenButton Click=@(args => NavigationManager.NavigateTo("/")) Text="Go home"/>
+
+@code {
+	public string? Message { get; set; }
+
+	protected override void OnInitialized()
+	{
+		var uri = new Uri(NavigationManager.Uri);
+		var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+		if (queryParams.TryGetValue("message", out var messageValue))
+		{
+			Message = messageValue;
+		}
+	}
+}

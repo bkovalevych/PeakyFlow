@@ -6,6 +6,7 @@ using PeakyFlow.Abstractions.LobbyAggregate;
 using PeakyFlow.Application.Common.Extensions;
 using PeakyFlow.Application.Common.Interfaces;
 using PeakyFlow.Application.LobbyGame.Create;
+using System.Reflection;
 
 namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
 {
@@ -38,6 +39,7 @@ namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
 
             var provider = services
                 .AddApplication()
+                .AddAutoMapper(Assembly.GetAssembly(typeof(DependencyInjection)))
                 .AddTransient(typeof(IRepository<Lobby>), x => fakeRepository.Object)
                 .AddSingleton(x => fakeLogger.Object)
                 .AddTransient<IGuid, GuidImpl>()

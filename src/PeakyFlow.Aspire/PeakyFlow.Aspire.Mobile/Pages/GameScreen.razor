@@ -1,0 +1,714 @@
+@page "/game"
+@using Microsoft.AspNetCore.Components
+@using PeakyFlow.Aspire.Mobile.Models
+
+<div class="game-screen">
+    <!-- Header with back button -->
+    <div class="header">
+        <button class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="title">ГРАВЦІ</div>
+    </div>
+
+    <!-- Players Row -->
+    <div class="players-row @(isExpanded ? "hidden" : "")">
+        <PlayerCard Name="ТИ" ImagePath="Hero1.png" Percentage="75" Type="PlayerType.Player1" IsTakingTurn="@(currentPlayer == PlayerType.Player1)" OnPlayerClick="SelectPlayer" />
+        <PlayerCard Name="ГРАВЕЦЬ 2" ImagePath="Hero2.png" Percentage="50" Type="PlayerType.Player2" IsTakingTurn="@(currentPlayer == PlayerType.Player2)" OnPlayerClick="SelectPlayer" />
+        <PlayerCard Name="ГРАВЕЦЬ 3" ImagePath="Hero3.png" Percentage="25" Type="PlayerType.Player3" IsTakingTurn="@(currentPlayer == PlayerType.Player3)" OnPlayerClick="SelectPlayer" />
+    </div>
+
+    <!-- Game Board -->
+    <div class="game-board">
+        <div class="section-title">КАРТА</div>
+        
+        <div class="grid-container @(isExpanded ? "small-tiles" : "")" style="position: relative;">
+            <GameTile Number="1" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" OnClick="() => HandleTileClick(1)" Neeples="@GetTileNeeples(1)" />
+            <GameTile Number="12" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" OnClick="() => HandleTileClick(12)" Neeples="@GetTileNeeples(12)" />
+            <GameTile Number="11" Title="РИНОК" Icon="fas fa-shopping-cart" TileType="TileType.Yellow" Size="@GetTileSize()" OnClick="() => HandleTileClick(11)" Neeples="@GetTileNeeples(11)" />
+            <GameTile Number="10" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" OnClick="() => HandleTileClick(10)" Neeples="@GetTileNeeples(10)" />
+            <GameTile Number="9" Title="ВИПЛАТА" Icon="fas fa-hand-holding-usd" TileType="TileType.Green" Size="@GetTileSize()" OnClick="() => HandleTileClick(9)" Neeples="@GetTileNeeples(9)" />
+            
+            <GameTile Number="2" Title="ВИПЛАТА" Icon="fas fa-hand-holding-usd" TileType="TileType.Green" Size="@GetTileSize()" OnClick="() => HandleTileClick(2)" Neeples="@GetTileNeeples(2)" />
+            <GameTile Title="" Icon="@currentDiceIcon" TileType="TileType.Dice" Size="@GetDiceSize()" />
+            <GameTile Number="8" Title="ЗВІЛЬНЕННЯ" Icon="fas fa-user-times" TileType="TileType.Orange" Size="@GetTileSize()" OnClick="() => HandleTileClick(8)" Neeples="@GetTileNeeples(8)" />
+            
+            <GameTile Number="3" Title="МИТТЄВІ ВИТРАТИ" Icon="fas fa-exclamation-triangle" TileType="TileType.Red" Size="@GetTileSize()" OnClick="() => HandleTileClick(3)" Neeples="@GetTileNeeples(3)" />
+            <GameTile Number="4" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" OnClick="() => HandleTileClick(4)" Neeples="@GetTileNeeples(4)" />
+            <GameTile Number="5" Title="РИНОК" Icon="fas fa-shopping-cart" TileType="TileType.Yellow" Size="@GetTileSize()" OnClick="() => HandleTileClick(5)" Neeples="@GetTileNeeples(5)" />
+            <GameTile Number="6" Title="КРОВНИЙ БОРГ" Icon="fas fa-heart-broken" TileType="TileType.Purple" Size="@GetTileSize()" OnClick="() => HandleTileClick(6)" Neeples="@GetTileNeeples(6)" />
+            <GameTile Number="7" Title="УГОДА" Icon="fas fa-handshake" TileType="TileType.Blue" Size="@GetTileSize()" OnClick="() => HandleTileClick(7)" Neeples="@GetTileNeeples(7)" />
+            
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button class="credit-button" @onclick="ShowCreditPopup">
+            <i class="fas fa-coins"></i> КРЕДИТ
+        </button>
+        <button class="turn-button" @onclick="RollDice" disabled="@isRolling">
+            <i class="fas fa-dice"></i> ХІД
+        </button>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar @(isExpanded ? "expanded" : "")">
+        
+        
+        <!-- Collapsed View -->
+        <div class="collapsed-content">
+            <div class="savings">
+                <div>SAVINGS:</div>
+                <div class="amount">£@savings</div>
+            </div>
+            <button class="expand-button" @onclick="ToggleExpand" @onclick:stopPropagation="true">
+                <i class="fas @(isExpanded ? "fa-chevron-down" : "fa-chevron-up")"></i>
+            </button>
+            <div class="cash-flow">
+                <div>CASH FLOW:</div>
+                <div class="amount">£@cashFlow</div>
+            </div>
+        </div>
+
+        <!-- Expanded Content -->
+        @if (isExpanded)
+        {
+            <div class="expanded-content scrollable">
+                <!-- Надходження -->
+                <div class="financial-section income">
+                    <div class="section-header">НАДХОДЖЕННЯ</div>
+                    <div class="financial-item">
+                        <span>Зарплата Казначея</span>
+                        <span class="amount">£950</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Відсотки/Дивіденди</span>
+                        <span class="amount"></span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Бар Бірмінгем</span>
+                        <span class="amount">£100</span>
+                    </div>
+                </div>
+
+                <!-- Витрати -->
+                <div class="financial-section expenses">
+                    <div class="section-header">ВИТРАТИ</div>
+                    <div class="financial-item">
+                        <span>Податки</span>
+                        <span class="amount">£100</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Іпотека</span>
+                        <span class="amount">£200</span>
+                    </div>
+                </div>
+
+                <!-- Активи -->
+                <div class="financial-section assets">
+                    <div class="section-header">АКТИВИ</div>
+                    <div class="financial-item">
+                        <span>Бар Бірмінгем</span>
+                        <span class="amount">£15 000</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Відсотки/Дивіденди</span>
+                        <span class="amount">£0</span>
+                    </div>
+                </div>
+
+                <!-- Пасиви -->
+                <div class="financial-section liabilities">
+                    <div class="section-header">ПАСИВИ</div>
+                    <div class="financial-item">
+                        <span>Кредит</span>
+                        <span class="amount">£2 000</span>
+                    </div>
+                    <div class="financial-item">
+                        <span>Іпотека</span>
+                        <span class="amount">£20 000</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Credit Popup -->
+@if (showCreditPopup)
+{
+    <div class="popup-overlay" @onclick="CloseCreditPopup">
+        <div class="popup-content" @onclick:stopPropagation="true">
+            <h2>КРЕДИТ</h2>
+            <p>Сума кредиту: £@(selectedLoanAmount * 1000)</p>
+            <p>Процентна ставка: 10%</p>
+            <p>До повернення: £@((int)(selectedLoanAmount * 1000 * 1.1))</p>
+            <select @bind="selectedLoanAmount">
+                <option value="1">£1,000</option>
+                <option value="2">£2,000</option>
+                <option value="3">£3,000</option>
+                <option value="4">£4,000</option>
+                <option value="5">£5,000</option>
+            </select>
+            <br><br>
+            <button @onclick="CloseCreditPopup">ВІДМІНИТИ</button>
+            <button @onclick="TakeLoan">ВЗЯТИ КРЕДИТ</button>
+        </div>
+    </div>
+}
+
+<!-- Expenses Popup -->
+@if (showExpensesPopup)
+{
+    <ExpensesPopup 
+        Title="МИТТЄВІ ВИТРАТИ"
+        Description="День був дуже важким, тому ви вирішили випити віскі та повеселитися з друзями. Заплатіть 10 фунтів за ваші розваги."
+        Amount="Сума до сплати: £10"
+        FooterText="OK"
+        OnClose="CloseExpensesPopup" 
+        OnExpensePaid="PayExpense" />
+}
+
+<!-- Blood Debt Popup -->
+@if (showBloodDebtPopup)
+{
+    <ExpensesPopup 
+        Title="КРОВНИЙ БОРГ"
+        Description="Вам не пощастило. Тепер ви винні родині Томаса 15 фунтів щомісяця."
+        Amount=""
+        FooterText="Збільшити витрати на 15 фунтів"
+        OnClose="CloseBloodDebtPopup" 
+        OnExpensePaid="AddBloodDebt" />
+}
+
+<!-- Unemployment Popup -->
+@if (showUnemploymentPopup)
+{
+    <ExpensesPopup 
+        Title="ЗВІЛЬНЕННЯ"
+        Description="Ви провалили свою роботу і були звільнені. Сплатіть свої рахунки і пропустіть 2 ходи."
+        Amount=""
+        FooterText="Сплатити рахунки і пропустити ходи"
+        OnClose="CloseUnemploymentPopup" 
+        OnExpensePaid="HandleUnemployment" />
+}
+
+<!-- Salary Popup -->
+@if (showSalaryPopup)
+{
+    <PositiveEventPopup 
+        Title="ВИПЛАТА"
+        Description="Ваш день зарплати. Ви можете сплатити свої рахунки або взяти кредит."
+        Amount=""
+        FooterText="Отримати зарплату"
+        OnClose="CloseSalaryPopup" 
+        OnEventProcessed="ProcessSalary" />
+}
+
+<!-- Market Crisis Popup -->
+@if (showMarketPopup)
+{
+    <PositiveEventPopup 
+        Title="РИНОК"
+        Description="Глобальна криза негативно вплинула на ваш бізнес, ваш дохід від бару зменшився вдвічі."
+        Amount=""
+        FooterText="Зменшити дохід від бару вдвічі"
+        OnClose="CloseMarketPopup" 
+        OnEventProcessed="ProcessMarketCrisis" />
+}
+
+<!-- Deal Popup -->
+@if (showDealPopup)
+{
+    <DealPopup 
+        SmallDeal="@smallDealInfo"
+        BigDeal="@bigDealInfo"
+        OnClose="CloseDealPopup" 
+        OnDealAccepted="ProcessDeal" />
+}
+
+<!-- Win Popup -->
+<WinPopup IsVisible="@showWinPopup" 
+          WinningPlayer="@winningPlayer" 
+          OnClose="CloseWinPopup" 
+          OnWowClick="HandleWinWow" />
+
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    // Game state
+    private int savings = 1250;
+    private int cashFlow = 250;
+    private bool isExpanded = false;
+    private PlayerType currentPlayer = PlayerType.Player2;
+    
+    // Tile-based neeple management
+    private Dictionary<int, List<(PlayerType player, bool isSelected)>> tileNeeples = new()
+    {
+        {1, new List<(PlayerType, bool)> { (PlayerType.Player1, false), (PlayerType.Player2, true), (PlayerType.Player3, false) }},
+        {2, new List<(PlayerType, bool)>()},
+        {3, new List<(PlayerType, bool)>()},
+        {4, new List<(PlayerType, bool)>()},
+        {5, new List<(PlayerType, bool)>()},
+        {6, new List<(PlayerType, bool)>()},
+        {7, new List<(PlayerType, bool)>()},
+        {8, new List<(PlayerType, bool)>()},
+        {9, new List<(PlayerType, bool)>()},
+        {10, new List<(PlayerType, bool)>()},
+        {11, new List<(PlayerType, bool)>()},
+        {12, new List<(PlayerType, bool)>()}
+    };
+    
+    // Big deal counter for win condition
+    private Dictionary<PlayerType, int> playerBigDeals = new()
+    {
+        { PlayerType.Player1, 0 },
+        { PlayerType.Player2, 0 },
+        { PlayerType.Player3, 0 }
+    };
+    
+    // Win popup state
+    private bool showWinPopup = false;
+    private PlayerType winningPlayer = PlayerType.Player1;
+    
+    // Credit popup state
+    private bool showCreditPopup = false;
+    private int selectedLoanAmount = 2;
+    
+    // Expenses popup state
+    private bool showExpensesPopup = false;
+    
+    // Blood debt popup state
+    private bool showBloodDebtPopup = false;
+    
+    // Unemployment popup state
+    private bool showUnemploymentPopup = false;
+    
+    // Salary popup state
+    private bool showSalaryPopup = false;
+    
+    // Market popup state
+    private bool showMarketPopup = false;
+    
+    // Deal popup state
+    private bool showDealPopup = false;
+    private DealPopupInfo smallDealInfo = new DealPopupInfo
+    {
+        Description = "Невелика інвестиція в місцевий бізнес. Низький ризик, стабільний дохід.",
+        Footer = "ПРИЙНЯТИ МАЛУ УГОДУ",
+        DownPay = 500,
+        Cost = 2000,
+        CashFlow = 50,
+        Debt = 1500
+    };
+    private DealPopupInfo bigDealInfo = new DealPopupInfo
+    {
+        Description = "Велика інвестиція в розширення бізнесу. Високий ризик, великий потенційний дохід.",
+        Footer = "ПРИЙНЯТИ ВЕЛИКУ УГОДУ",
+        DownPay = 2000,
+        Cost = 10000,
+        CashFlow = 200,
+        Debt = 8000
+    };
+    
+    // Dice state
+    private bool isRolling = false;
+    private string currentDiceIcon = "fas fa-dice-one";
+    private readonly string[] diceIcons = {
+        "fas fa-dice-one",
+        "fas fa-dice-two",
+        "fas fa-dice-three",
+        "fas fa-dice-four",
+        "fas fa-dice-five",
+        "fas fa-dice-six"
+    };
+
+    // Expand/Collapse functionality
+    private void ToggleExpand()
+    {
+        isExpanded = !isExpanded;
+    }
+
+    // Tile size methods
+    private TileSize GetTileSize()
+    {
+        return isExpanded ? TileSize.Small : TileSize.Normal;
+    }
+
+    private TileSize GetDiceSize()
+    {
+        var size = isExpanded ? TileSize.SmallDice : TileSize.NormalDice;
+        Console.WriteLine($"GetDiceSize called - isExpanded: {isExpanded}, returning: {size}");
+        return size;
+    }
+
+    // Dice rolling functionality
+    private async Task RollDice()
+    {
+        if (isRolling) return;
+        
+        Console.WriteLine("Starting dice roll animation");
+        isRolling = true;
+        StateHasChanged();
+        
+        var random = new Random();
+        var animationSteps = 15; // 15 steps for 1.5 seconds
+        var stepDuration = 100; // 100ms per step
+        
+        // Animation loop - show random dice faces
+        for (int i = 0; i < animationSteps; i++)
+        {
+            var randomDiceIndex = random.Next(0, 6);
+            currentDiceIcon = diceIcons[randomDiceIndex];
+            Console.WriteLine($"Animation step {i + 1}: showing {currentDiceIcon}");
+            StateHasChanged();
+            await Task.Delay(stepDuration);
+        }
+        
+        // Final dice value
+        var finalDiceIndex = random.Next(0, 6);
+        currentDiceIcon = diceIcons[finalDiceIndex];
+        isRolling = false;
+        Console.WriteLine($"Dice roll finished: final result {currentDiceIcon}");
+        StateHasChanged();
+    }
+
+    // Credit popup methods
+    private void ShowCreditPopup()
+    {
+        Console.WriteLine("КРЕДИТ button clicked!");
+        Console.WriteLine("Opening credit popup");
+        showCreditPopup = true;
+        StateHasChanged();
+        Console.WriteLine($"showCreditPopup is now: {showCreditPopup}");
+    }
+    
+    private void CloseCreditPopup()
+    {
+        Console.WriteLine("Closing credit popup");
+        showCreditPopup = false;
+        StateHasChanged();
+    }
+    
+    private void TakeLoan()
+    {
+        int loanAmount = selectedLoanAmount * 1000;
+        Console.WriteLine($"Loan taken: £{loanAmount}");
+        savings += loanAmount;
+        showCreditPopup = false;
+        StateHasChanged();
+    }
+    
+    // Expenses popup methods
+    private void ShowExpensesPopup()
+    {
+        Console.WriteLine("МИТТЄВІ ВИТРАТИ tile clicked!");
+        Console.WriteLine("Opening expenses popup");
+        showExpensesPopup = true;
+        StateHasChanged();
+    }
+    
+    private void CloseExpensesPopup()
+    {
+        Console.WriteLine("Closing expenses popup");
+        showExpensesPopup = false;
+        StateHasChanged();
+    }
+    
+    private void PayExpense()
+    {
+        Console.WriteLine("Paying expense: £10");
+        savings -= 10; // Deduct 10 pounds
+        if (savings < 0) savings = 0; // Prevent negative savings
+        Console.WriteLine($"New savings: £{savings}");
+        StateHasChanged();
+    }
+    
+    // Blood debt popup methods
+    private void ShowBloodDebtPopup()
+    {
+        Console.WriteLine("КРОВНИЙ БОРГ tile clicked!");
+        Console.WriteLine("Opening blood debt popup");
+        showBloodDebtPopup = true;
+        StateHasChanged();
+    }
+    
+    private void CloseBloodDebtPopup()
+    {
+        Console.WriteLine("Closing blood debt popup");
+        showBloodDebtPopup = false;
+        StateHasChanged();
+    }
+    
+    private void AddBloodDebt()
+    {
+        Console.WriteLine("Adding blood debt: £15 monthly expense");
+        cashFlow -= 15; // Reduce cash flow by 15 pounds monthly
+        Console.WriteLine($"New cash flow: £{cashFlow}");
+        StateHasChanged();
+    }
+    
+    // Unemployment popup methods
+    private void ShowUnemploymentPopup()
+    {
+        Console.WriteLine("ЗВІЛЬНЕННЯ tile clicked!");
+        Console.WriteLine("Opening unemployment popup");
+        showUnemploymentPopup = true;
+        StateHasChanged();
+    }
+    
+    private void CloseUnemploymentPopup()
+    {
+        Console.WriteLine("Closing unemployment popup");
+        showUnemploymentPopup = false;
+        StateHasChanged();
+    }
+    
+    private void HandleUnemployment()
+    {
+        Console.WriteLine("Handling unemployment: paying bills and skipping 2 turns");
+        // Pay bills - reduce savings significantly
+        savings -= 100; // Pay bills
+        if (savings < 0) savings = 0; // Prevent negative savings
+        
+        // Skip 2 turns logic would be implemented here
+        // For now, just log the action
+        Console.WriteLine($"Bills paid. New savings: £{savings}. Player should skip 2 turns.");
+        StateHasChanged();
+    }
+    
+    // Salary popup methods
+    private void ShowSalaryPopup()
+    {
+        Console.WriteLine("ВИПЛАТА tile clicked!");
+        Console.WriteLine("Opening salary popup");
+        showSalaryPopup = true;
+        StateHasChanged();
+    }
+    
+    private void CloseSalaryPopup()
+    {
+        Console.WriteLine("Closing salary popup");
+        showSalaryPopup = false;
+        StateHasChanged();
+    }
+    
+    private void ProcessSalary()
+    {
+        Console.WriteLine("Processing salary payment");
+        savings += 950; // Add salary to savings
+        Console.WriteLine($"Salary received. New savings: £{savings}");
+        StateHasChanged();
+    }
+    
+    // Market popup methods
+    private void ShowMarketPopup()
+    {
+        Console.WriteLine("РИНОК tile clicked!");
+        Console.WriteLine("Opening market crisis popup");
+        showMarketPopup = true;
+        StateHasChanged();
+    }
+    
+    private void CloseMarketPopup()
+    {
+        Console.WriteLine("Closing market popup");
+        showMarketPopup = false;
+        StateHasChanged();
+    }
+    
+    private void ProcessMarketCrisis()
+    {
+        Console.WriteLine("Processing market crisis: halving bar income");
+        // Reduce bar income from £100 to £50 in cash flow
+        cashFlow -= 50; // Halve the bar income (from £100 to £50)
+        Console.WriteLine($"Bar income halved. New cash flow: £{cashFlow}");
+        StateHasChanged();
+    }
+    
+    // Deal popup methods
+    private void ShowDealPopup()
+    {
+        Console.WriteLine("УГОДА tile clicked!");
+        Console.WriteLine("Opening deal popup");
+        showDealPopup = true;
+        StateHasChanged();
+    }
+    
+    private void CloseDealPopup()
+    {
+        Console.WriteLine("Closing deal popup");
+        showDealPopup = false;
+        StateHasChanged();
+    }
+    
+    private void ProcessDeal(DealPopupInfo deal)
+    {
+        Console.WriteLine($"Processing deal: {deal.Description}");
+        
+        // Update savings and cash flow
+        savings -= deal.DownPay;
+        cashFlow += deal.CashFlow;
+        
+        // Check if this is a big deal (based on cost)
+        if (deal.Cost >= 10000)
+        {
+            playerBigDeals[currentPlayer]++;
+            Console.WriteLine($"Big deal completed! Player {currentPlayer} now has {playerBigDeals[currentPlayer]} big deals.");
+            
+            // Check win condition
+            if (playerBigDeals[currentPlayer] >= 3)
+            {
+                winningPlayer = currentPlayer;
+                showWinPopup = true;
+                Console.WriteLine($"Player {currentPlayer} wins with 3 big deals!");
+            }
+        }
+        
+        Console.WriteLine($"Deal processed. New savings: £{savings}, New cash flow: £{cashFlow}, Debt incurred: £{deal.Debt}");
+        StateHasChanged();
+    }
+    
+    // Player selection methods
+    private void SelectPlayer(PlayerType playerType)
+    {
+        Console.WriteLine($"Player {playerType} selected!");
+        currentPlayer = playerType;
+        
+        // Update neeple selection status for all tiles
+        UpdateNeepleSelection();
+        
+        StateHasChanged();
+    }
+
+    private List<(PlayerType player, bool isSelected)> GetTileNeeples(int tileNumber)
+    {
+        return tileNeeples.ContainsKey(tileNumber) ? tileNeeples[tileNumber] : new List<(PlayerType, bool)>();
+    }
+
+    private void HandleTileClick(int tileNumber)
+    {
+        Console.WriteLine($"Tile {tileNumber} clicked!");
+        
+        // Remove current player from all tiles
+        foreach (var tile in tileNeeples.Keys.ToList())
+        {
+            tileNeeples[tile].RemoveAll(n => n.player == currentPlayer);
+        }
+        
+        // Add current player to the clicked tile
+        if (!tileNeeples.ContainsKey(tileNumber))
+        {
+            tileNeeples[tileNumber] = new List<(PlayerType, bool)>();
+        }
+        tileNeeples[tileNumber].Add((currentPlayer, true));
+        
+        // Update selection status for all neeples
+        UpdateNeepleSelection();
+        
+        // Trigger appropriate popup based on tile type
+        switch (tileNumber)
+        {
+            case 1:
+            case 4:
+            case 7:
+                ShowDealPopup();
+                break;
+            case 2:
+            case 9:
+                ShowSalaryPopup();
+                break;
+            case 3:
+            case 10:
+            case 12:
+                ShowExpensesPopup();
+                break;
+            case 5:
+            case 11:
+                ShowMarketPopup();
+                break;
+            case 6:
+                ShowBloodDebtPopup();
+                break;
+            case 8:
+                ShowUnemploymentPopup();
+                break;
+        }
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateNeepleSelection()
+    {
+        foreach (var tile in tileNeeples.Keys.ToList())
+        {
+            for (int i = 0; i < tileNeeples[tile].Count; i++)
+            {
+                var neeple = tileNeeples[tile][i];
+                tileNeeples[tile][i] = (neeple.player, neeple.player == currentPlayer);
+            }
+        }
+    }
+    
+    // Win popup methods
+    private void CloseWinPopup()
+    {
+        showWinPopup = false;
+        StateHasChanged();
+    }
+    
+    private void HandleWinWow()
+    {
+        Console.WriteLine("WOW button clicked! Resetting game and navigating to root.");
+        
+        // Reset game state
+        ResetGameState();
+        
+        // Navigate to root page
+        Navigation.NavigateTo("/");
+    }
+    
+    private void ResetGameState()
+    {
+        // Reset all neeples to tile 1
+        foreach (var tile in tileNeeples.Keys.ToList())
+        {
+            tileNeeples[tile].Clear();
+        }
+        tileNeeples[1] = new List<(PlayerType, bool)> 
+        { 
+            (PlayerType.Player1, false), 
+            (PlayerType.Player2, true), 
+            (PlayerType.Player3, false) 
+        };
+        
+        // Reset big deal counters
+        foreach (var player in playerBigDeals.Keys.ToList())
+        {
+            playerBigDeals[player] = 0;
+        }
+        
+        // Reset current player
+        currentPlayer = PlayerType.Player2;
+        
+        // Close all popups
+        showWinPopup = false;
+        showCreditPopup = false;
+        showExpensesPopup = false;
+        showBloodDebtPopup = false;
+        showUnemploymentPopup = false;
+        showSalaryPopup = false;
+        showMarketPopup = false;
+        showDealPopup = false;
+        
+        Console.WriteLine("Game state reset to initial values.");
+    }
+
+    // Navigation methods
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

@@ -21,6 +21,11 @@ namespace PeakyFlow.Infrastructure.Redis
         private readonly RedisCollection<TModel> _redisCollection;
         private readonly IMapper _mapper;
 
+        public Task Init()
+        {
+            return Task.CompletedTask;
+        }
+
         public RedisRepository(RedisConnectionProvider provider, IMapper mapper, ILogger<RedisRepository<T, TModel>> logger)
         {
             _redisProvider = provider;
@@ -172,8 +177,8 @@ namespace PeakyFlow.Infrastructure.Redis
                 initialExpression = initialExpression.Where(_mapper.Map<Expression<Func<TModel, bool>>>(where.Filter));
             }
 
-            return _mapper.Map<List<T>>(await initialExpression.Skip(specification.Skip ?? 0)
-                .Take(specification.Take ?? MaxTake).ToListAsync());
+            return _mapper.Map<List<T>>((await initialExpression.ToListAsync()).Skip(specification.Skip ?? 0)
+                .Take(specification.Take ?? MaxTake));
         }
 
         public async Task<List<TResult>> ListAsync<TResult>(ISpecification<T, TResult> specification, CancellationToken cancellationToken = default)

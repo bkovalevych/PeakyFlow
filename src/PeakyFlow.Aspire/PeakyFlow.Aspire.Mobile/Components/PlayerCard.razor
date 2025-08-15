@@ -1,0 +1,45 @@
+<div class="player-card @GetPlayerClass()" @onclick="HandlePlayerClick">
+    <div class="player-avatar">
+        <img src="@ImagePath" alt="@Name" />
+        @if (IsTakingTurn)
+        {
+            <div class="turn-indicator">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        }
+    </div>
+    <div class="player-name">@Name</div>
+    <div class="progress-container">
+        <div class="progress-bar" style="width: @(Percentage)%;"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+    [Parameter] public string ImagePath { get; set; } = string.Empty;
+    [Parameter] public int Percentage { get; set; } = 0;
+    [Parameter] public PlayerType Type { get; set; } = PlayerType.Player1;
+    [Parameter] public bool IsTakingTurn { get; set; } = false;
+    [Parameter] public EventCallback<PlayerType> OnPlayerClick { get; set; }
+
+    private async Task HandlePlayerClick()
+    {
+        if (OnPlayerClick.HasDelegate)
+        {
+            await OnPlayerClick.InvokeAsync(Type);
+        }
+    }
+
+    private string GetPlayerClass()
+    {
+        var baseClass = Type switch
+        {
+            PlayerType.Player1 => "player1",
+            PlayerType.Player2 => "player2",
+            PlayerType.Player3 => "player3",
+            _ => "player1"
+        };
+        
+        return IsTakingTurn ? $"{baseClass} taking-turn" : baseClass;
+    }
+}

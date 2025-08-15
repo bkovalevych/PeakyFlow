@@ -1,0 +1,50 @@
+﻿@page "/lobbies"
+@attribute [StreamRendering(true)]
+
+@inject LobbyRpcServiceClient LobbyService;
+
+<PageTitle>Lobbies</PageTitle>
+
+<h1>Lobbies</h1>
+
+<p>Get ready to join the game</p>
+
+@if (lobbies == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Created</th>
+                <th>Name</th>
+                <th>Players</th>
+                <th>Is public</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lobby in lobbies)
+            {
+                <tr>
+                    <td>@lobby.Created.ToDateTime().ToShortDateString()</td>
+                    <td>@lobby.Name</td>
+                    <td>@lobby.PlayersNumber / @lobby.TeamSize</td>
+                    <td>@lobby.IsPublic</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private LobbyItem[]? lobbies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lobbies = (await LobbyService.ListLobbiesAsync(new ListLobbyMessage() { PaginationSkip = 0, PaginationCount = 100}))
+        .Lobbies
+        .ToArray();
+    }
+}

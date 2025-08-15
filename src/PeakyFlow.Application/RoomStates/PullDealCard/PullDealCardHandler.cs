@@ -22,6 +22,7 @@ namespace PeakyFlow.Application.RoomStates.PullDealCard
 
         public async Task<Result<Card>> Handle(PullDealCardCommand request, CancellationToken cancellationToken)
         {
+            await _roomStateRepository.Init();
             var cardRule = await _cardRepository.FirstOrDefaultAsync(new FirstOrDefaultCardRuleSpecification(), cancellationToken);
 
             if (cardRule == null)

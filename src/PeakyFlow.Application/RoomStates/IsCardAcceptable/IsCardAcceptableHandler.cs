@@ -20,6 +20,7 @@ namespace PeakyFlow.Application.RoomStates.IsCardAcceptable
 
         public async Task<Result<IsCardAcceptableResponse>> Handle(IsCardAcceptableQuery request, CancellationToken cancellationToken)
         {
+            await _roomStateRepository.Init();
             var cardRule = await _gameCardRuleRepository.FirstOrDefaultAsync(new FirstOrDefaultCardRuleSpecification(), cancellationToken);
 
             if (cardRule == null)

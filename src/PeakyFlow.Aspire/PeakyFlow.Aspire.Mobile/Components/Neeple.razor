@@ -1,0 +1,24 @@
+@using PeakyFlow.Aspire.Mobile.Models
+
+<div class="neeple @GetPlayerClass() @(IsSelected ? "selected" : "")">
+    <div class="neeple-inner">
+        <i class="fas fa-user"></i>
+    </div>
+</div>
+
+@code {
+    [Parameter] public PlayerType Player { get; set; } = PlayerType.Player1;
+    [Parameter] public bool IsSelected { get; set; } = false;
+
+    private string GetPlayerClass()
+    {
+        return Player switch
+        {
+            PlayerType.Player1 => "player1",
+            PlayerType.Player2 => "player2", 
+            PlayerType.Player3 => "player3",
+            PlayerType.Player4 => "player4",
+            _ => "player1"
+        };
+    }
+}

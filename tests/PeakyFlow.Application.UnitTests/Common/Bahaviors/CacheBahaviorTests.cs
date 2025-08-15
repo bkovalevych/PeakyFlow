@@ -8,6 +8,7 @@ using PeakyFlow.Application.Common.Extensions;
 using PeakyFlow.Application.Common.Interfaces;
 using PeakyFlow.Application.LobbyGame.Create;
 using PeakyFlow.Application.LobbyGame.List;
+using System.Reflection;
 
 namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
 {
@@ -50,6 +51,7 @@ namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
 
             var provider = services
                 .AddApplication()
+                .AddAutoMapper(Assembly.GetAssembly(typeof(DependencyInjection)))
                 .AddTransient(typeof(IRepository<Lobby>), x => fakeRepository.Object)
                 .AddTransient(x => fakeDateProvider.Object)
                 .AddTransient(x => fakeCacheSevice.Object)
@@ -108,6 +110,7 @@ namespace PeakyFlow.Application.UnitTests.Common.Bahaviors
 
             var provider = services
                 .AddApplication()
+                .AddAutoMapper(Assembly.GetAssembly(typeof(DependencyInjection)))
                 .AddTransient(typeof(IRepository<Lobby>), x => fakeRepository.Object)
                 .AddTransient(x => fakeDateProvider.Object)
                 .AddTransient(x => fakeCacheSevice.Object)

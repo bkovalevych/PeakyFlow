@@ -1,0 +1,146 @@
+/* Deal Popup Styles - Blue Theme */
+.deal-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 139, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.deal-popup-content {
+    background-color: #1a1a2a;
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    color: #ffffff;
+    text-align: center;
+    border: 2px solid #4169E1;
+    box-shadow: 0 10px 30px rgba(0, 0, 139, 0.5);
+    animation: popupFadeIn 0.3s ease-out;
+}
+
+.deal-popup-content h2 {
+    color: #87CEEB;
+    margin-bottom: 20px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 139, 0.3);
+}
+
+.deal-description {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(0, 0, 139, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 139, 0.3);
+}
+
+.deal-description p {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.deal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.deal-button {
+    background: linear-gradient(135deg, #4169E1, #6495ED);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 139, 0.3);
+}
+
+.deal-button:hover {
+    background: linear-gradient(135deg, #6495ED, #4169E1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 139, 0.4);
+}
+
+.deal-details {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.deal-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+}
+
+.deal-item:last-child {
+    border-bottom: none;
+}
+
+.deal-item .amount {
+    font-weight: bold;
+}
+
+.deal-item .amount.positive {
+    color: #90EE90;
+}
+
+.deal-item .amount.negative {
+    color: #FF6B6B;
+}
+
+.deal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.deal-cancel-button {
+    background: linear-gradient(135deg, #666, #888);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.deal-cancel-button:hover {
+    background: linear-gradient(135deg, #888, #666);
+    transform: translateY(-1px);
+}
+
+.deal-accept-button {
+    background: linear-gradient(135deg, #4169E1, #6495ED);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 139, 0.3);
+}
+
+.deal-accept-button:hover {
+    background: linear-gradient(135deg, #6495ED, #4169E1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 139, 0.4);
+}

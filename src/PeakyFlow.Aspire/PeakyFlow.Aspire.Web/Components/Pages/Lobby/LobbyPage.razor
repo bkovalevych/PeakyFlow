@@ -1,0 +1,117 @@
+﻿@page "/Lobby"
+@using PeakyFlow.Aspire.Web.Components.Services
+@inject JoinLobbyService JoinLobbyService
+@implements IDisposable
+
+<h3>LobbyPage</h3>
+
+@if (Lobby == null)
+{
+	<div>Loading..</div>
+}
+else if (Lobby != null && Player != null) {
+	<div>Lobby @Lobby.Name</div>
+	<small>LobbyId: @Lobby.Id</small>
+	<RadzenStack>
+		<RadzenColumn>
+			<RadzenCheckBox TValue="bool" Change="OnPlayerIsReadyChange" Name="PlayerIsReadyCheckbox" />
+			<RadzenLabel Component="PlayerIsReadyCheckbox" Text="Confirm that you are ready" />
+		</RadzenColumn>
+	</RadzenStack>
+
+	<ul>
+		@foreach(var item in Lobby.Players)
+		{
+			<li>@item.Name @(item.IsOwner ? "Owner" : "")@(item.Id == Player?.Id ? " (you)" : "") @(item.IsReady ? "is ready" : "is not ready")</li>
+		}
+	</ul>
+}
+
+@code {
+	public LobbyMsg? Lobby;
+	public LobbyPlayerMsg? Player;
+
+	private async Task OnPlayerIsReadyChange(bool val)
+	{
+		await JoinLobbyService.SetMeAsReady(val);
+	}
+
+	protected override void OnInitialized()
+	{
+		JoinLobbyService.OnLobbyEvent += OnLobbyEvent;
+	}
+
+	private void OnLobbyEvent(LobbyEvent lobbyEvent)
+	{
+		switch(lobbyEvent.ReasonCase)
+		{
+			case LobbyEvent.ReasonOneofCase.PlayerIsReadyId:
+				PlayerIsReady(lobbyEvent.PlayerIsReadyId, true);
+				break;
+			case LobbyEvent.ReasonOneofCase.PlayerIsNotReadyId:
+				PlayerIsReady(lobbyEvent.PlayerIsNotReadyId, false);
+				break;
+			case LobbyEvent.ReasonOneofCase.PlayerLeftId:
+				PlayerLeft(lobbyEvent.PlayerLeftId);
+				break;
+			case LobbyEvent.ReasonOneofCase.PlayerJoined:
+				PlayerJoined(lobbyEvent.PlayerJoined);
+				break;
+		}
+	}
+
+	private void PlayerJoined(PlayerJoinedToLobbyMessage p)
+	{
+		var player = new LobbyPlayerMsg()
+		{
+			Id = p.PlayerId,
+			LobbyId = p.LobbyId,
+			Name = p.PlayerName
+		};
+
+		Lobby?.Players.Add(player);
+	}
+
+	private void PlayerIsReady(string playerId, bool isReady)
+	{
+		var player = Lobby?.Players.FirstOrDefault(x => x.Id == playerId);
+
+		if (player != null)
+		{
+			player.IsReady = isReady;
+		}
+	}
+
+	private void PlayerLeft(string playerId)
+	{
+		var player = Lobby?.Players.FirstOrDefault(x => x.Id == playerId);
+
+		if (player != null)
+		{
+			Lobby?.Players.Remove(player);
+		}
+	}
+
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (!firstRender)
+		{
+			return;
+		}
+
+		await JoinLobbyService.OnInit();
+		Lobby = JoinLobbyService.Lobby;
+		Player = JoinLobbyService.Player;
+		JoinLobbyService.SubscribeOnLobbyEvents();
+		StateHasChanged();
+	}
+
+	public void Dispose()
+	{
+		JoinLobbyService.OnLobbyEvent -= OnLobbyEvent;
+		JoinLobbyService.Dispose();	
+	}
+}

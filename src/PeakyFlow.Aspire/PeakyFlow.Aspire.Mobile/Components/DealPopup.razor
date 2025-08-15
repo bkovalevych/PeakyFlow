@@ -1,0 +1,97 @@
+@using PeakyFlow.Aspire.Mobile.Models
+
+<div class="deal-popup-overlay" @onclick="OnClose">
+    <div class="deal-popup-content" @onclick:stopPropagation="true">
+        @if (currentStep == DealStep.ChooseSize)
+        {
+            <!-- Step 1: Choose Deal Size -->
+            <h2>УГОДА</h2>
+            <div class="deal-description">
+                <p>Оберіть тип угоди:</p>
+            </div>
+            <div class="deal-buttons">
+                <button class="deal-button small-deal" @onclick="() => SelectDeal(true)">МАЛА УГОДА</button>
+                <button class="deal-button big-deal" @onclick="() => SelectDeal(false)">ВЕЛИКА УГОДА</button>
+            </div>
+        }
+        else
+        {
+            <!-- Step 2: Show Deal Details -->
+            <h2>@(isSmallDeal ? "МАЛА УГОДА" : "ВЕЛИКА УГОДА")</h2>
+            <div class="deal-description">
+                <p>@selectedDeal.Description</p>
+            </div>
+            <div class="deal-details">
+                @if (selectedDeal.DownPay > 0)
+                {
+                    <div class="deal-item">
+                        <span>Перший внесок:</span>
+                        <span class="amount">£@selectedDeal.DownPay</span>
+                    </div>
+                }
+                @if (selectedDeal.Cost > 0)
+                {
+                    <div class="deal-item">
+                        <span>Загальна вартість:</span>
+                        <span class="amount">£@selectedDeal.Cost</span>
+                    </div>
+                }
+                @if (selectedDeal.CashFlow != 0)
+                {
+                    <div class="deal-item">
+                        <span>Щомісячний дохід:</span>
+                        <span class="amount @(selectedDeal.CashFlow > 0 ? "positive" : "negative")">£@selectedDeal.CashFlow</span>
+                    </div>
+                }
+                @if (selectedDeal.Debt > 0)
+                {
+                    <div class="deal-item">
+                        <span>Борг:</span>
+                        <span class="amount negative">£@selectedDeal.Debt</span>
+                    </div>
+                }
+            </div>
+            <div class="deal-footer">
+                <button class="deal-cancel-button" @onclick="OnClose">ВІДМІНИТИ</button>
+                <button class="deal-accept-button" @onclick="AcceptDeal">@selectedDeal.Footer</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public DealPopupInfo SmallDeal { get; set; } = new();
+    [Parameter] public DealPopupInfo BigDeal { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<DealPopupInfo> OnDealAccepted { get; set; }
+
+    private enum DealStep
+    {
+        ChooseSize,
+        ShowDeal
+    }
+
+    private DealStep currentStep = DealStep.ChooseSize;
+    private bool isSmallDeal = true;
+    private DealPopupInfo selectedDeal = new();
+
+    private void SelectDeal(bool small)
+    {
+        isSmallDeal = small;
+        selectedDeal = small ? SmallDeal : BigDeal;
+        currentStep = DealStep.ShowDeal;
+        StateHasChanged();
+    }
+
+    private async Task AcceptDeal()
+    {
+        await OnDealAccepted.InvokeAsync(selectedDeal);
+        await OnClose.InvokeAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        currentStep = DealStep.ChooseSize;
+        base.OnInitialized();
+    }
+}

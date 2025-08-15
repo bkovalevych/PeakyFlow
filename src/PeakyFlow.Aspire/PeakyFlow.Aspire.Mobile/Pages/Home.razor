@@ -1,0 +1,21 @@
+@page "/"
+@inject NavigationManager Navigation
+
+<PageTitle>Blood &amp; Balance</PageTitle>
+
+<div class="splash-container">
+    <h1 class="splash-title">BLOOD &amp; BALANCE</h1>
+    <img src="LogoBNB.png" alt="Blood and Balance" class="splash-logo" width="260" height="260" />
+
+    <button class="btn-play" @onclick="GotoProfession">ГРАТИ</button>
+
+    <button class="btn-secondary">ПІДТРИМАТИ</button>
+    <button class="btn-secondary">ПРО НАС</button>
+</div>
+
+@code {
+    private void GotoProfession()
+    {
+        Navigation.NavigateTo("/profession");
+    }
+}

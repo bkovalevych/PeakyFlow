@@ -1,0 +1,37 @@
+﻿@page "/WhatIsYourNamePage"
+@using Blazored.SessionStorage
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%">
+    <RadzenStack>
+        <RadzenText>Pls write your name below</RadzenText>
+    </RadzenStack>
+    <RadzenTemplateForm TItem="string" Data="_name" Submit="OnSubmit">
+        <RadzenStack>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Your Name</RadzenText>
+                    <RadzenTextBox Name="Owner" @bind-Value=@_name />
+				    <RadzenRequiredValidator Component="Owner" Text="Name is required" Style="position: absolute"/>
+				    <RadzenRegexValidator Component="Owner" Pattern="[\da-zA-Z]{3,20}" Text="Name should contain only letters and numbers. Length from 3 to 20" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Flat" Text="Create" Style="width: 120px" />
+            <RadzenButton ButtonType="ButtonType.Button" Click="@((args) => DialogService.Close(new DialogResult()))" Variant="Variant.Flat" Text="Skip for now" Style="width: 120px" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenStack>
+
+@code {
+
+	private string _name = string.Empty;	
+
+	private void OnSubmit(string value)
+	{
+        DialogService.Close(new DialogResult(true, value));
+	}
+
+    public record DialogResult(bool NameCreated = false, string Name = "");
+}
