@@ -38,10 +38,10 @@
 @code {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
-    private void GoBack() => Navigation.NavigateTo("/");
+    private void GoBack() => Navigation.NavigateTo("/PeakyFlow/");
 
     private void StartGame()
     {
-        Navigation.NavigateTo("/game");
+        Navigation.NavigateTo("/PeakyFlow/game");
     }
 }
