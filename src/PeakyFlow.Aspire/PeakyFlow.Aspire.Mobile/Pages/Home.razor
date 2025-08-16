@@ -14,8 +14,10 @@
 </div>
 
 @code {
+    [Inject] private NavigationService NavigationService { get; set; } = default!;
+    
     private void GotoProfession()
     {
-        Navigation.NavigateTo("/PeakyFlow/profession");
+        NavigationService.NavigateTo("/profession");
     }
 }

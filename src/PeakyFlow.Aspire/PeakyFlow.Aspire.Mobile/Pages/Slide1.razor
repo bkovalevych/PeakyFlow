@@ -35,11 +35,11 @@
 </div>
 
 @code {
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private NavigationService NavigationService { get; set; } = default!;
 
     private void GoBack()
     {
-        Navigation.NavigateTo("/PeakyFlow/");
+        NavigationService.NavigateTo("/");
     }
 
     private void StartGame()

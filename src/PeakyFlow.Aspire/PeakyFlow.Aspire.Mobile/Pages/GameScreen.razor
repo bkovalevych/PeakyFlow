@@ -237,6 +237,7 @@
 
 @code {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private NavigationService NavigationService { get; set; } = default!;
 
     // Game state
     private int savings = 1250;
@@ -667,7 +668,7 @@
         ResetGameState();
         
         // Navigate to root page
-        Navigation.NavigateTo("/PeakyFlow/");
+        NavigationService.NavigateTo("/");
     }
     
     private void ResetGameState()
@@ -709,6 +710,6 @@
     // Navigation methods
     private void NavigateBack()
     {
-        Navigation.NavigateTo("/PeakyFlow/");
+        NavigationService.NavigateTo("/");
     }
 }
