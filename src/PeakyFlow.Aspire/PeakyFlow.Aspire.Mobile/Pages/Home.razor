@@ -9,15 +9,21 @@
 
     <button class="btn-play" @onclick="GotoProfession">ГРАТИ</button>
 
-    <button class="btn-secondary">ПІДТРИМАТИ</button>
+    <button class="btn-secondary" @onclick="OpenDonationLink">ПІДТРИМАТИ</button>
     <button class="btn-secondary">ПРО НАС</button>
 </div>
 
 @code {
     [Inject] private NavigationService NavigationService { get; set; } = default!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     
     private void GotoProfession()
     {
         NavigationService.NavigateTo("/profession");
+    }
+    
+    private async Task OpenDonationLink()
+    {
+        await JSRuntime.InvokeVoidAsync("open", "https://send.monobank.ua/jar/7tFXD9ivHu", "_blank");
     }
 }

@@ -158,6 +158,11 @@ html, body {
   color: var(--color-text);
   border: none;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
 }
 
 /* Default colors */
