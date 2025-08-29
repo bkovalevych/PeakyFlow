@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+# OPTION 1: Use Google Cloud project (Recommended)
+# project_id = "peaky-flow-solution"
+
+# OPTION 2: Use existing Firebase project  
+# project_id = "peaky-flow"
+
+# Your Google Cloud Project ID (choose one from above)
+project_id = "peaky-flow-solution"
+
+# Google Cloud region (optional, defaults to us-central1)
+region = "us-central1"
+
+# Firebase Hosting site ID (optional, defaults to peakyflow)
+site_id = "peakyflow"
