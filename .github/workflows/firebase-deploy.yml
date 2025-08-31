@@ -3,8 +3,6 @@ name: Deploy to Firebase Hosting
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build_and_deploy:
@@ -21,8 +19,32 @@ jobs:
         run: dotnet restore
         working-directory: ./src/PeakyFlow.Aspire/PeakyFlow.Aspire.Mobile
 
-      - name: Build
-        run: dotnet publish -c Release -o published
+      - name: Build and Publish
+        run: |
+          # Show current directory structure
+          echo "Current directory:"
+          pwd
+          ls -la
+          
+          # Publish the app
+          dotnet publish -c Release -o ./publish-output
+          
+          # Show published files
+          echo "Published files in publish-output:"
+          find ./publish-output -type f
+          
+          # Create deployment directory
+          mkdir -p /tmp/firebase-deploy
+          
+          # Copy all published files (including subdirectories)
+          cp -r ./publish-output/. /tmp/firebase-deploy/
+          
+          # Ensure we have the firebase.json in the deployment directory
+          cp $GITHUB_WORKSPACE/firebase.json /tmp/firebase-deploy/
+          
+          # Verify deployment files
+          echo "\nDeployment files:"
+          find /tmp/firebase-deploy -type f
         working-directory: ./src/PeakyFlow.Aspire/PeakyFlow.Aspire.Mobile
 
       - name: Install Firebase CLI
@@ -32,6 +54,13 @@ jobs:
 
       - name: Deploy to Firebase
         run: |
+          # Move to deployment directory
+          cd /tmp/firebase-deploy
+          
+          # Verify files are in place
+          echo "Files in deployment directory:"
+          ls -la
+          
+          # Deploy to Firebase
           firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_TOKEN }}"
           firebase deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}"
-        working-directory: ./src/PeakyFlow.Aspire/PeakyFlow.Aspire.Mobile
