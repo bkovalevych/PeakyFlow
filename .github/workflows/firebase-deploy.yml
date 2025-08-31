@@ -23,12 +23,18 @@ jobs:
 
       - name: Build and Publish
         run: |
+          dotnet publish -c Release -o ./publish-output
           mkdir -p published
-          dotnet publish -c Release -o ./published
+          cp -r publish-output/wwwroot/. published/wwwroot/
+          cp firebase.json published/
         working-directory: ./src/PeakyFlow.Aspire/PeakyFlow.Aspire.Mobile
 
       - name: Verify published files
-        run: ls -la published/wwwroot
+        run: |
+          echo "Published files in publish-output:"
+          ls -la publish-output/
+          echo "\nCopied files in published:"
+          ls -la published/
         working-directory: ./src/PeakyFlow.Aspire/PeakyFlow.Aspire.Mobile
 
       - name: Install Firebase CLI
@@ -40,4 +46,4 @@ jobs:
         run: |
           firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_TOKEN }}"
           firebase deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}"
-        working-directory: .
+        working-directory: ./src/PeakyFlow.Aspire/PeakyFlow.Aspire.Mobile/published
