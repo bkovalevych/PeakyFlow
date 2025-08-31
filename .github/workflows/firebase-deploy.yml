@@ -38,10 +38,10 @@ jobs:
           # Create deployment directory
           mkdir -p /tmp/firebase-deploy
           
-          # Copy published files
-          cp -r ./publish-output/wwwroot/. /tmp/firebase-deploy/
+          # Copy all published files (including subdirectories)
+          cp -r ./publish-output/. /tmp/firebase-deploy/
           
-          # Copy firebase.json from repository root
+          # Ensure we have the firebase.json in the deployment directory
           cp $GITHUB_WORKSPACE/firebase.json /tmp/firebase-deploy/
           
           # Verify deployment files
